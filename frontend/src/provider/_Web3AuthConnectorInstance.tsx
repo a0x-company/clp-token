@@ -13,7 +13,7 @@ export const web3AuthNetwork =
 export const clientId =
   process.env.NODE_ENV === "development"
     ? "BPqYQP85hVS7ya9Fb_CLkrIInUtQz9qboZKXGPydYKukgfmQo1hcGYZD-JpxFyjqwFDl4P93-j8nuZNv1Zaf9Bg"
-    : (process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID as string);
+    : "BA6lY_quEYRV11dPULYx6_wP2EaEF41EV_CYxs8s4X8c-SLQeVi9bh1JP1h-heDyjsgSxSNXPVA3Z5ObfmoMljs";
 
 export default function Web3AuthConnectorInstance(chains: Chain[]) {
   // Create Web3Auth Instance
