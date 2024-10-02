@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { KYCStatus } from "@/components/onboarding/OnboardingUI";
 
 // web3auth
-import { useWeb3Auth } from "@web3auth/no-modal-react-hooks";
+import { web3AuthInstance } from "@/provider/WagmiConfig";
 
 // components
 import {
@@ -34,6 +34,7 @@ import { CalendarIcon } from "lucide-react";
 
 // tailwindcss
 import { cn } from "@/lib/utils";
+import { UserInfo } from "@web3auth/base";
 
 interface KYCSynapsisProps {
   sessionId: string | null;
@@ -85,7 +86,15 @@ const KYCSynapsis = ({
 
   const birthDate = watch("personalInfo.dob");
 
-  const { userInfo } = useWeb3Auth();
+  const [userInfo, setUserInfo] = useState<Partial<UserInfo> | null>(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const info = await web3AuthInstance.getUserInfo();
+      setUserInfo(info);
+    };
+    fetchUserInfo();
+  }, []);
 
   useEffect(() => {
     if (userInfo && userInfo.email) {

@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 // react
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 // web3auth
-import { useWeb3Auth } from "@web3auth/no-modal-react-hooks";
+import { web3AuthInstance } from "@/provider/WagmiConfig";
 
 // context
 import { useUserStore } from "@/context/global-store";
@@ -23,6 +23,7 @@ import ConnectWithGoogle from "@/components/onboarding/ConnectWithGoogle";
 import { BadgeCheck } from "lucide-react";
 import Pride from "react-canvas-confetti/dist/presets/pride";
 import { TConductorInstance } from "react-canvas-confetti/dist/types";
+import { UserInfo } from "@web3auth/base";
 
 enum OnboardingStep {
   SignIn,
@@ -46,10 +47,24 @@ interface OnboardingUIProps {
 }
 
 export default function OnboardingUI({ kycStatus }: OnboardingUIProps) {
-  const { isConnected, userInfo, isInitialized } = useWeb3Auth();
   const [step, setStep] = useState<OnboardingStep>(OnboardingStep.SignIn);
   const [kycStatusState, setKycStatusState] = useState(kycStatus.status);
   const [sessionId, setSessionId] = useState(kycStatus.sessionId);
+
+  const [userInfo, setUserInfo] = useState<Partial<UserInfo> | null>(null);
+
+  console.log(userInfo, web3AuthInstance.status, web3AuthInstance.connected);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const info = await web3AuthInstance.getUserInfo();
+      setUserInfo(info);
+    };
+
+    if (web3AuthInstance.connected) {
+      fetchUserInfo();
+    }
+  }, [web3AuthInstance.connected]);
 
   /* Confetti */
   const [conductor1, setConductor1] = useState<TConductorInstance>();
@@ -78,7 +93,7 @@ export default function OnboardingUI({ kycStatus }: OnboardingUIProps) {
   }, [kycStatus.status, kycStatus.sessionId]);
 
   useEffect(() => {
-    if (isConnected && isInitialized && userInfo && kycStatusState) {
+    if (web3AuthInstance.connected && kycStatusState) {
       console.log(kycStatusState);
       if (
         kycStatusState === KYCStatus.APPROVED ||
@@ -92,9 +107,7 @@ export default function OnboardingUI({ kycStatus }: OnboardingUIProps) {
       }
     }
   }, [
-    isConnected,
-    isInitialized,
-    userInfo,
+    web3AuthInstance.connected,
     kycStatusState,
     conductor1,
     conductor2,
@@ -162,9 +175,9 @@ export default function OnboardingUI({ kycStatus }: OnboardingUIProps) {
   };
 
   return (
-    <main className="bg-zinc-100 flex flex-col items-center justify-center min-h-screen">
+    <main className="bg-foreground flex flex-col items-center justify-center min-h-screen">
       {/* Progress bar */}
-      <div className="max-w-md w-full h-2 bg-zinc-200 rounded-full mt-20">
+      <div className="max-w-md w-full h-2 bg-secondary rounded-full mt-20">
         <div
           className="h-full bg-black rounded-t-full transition-all duration-300 ease-in-out"
           style={{ width: `${((step + 1) / 3) * 100}%` }}

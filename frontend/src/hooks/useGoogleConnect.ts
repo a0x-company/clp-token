@@ -1,15 +1,15 @@
 // react
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // web3auth
-import { useWeb3Auth } from "@web3auth/no-modal-react-hooks";
+import { web3AuthInstance } from "@/provider/WagmiConfig";
 import { WALLET_ADAPTERS } from "@web3auth/base";
 
 // wagmi
-import { useAccount } from "wagmi";
+import { useAccount, Connector, useConnect } from "wagmi";
 
 // next
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 // axios
 import axios from "axios";
@@ -23,27 +23,18 @@ import crypto from "crypto";
 export const useGoogleConnect = () => {
   const { address } = useAccount();
   const { setUser } = useUserStore();
-  const { connectTo, isConnected, userInfo, init, isInitialized, provider } =
-    useWeb3Auth();
+  const { connect, connectors } = useConnect();
   const [loadingUser, setLoadingUser] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    const initialize = async () => {
-      await init();
-    };
-    if (!isInitialized) {
-      initialize();
-    }
-  }, [init, isInitialized]);
-
-  useEffect(() => {
     const checkUserInfo = async () => {
       setLoadingUser(true);
-      if (isConnected && isInitialized && provider) {
+      if (web3AuthInstance.connected) {
+        const userInfo = await web3AuthInstance.getUserInfo();
         const idToken = userInfo?.idToken;
-        const publicKey = await provider?.request({
+        const publicKey = await web3AuthInstance.provider?.request({
           method: "eth_private_key",
         });
 
@@ -88,20 +79,28 @@ export const useGoogleConnect = () => {
     };
 
     checkUserInfo();
-  }, [
-    isConnected,
-    address,
-    setUser,
-    userInfo,
-    router,
-    isInitialized,
-    provider,
-    pathname,
-  ]);
+  }, [address, setUser, router, pathname, web3AuthInstance.connected]);
 
   const handleConnect = async () => {
-    await connectTo(WALLET_ADAPTERS.OPENLOGIN, { loginProvider: "google" });
+    // await web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
+    //   loginProvider: "google",
+    // });
+    const connector = connectors[0];
+    try {
+      connect({ connector });
+    } catch (err) {
+      console.error("Error connecting to Google:", err);
+    }
   };
 
-  return { isConnected, loadingUser, handleConnect };
+  const handleDisconnect = async () => {
+    await web3AuthInstance.logout();
+  };
+
+  return {
+    isConnected: web3AuthInstance.connected,
+    loadingUser,
+    handleConnect,
+    handleDisconnect,
+  };
 };

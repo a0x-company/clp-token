@@ -22,11 +22,11 @@ const ConnectWithGoogle: React.FC<ConnectWithGoogleProps> = () => {
   const { isConnected, loadingUser, handleConnect } = useGoogleConnect();
 
   return (
-    <section className="bg-background text-black flex items-center justify-center max-w-md w-full">
+    <section className="bg-gray-300 rounded-b-lg text-black flex items-center justify-center max-w-md w-full">
       <div className="gap-4 flex flex-col items-center w-full">
         {loadingUser && (
           <Button
-            className="bg-white text-black/50 text-lg rounded-[10px] py-[15px] w-full"
+            className=" text-black/50 text-lg rounded-[10px] py-[15px] w-full"
             size="lg"
             disabled
           >
@@ -36,7 +36,7 @@ const ConnectWithGoogle: React.FC<ConnectWithGoogleProps> = () => {
         )}
         {!isConnected && (
           <Button
-            className="bg-white text-black/50 text-lg rounded-t-0 rounded-b-[10px] py-[15px] hover:bg-white/90 w-full"
+            className=" text-black/50 text-lg rounded-t-0 rounded-b-[10px] py-[15px] hover:bg-white/90 w-full"
             size="lg"
             onClick={handleConnect}
           >

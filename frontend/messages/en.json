@@ -1,0 +1,9 @@
+{
+  "navbar": {
+    "login": "Login",
+    "stableCoin": "Stable Coin",
+    "earnWithPesos": "Earn with Pesos",
+    "aboutUs": "About Us",
+    "reserve": "Reserve"
+  }
+}
