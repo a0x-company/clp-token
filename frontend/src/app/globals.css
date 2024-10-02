@@ -25,3 +25,26 @@ body {
     text-wrap: balance;
   }
 }
+
+@layer base {
+  @font-face {
+    font-family: "Helvetica";
+    font-weight: 500;
+    font-style: normal;
+    src: url("/fonts/Helvetica.ttf") format("ttf");
+  }
+
+  @font-face {
+    font-family: "Helvetica";
+    font-weight: 700;
+    font-style: normal;
+    src: url("/fonts/Helvetica-Bold.ttf") format("ttf");
+  }
+
+  @font-face {
+    font-family: "Romaben";
+    font-weight: 500;
+    font-style: normal;
+    src: url("/fonts/Romaben-Regular.ttf") format("ttf");
+  }
+}
