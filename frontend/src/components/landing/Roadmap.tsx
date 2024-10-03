@@ -51,7 +51,7 @@ const Quarter = ({
 const Roadmap: React.FC = () => {
   const t = useTranslations("landing.roadmap");
   return (
-    <section className="min-h-screen flex items-start justify-start bg-brand-orange-pastel py-16 px-32 relative overflow-hidden gap-16">
+    <section className="min-h-screen flex items-start justify-start -mt-56 bg-brand-orange-pastel py-16 px-16 xl:px-32 relative overflow-hidden gap-16">
       <div className="flex flex-col flex-1 items-start gap-[160px]">
         <h2 className="text-[64px] font-romaben text-white">{t("title")}</h2>
 

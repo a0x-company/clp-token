@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 const DepositSection: React.FC = () => {
   const t = useTranslations("landing");
   return (
-    <section className="flex items-center justify-center relative px-32 pt-[48px] pb-[120px] gap-16">
+    <section className="flex items-center justify-center relative px-16 xl:px-32 pt-[48px] pb-[120px] gap-16">
       <div className="flex flex-col flex-1 gap-4">
         <div className="bg-black text-white rounded-xl p-4 flex justify-between items-center w-full">
           <div>
@@ -54,7 +54,7 @@ const DepositSection: React.FC = () => {
           alt="Divider"
           width={1080}
           height={7}
-          className="absolute right-1/2 translate-x-1/2 -bottom-[calc(7px/2)]"
+          className="absolute right-1/2 translate-x-1/2 -bottom-[calc(7px/2)] max-[1280px]:w-[980px]"
         />
       </div>
     </section>
