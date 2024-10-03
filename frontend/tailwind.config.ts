@@ -23,6 +23,8 @@ const config: Config = {
         foreground: "var(--foreground)",
         brand: {
           blue: "#0267FF",
+          "blue-dark": "#0033A0",
+          "orange-pastel": "#EF5D52",
         },
       },
       fontFamily: {
@@ -31,6 +33,7 @@ const config: Config = {
       },
       boxShadow: {
         brutalist: "4px 4px 0px 0px rgba(0,0,0,1)",
+        "brutalist-sm": "2px 2px 0px 0px rgba(0,0,0,1)",
       },
     },
   },
