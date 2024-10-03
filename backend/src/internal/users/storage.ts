@@ -22,17 +22,19 @@ export class UserDataStorage {
     return this.firestore.collection(this.userCollectionName);
   }
 
-  public async addNewUser(userData: StoredUserData): Promise<void> {
+  public async addNewUser(userData: StoredUserData): Promise<StoredUserData> {
     try {
       const existingUser = await this.getUser({ address: userData.address });
       if (existingUser) {
-        throw new Error("User with this address already exists");
-      }
+        return existingUser; 
+            }
 
       await this.userCollection.doc(userData.address).set(userData);
       console.log(
         `✅ New user with address ${userData.address} added successfully`
       );
+      return userData;
+
     } catch (err: unknown) {
       if (err instanceof Error) {
         throw new Error(

@@ -58,8 +58,14 @@ export class UserService {
     await this.storage.updateUserData(this.publicKeyToAddress(decodedToken.wallets[0].public_key), updatedData);
   }
 
-  public async getUser(param: { address?: string; email?: string }): Promise<StoredUserData | null> {
-    return await this.storage.getUser(param);
+  public async getUser(param: { address?: string; email?: string; token?: string }): Promise<StoredUserData | null> {
+    if (param.token) {
+      const decodedToken = this.decodeToken(param.token);
+      const address = this.publicKeyToAddress(decodedToken.wallets[0].public_key);
+      return await this.storage.getUser({ address });
+    } else {
+      return await this.storage.getUser(param);
+    }
   }
 
   public getAddressFromToken(token: string): string {
