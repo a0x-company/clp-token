@@ -11,7 +11,22 @@ import axios from 'axios';
 // ethers
 import { ethers } from 'ethers';
 
-// ABI simplificado para la función totalSupply
+// recharts
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+
+interface ReserveData {
+  balance: number;
+  timestamp: number;
+}
+
 const ABI = [
   {
     constant: true,
@@ -26,6 +41,8 @@ export default function Reserve() {
   const [bankBalance, setBankBalance] = useState<number | null>(null);
   const [tokenSupply, setTokenSupply] = useState<string | null>(null);
   const [isMatching, setIsMatching] = useState<boolean | null>(null);
+
+  const [reserveData, setReserveData] = useState<ReserveData[]>([]);
 
   useEffect(() => {
     const fetchBankBalance = async () => {
@@ -57,8 +74,25 @@ export default function Reserve() {
       }
     };
 
+    const fetchReserveData = async () => {
+      try {
+        const response = await axios.get(
+          'https://development-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/history?period=week',
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'api-key': 'a0xkey85vu5yu%1*',
+            },
+          }
+        );
+        setReserveData(response.data.balanceHistory);
+      } catch (error) {
+        console.error('Error al obtener los datos de reserva:', error);
+      }
+    };
+
     const fetchData = async () => {
-      await Promise.all([fetchBankBalance(), fetchTokenSupply()]);
+      await Promise.all([fetchBankBalance(), fetchTokenSupply(), fetchReserveData()]);
       setIsMatching(bankBalance === parseFloat(tokenSupply || '0'));
     };
 
@@ -66,13 +100,27 @@ export default function Reserve() {
     const interval = setInterval(fetchData, 60000);
 
     return () => clearInterval(interval);
-  }, [bankBalance, tokenSupply]);
+  }, [bankBalance, tokenSupply, reserveData]);
 
   const boxStyle = 'border-2 border-black rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-8';
 
+  const processedReserveData = reserveData
+    .filter((_, index) => index % 12 === 0)
+    .map((item) => ({
+      ...item,
+      date: new Date(item.timestamp).toLocaleDateString('es-ES', {
+        month: 'short',
+        day: 'numeric',
+      }),
+      time: new Date(item.timestamp).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    }));
+
   return (
-    <div className="min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-gray-100">
-      <main className="max-w-4xl mx-auto">
+    <main className="max-w-4xl mx-auto">
+      <div className="min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-gray-100">
         <h1 className="text-4xl font-bold mb-8 text-center font-helvetica">Reserva CLPa</h1>
 
         <div className={`${boxStyle} mb-12 flex flex-col md:flex-row items-start`}>
@@ -167,6 +215,7 @@ export default function Reserve() {
             </div>
           </div>
         </div>
+
         {isMatching !== null && (
           <div
             className={`mt-8 ${boxStyle} ${isMatching ? 'bg-green-300' : 'bg-red-300'} text-center`}
@@ -176,7 +225,64 @@ export default function Reserve() {
             </p>
           </div>
         )}
-      </main>
-    </div>
+
+        <div className={`mt-12 ${boxStyle}`}>
+          <h2 className="text-2xl font-semibold mb-6 font-romaben text-center">
+            Historial del balance en la cuenta de reserva
+          </h2>
+          <div className="balance-history-chart w-full h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={processedReserveData}
+                margin={{
+                  top: 5,
+                  right: 5,
+                  left: 5,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fill: '#666', fontSize: 12 }}
+                  tickLine={{ stroke: '#666' }}
+                />
+                <YAxis
+                  tick={{ fill: '#666', fontSize: 12 }}
+                  tickLine={{ stroke: '#666' }}
+                  tickFormatter={(value) => `$${value.toLocaleString('es-ES')}`}
+                />
+
+                <Tooltip
+                  formatter={(value) => [`$${(value as number).toLocaleString('es-ES')}`, 'Saldo']}
+                  labelFormatter={(label, payload) => {
+                    if (payload && payload.length > 0) {
+                      return `${payload[0].payload.date} ${payload[0].payload.time}`;
+                    }
+                    return label;
+                  }}
+                  labelStyle={{ color: '#666' }}
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '10px',
+                  }}
+                />
+
+                <Line
+                  type="monotone"
+                  dataKey="balance"
+                  stroke="#0000FF"
+                  strokeWidth={3}
+                  dot={false}
+                  activeDot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
