@@ -5,20 +5,24 @@ import "forge-std/Script.sol";
 import "../src/ACLP.sol";
 
 contract DeployACLP is Script {
+    // Address to receive the tokens
+    address public receiver = 0x1234567890123456789012345678901234567890;
+
     function run() external {
-        // Dirección del receptor de tokens
-        address receiver = payable(0xd806A01E295386ef7a7Cea0B9DA037B242622743);
+        // Read private key or account from environment variables
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-        // Inicia la transacción de despliegue
-        vm.startBroadcast();
+        // Start broadcasting the transaction
+        vm.startBroadcast(deployerPrivateKey);
 
-        // Desplegar el contrato ACLP
+        // Deploy the ACLP contract
         ACLP aclp = new ACLP(receiver);
 
-        // Finaliza la transacción
-        vm.stopBroadcast();
+        // Log the deployed contract address
+        console.log("ACLP contract deployed at:", address(aclp));
 
-        // Log del contrato desplegado
-        console.log("ACLP deployed at:", address(aclp));
+        // Stop broadcasting
+        vm.stopBroadcast();
     }
+
 }

@@ -6,21 +6,22 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
 
-// Contrato principal de CLPCoin que hereda de ERC20, Ownable y ChainlinkClient
+// Main contract for ACLP that inherits from ERC20, Ownable, and FunctionsClient
 contract ACLP is ERC20, Ownable, FunctionsClient {
     using FunctionsRequest for FunctionsRequest.Request;
 
-    // Variables para almacenar el último request ID y balance
+    // Variables to store the last request ID and balance
     bytes32 public s_lastRequestId;
     bytes public s_lastResponse;
     bytes public s_lastError;
     uint256 public vaultBalance;
     uint64 public subscriptionId;
 
-    // Error customizado
+    // Custom error
     error UnexpectedRequestID(bytes32 requestId);
+    error MintConditionNotMet(uint256 balance, uint256 totalSupply, uint256 mintAmount);
 
-    // Evento para registrar respuestas
+    // Event to log responses
     event Response(
         bytes32 indexed requestId,
         uint256 balance,
@@ -28,29 +29,29 @@ contract ACLP is ERC20, Ownable, FunctionsClient {
         bytes err
     );
 
-    // Variables para almacenar el mint pendiente
+    // Variables to store pending mint amounts and users
     uint256 private pendingMintAmount;
     address private pendingUser;
 
-    // Variables para almacenar los usuarios y montos pendientes en el mintBatch
+    // Variables to store pending users and amounts in mintBatch
     address[] private pendingUsers;
     uint256[] private pendingAmounts;
 
-    // Eventos
+    // Events
     event Requestbalance(bytes32 indexed requestId, uint256 balance);
 
-    // Dirección que recibirá los tokens durante el retiro o la revocación
+    // Address that will receive tokens
     address public receiver;
 
-    // Mappings para agentes autorizados, cuentas congeladas, y cuentas en lista negra
+    // Mappings for authorized agents, frozen accounts, and blacklisted accounts
     mapping(address => bool) public agents;
     mapping(address => bool) public frozenAccounts;
     mapping(address => bool) public blacklisted;
 
-    // Variable para bloquear todas las transferencias
+    // Variable to block all transfers
     bool public freezeAll;
 
-    // Eventos adicionales para diferentes acciones
+    // Additional events for different actions
     event TokensMinted(address indexed agent, address indexed user, uint256 amount);
     event BatchMintCompleted(address[] users, uint256[] amounts, uint256 totalAmount);
     event RedeemExecuted(address indexed user, uint256 amount, address receiver);
@@ -61,11 +62,17 @@ contract ACLP is ERC20, Ownable, FunctionsClient {
     event AccountRemovedFromBlacklist(address indexed user);
     event TokensRevoked(address indexed user, uint256 amount, address receiver);
     event ForceTransferExecuted(address indexed from, address indexed to, uint256 amount);
+    event AllTokensFrozen();
+    event AllTokensUnfrozen();
+    event AddAgent();
+    event RemoveAgent();
+    event SetsubscriptionID();
+    event SetReceiver();
     
-    // Dirección del router - Hardcoded para Sepolia (cambiar según la red)
+    // Router address
     address router = 0xf9B8fc078197181C841c296C876945aaa425B278;
 
-    // Código JavaScript fuente para hacer la solicitud a la API Vault
+    // JavaScript source code to make the request to the Vault API
     string source =
         "const apiResponse = await Functions.makeHttpRequest({"
         "url: 'https://development-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/storage',"
@@ -76,72 +83,79 @@ contract ACLP is ERC20, Ownable, FunctionsClient {
         "const balance = parseInt(data.balance, 10);"
         "return Functions.encodeUint256(balance);";
 
-    // Límite de gas para el callback
+    // Gas limit for the callback
     uint32 gasLimit = 300000;
 
-    // donID - Hardcoded para Sepolia
+    // donID
     bytes32 donID =
         0x66756e2d626173652d7365706f6c69612d310000000000000000000000000000;
 
-    // Constructor para inicializar el contrato y definir el receptor
-    constructor(address _receiver) FunctionsClient(router) ERC20("ACLP", "ACLP") Ownable(msg.sender) {}
+    // Constructor to initialize the contract and define the receiver
+    constructor(address _receiver) FunctionsClient(router) ERC20("ACLP", "ACLP") Ownable(msg.sender) {
+        require(_receiver != address(0), "Receiver cannot be the zero address");
+        receiver = _receiver;
+    }
 
-    // Modificador para restringir el acceso solo a agentes autorizados
+    // Modifier to restrict access to authorized agents
     modifier onlyAgent() {
         require(agents[msg.sender], "Only agents can execute this function");
         _;
     }
 
-    // Modificador para verificar si la cuenta está congelada o en lista negra
+    // Modifier to check if the account is frozen or blacklisted
     modifier notFrozenOrBlacklisted(address _from, address _to) {
         require(!freezeAll, "All transfers are frozen");
-        require(!frozenAccounts[_from], "Account is frozen");
+        require(!frozenAccounts[_from], "Sender is frozen");
+        require(!frozenAccounts[_to], "Recipient is frozen");
         require(!blacklisted[_from], "Sender is blacklisted");
         require(!blacklisted[_to], "Recipient is blacklisted");
         _;
     }
 
-    // Cambiar de valor a subscriptionId
-    function setSubscriptionId(uint64 _subscriptionId) external onlyOwner{
+
+    // Change the value of subscriptionId
+    function setSubscriptionId(uint64 _subscriptionId) external onlyAgent {
         subscriptionId = _subscriptionId;
+        emit SetsubscriptionID();
     }
 
-    // Función para agregar agentes autorizados
+    // Function to add authorized agents
     function addAgent(address agent) external onlyOwner {
         agents[agent] = true;
+        emit AddAgent();
     }
 
-    // Función para eliminar agentes autorizados
+    // Function to remove authorized agents
     function removeAgent(address agent) external onlyOwner {
         agents[agent] = false;
+        emit RemoveAgent();
     }
 
     // Función para que los agentes puedan mintear tokens
     function mint(address user, uint256 amount) external onlyAgent {
-        pendingMintAmount = amount;  // Almacenar la cantidad pendiente de mint
-        pendingUser = user;  // Almacenar el usuario pendiente
-        sendRequest(subscriptionId);  // Llamar a la función para obtener el balance
+        pendingMintAmount = amount;  // Store the pending mint amount
+        pendingUser = user;  // Store the pending user
+        sendRequest(subscriptionId);  // Call the function to get the balance
     }
 
     // Función para mintear tokens en lote para múltiples usuarios
     function mintBatch(address[] calldata users, uint256[] calldata amounts) external onlyAgent {
         require(users.length == amounts.length, "Users and amounts length mismatch");
-
-        pendingUsers = users;  // Almacenar usuarios pendientes
-        pendingAmounts = amounts;  // Almacenar cantidades pendientes
-        sendRequest(subscriptionId);  // Iniciar la solicitud de balance
+        pendingUsers = users;  // Store the pending users
+        pendingAmounts = amounts;  // Store the pending amounts
+        sendRequest(subscriptionId);  // Start the balance request
     }
 
-    // Función para enviar una solicitud para obtener el balance del Vault
+    // Function to send a request to get the Vault balance
     function sendRequest(
         uint64 _subscriptionId
-    ) public onlyOwner returns (bytes32 requestId) {
+    ) public onlyAgent returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(source);
 
         s_lastRequestId = _sendRequest(
             req.encodeCBOR(),
-            _subscriptionId, // Usar la nueva variable
+            _subscriptionId,
             gasLimit,
             donID
         );
@@ -149,70 +163,69 @@ contract ACLP is ERC20, Ownable, FunctionsClient {
         return s_lastRequestId;
     }
 
-
-    // Función callback para manejar la respuesta
+    // Function callback to handle the response
     function fulfillRequest(
         bytes32 requestId,
         bytes memory response,
         bytes memory err
     ) internal override {
         if (s_lastRequestId != requestId) {
-            revert UnexpectedRequestID(requestId); // Verificar que los IDs coincidan
+            revert UnexpectedRequestID(requestId); // Check that the IDs match
         }
-        // Actualizar el balance recibido
+        // Update the received balance
         s_lastResponse = response;
         s_lastError = err;
         vaultBalance = abi.decode(response, (uint256));
         uint256 balance = vaultBalance * 10 **18;
 
-        // Emitir un evento con la respuesta
+        // Emit an event with the response
         emit Response(requestId, vaultBalance, s_lastResponse, s_lastError);
 
-        // Si se trata de un mintBatch
+        // If it's a mintBatch
         if (pendingUsers.length > 0) {
             uint256 totalMintAmount = 0;
             for (uint256 i = 0; i < pendingAmounts.length; i++) {
                 totalMintAmount += pendingAmounts[i];
             }
 
-            // Verificar si el balance es igual a totalSupply() + totalMintAmount
+            // Check if the balance is equal to totalSupply() + totalMintAmount
             if (balance == (totalSupply() + totalMintAmount)) {
                 for (uint256 i = 0; i < pendingUsers.length; i++) {
-                    _mint(pendingUsers[i], pendingAmounts[i]);  // Realizar mint a cada usuario
-                    emit TokensMinted(msg.sender, pendingUsers[i], pendingAmounts[i]);  // Emitir evento
+                    _mint(pendingUsers[i], pendingAmounts[i]);  // Mint to each user
+                    emit TokensMinted(msg.sender, pendingUsers[i], pendingAmounts[i]);  // Emit event
                 }
-                emit BatchMintCompleted(pendingUsers, pendingAmounts, totalMintAmount);  // Evento de mint en lote
+                emit BatchMintCompleted(pendingUsers, pendingAmounts, totalMintAmount);  // Event of batch mint
             } else {
-                revert("Mint batch condition not met, balance mismatch");
+                revert MintConditionNotMet(balance, totalSupply(), pendingMintAmount);
             }
 
-            // Reiniciar variables temporales
+            // Reset temporary variables
             delete pendingUsers;
             delete pendingAmounts;
         }
-        // Si se trata de un mint simple
+        // If it's a simple mint
         else if (pendingMintAmount > 0) {
             if (balance == (totalSupply() + pendingMintAmount)) {
-                _mint(pendingUser, pendingMintAmount);  // Realizar mint
-                emit TokensMinted(msg.sender, pendingUser, pendingMintAmount);  // Emitir evento
+                _mint(pendingUser, pendingMintAmount);  // Mint
+                emit TokensMinted(msg.sender, pendingUser, pendingMintAmount);  // Emit event
             } else {
-                revert("Mint condition not met, balance mismatch");
+                revert MintConditionNotMet(balance, totalSupply(), pendingMintAmount);
             }
 
-            // Reiniciar variables
+            // Reset variables
             pendingMintAmount = 0;
             pendingUser = address(0);
         }
     }
 
-    // Función para transferencias forzadas de tokens
-    function forceTransfer(address from, address to, uint256 amount) external onlyAgent {
+    // Function for forced transfers of tokens
+    function forceTransfer(address from, address to, uint256 amount) external onlyAgent notFrozenOrBlacklisted(msg.sender, receiver) {
         require(balanceOf(from) >= amount, "Source address does not have enough tokens");
         _transfer(from, to, amount);
         emit ForceTransferExecuted(from, to, amount);
     }
 
-    // Función de redención de tokens
+    // Function to redeem tokens
     function redeem(uint256 amount) external notFrozenOrBlacklisted(msg.sender, receiver) {
         require(balanceOf(msg.sender) >= amount, "Not enough tokens to redeem");
         _transfer(msg.sender, receiver, amount);
@@ -221,7 +234,7 @@ contract ACLP is ERC20, Ownable, FunctionsClient {
         emit RedeemExecuted(msg.sender, amount, receiver);
     }
 
-    // Funciones para congelar cuentas específicas y desbloquearlas
+    // Functions to freeze specific accounts and unfreeze them
     function freezeAccount(address user) external onlyAgent {
         frozenAccounts[user] = true;
         emit AccountFrozen(user);
@@ -232,16 +245,18 @@ contract ACLP is ERC20, Ownable, FunctionsClient {
         emit AccountUnfrozen(user);
     }
 
-    // Funciones para congelar o desbloquear todas las cuentas
+    // Functions to freeze or unfreeze all accounts
     function freezeAllTokens() external onlyAgent {
         freezeAll = true;
+        emit AllTokensFrozen();
     }
 
     function unfreezeAllTokens() external onlyAgent {
         freezeAll = false;
+        emit AllTokensUnfrozen();
     }
 
-    // Funciones para añadir o quitar usuarios de la lista negra
+    // Functions to add or remove users from the blacklist
     function blacklist(address user) external onlyAgent {
         blacklisted[user] = true;
         emit AccountBlacklisted(user);
@@ -252,14 +267,14 @@ contract ACLP is ERC20, Ownable, FunctionsClient {
         emit AccountRemovedFromBlacklist(user);
     }
 
-    // Función para revocar tokens de cuentas congeladas
+    // Function to revoke tokens from frozen accounts
     function revoke(address user, uint256 amount) external onlyAgent {
         require(frozenAccounts[user], "Account is not frozen");
         _transfer(user, receiver, amount);
         emit TokensRevoked(user, amount, receiver);
     }
 
-    // Sobrescribe las funciones de transferencia para aplicar restricciones
+    // Overrides the transfer functions to apply restrictions
     function transfer(address recipient, uint256 amount) public override notFrozenOrBlacklisted(msg.sender, recipient) returns (bool) {
         return super.transfer(recipient, amount);
     }
@@ -268,8 +283,9 @@ contract ACLP is ERC20, Ownable, FunctionsClient {
         return super.transferFrom(sender, recipient, amount);
     }
 
-    // Función para cambiar la dirección del receptor
-    function setReceiver(address _receiver) external onlyOwner {
+    // Function to change the receiver address
+    function setReceiver(address _receiver) external onlyAgent {
         receiver = _receiver;
+        emit SetReceiver();
     }
 }
