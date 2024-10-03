@@ -1,0 +1,25 @@
+{
+  "entry": [
+    "src/**/*.ts"
+  ],
+  "project": "tsconfig.json",
+  "ignore": [
+    "node_modules/**",
+    "dist/**",
+    "coverage/**",
+    "jest.config.js",
+    "tsconfig.json"
+  ],
+  "ignoreDependencies": [
+    "@types/jest",
+    "ts-unused-exports",
+    "raw-loader",
+    "ts-loader",
+    "request",
+    "ts-node",
+    "tsconfig-paths"
+  ],
+  "ignoreBinaries": [
+    "gcloud"
+  ]
+}
