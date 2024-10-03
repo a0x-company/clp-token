@@ -102,10 +102,11 @@ export default function Reserve() {
     return () => clearInterval(interval);
   }, [bankBalance, tokenSupply, reserveData]);
 
-  const boxStyle = 'border-2 border-black rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-8';
+  const boxStyle =
+    'border-2 border-black rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-2 sm:p-8';
 
   const processedReserveData = reserveData
-    .filter((_, index) => index % 12 === 0)
+    .filter((item) => item.balance > 0)
     .map((item) => ({
       ...item,
       date: new Date(item.timestamp).toLocaleDateString('es-ES', {
@@ -121,8 +122,6 @@ export default function Reserve() {
   return (
     <main className="max-w-4xl mx-auto">
       <div className="min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-gray-100">
-        <h1 className="text-4xl font-bold mb-8 text-center font-helvetica">Reserva CLPa</h1>
-
         <div className={`${boxStyle} mb-12 flex flex-col md:flex-row items-start`}>
           <div className="md:w-1/2 pr-8">
             <h2 className="text-3xl font-bold mb-6 text-left font-romaben">
@@ -162,9 +161,7 @@ export default function Reserve() {
 
         <div className="grid gap-8 md:grid-cols-2">
           <div className={`${boxStyle} text-center`}>
-            <h2 className="text-2xl font-semibold mb-4 font-romaben">
-              Valor en la cuenta del banco
-            </h2>
+            <h2 className="text-2xl font-semibold mb-4 font-romaben">Cuenta del banco</h2>
             {bankBalance !== null ? (
               <p className="text-5xl font-bold text-black font-helvetica">
                 $
@@ -230,6 +227,7 @@ export default function Reserve() {
           <h2 className="text-2xl font-semibold mb-6 font-romaben text-center">
             Historial del balance en la cuenta de reserva
           </h2>
+
           <div className="balance-history-chart w-full h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
