@@ -179,7 +179,7 @@ export default function Reserve() {
                 alt="Banco Santander Logo"
                 width={50}
                 height={50}
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 rounded-full border-2 border-black"
               />
               <p className="ml-2 text-sm text-gray-600 font-romaben">
                 Cuenta en Banco Santander Chile
@@ -204,7 +204,7 @@ export default function Reserve() {
                 alt="Base Network Logo"
                 width={50}
                 height={50}
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 rounded-full border-2 border-black"
               />
               <p className="ml-2 text-sm text-gray-600 font-helvetica">
                 Token deployado en la red de Base
