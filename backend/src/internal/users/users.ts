@@ -30,7 +30,7 @@ export class UserService {
     return decodedToken;
   }
 
-  public async saveUser(token: string): Promise<void> {
+  public async saveUser(token: string): Promise<StoredUserData> {
     const decodedToken = this.decodeToken(token);
     const userData: StoredUserData = {
       address: this.publicKeyToAddress(decodedToken.wallets[0].public_key),
@@ -41,8 +41,8 @@ export class UserService {
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
-
-    await this.storage.addNewUser(userData);
+  
+    return await this.storage.addNewUser(userData);
   }
 
   public async updateUser(token: string): Promise<void> {

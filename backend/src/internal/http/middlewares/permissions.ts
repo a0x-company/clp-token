@@ -25,7 +25,7 @@ export const Permission = async (req: RequestWithApiKey, res: Response, next: Ne
 
   if (apiKey != API_KEY) {
     return res.status(401).send({
-      error: "the api key entered does not exist in a0x services",
+      error: "the api key entered does not exist in clpa services",
     });
   }
 

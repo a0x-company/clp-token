@@ -16,6 +16,7 @@ function stopProgram(envKey: string) {
 export function validateRequiredEnvs() {
   if (!PROJECT_ID) stopProgram("PROJECT_ID");
   if (!API_KEY) stopProgram("API_KEY");
+  if (!DATABASE_ENV) stopProgram("DATABASE_ENV");
 }
 
 export function validateVaultApiEnvs() {

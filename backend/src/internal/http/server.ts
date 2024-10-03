@@ -33,7 +33,7 @@ export function createServer(): Express {
   server.use(bodyParser.json());
   server.use(express.json());
 
-  // a0x authentication
+  // clpa authentication
   server.use(middleware.Permission);
   server.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
