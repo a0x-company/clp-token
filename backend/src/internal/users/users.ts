@@ -1,28 +1,43 @@
 import jwt from 'jsonwebtoken';
+import { keccak256 } from 'js-sha3';
 import { UserDataStorage, StoredUserData } from './storage';
 
-export class User {
-  private token: string;
-  private decodedToken: any;
+export class UserService {
   private storage: UserDataStorage;
 
-  constructor(token: string, storage: UserDataStorage) {
-    this.token = token;
-    this.decodedToken = jwt.decode(token);
+  constructor(storage: UserDataStorage) {
     this.storage = storage;
-
-    if (!this.decodedToken) {
-      throw new Error("Invalid token");
-    }
   }
 
-  public async save(): Promise<void> {
+  private publicKeyToAddress(publicKey: string): string {
+    const cleanPublicKey = publicKey.startsWith('0x') ? publicKey.slice(2) : publicKey;
+    
+    if (cleanPublicKey.length !== 128) {
+      throw new Error('La clave pública debe tener 64 bytes');
+    }
+    
+    const hash = keccak256(Buffer.from(cleanPublicKey, 'hex'));
+    const address = '0x' + hash.slice(-40);
+    
+    return address.toLowerCase();
+  }
+
+  private decodeToken(token: string): any {
+    const decodedToken = jwt.decode(token);
+    if (!decodedToken) {
+      throw new Error("Token inválido");
+    }
+    return decodedToken;
+  }
+
+  public async saveUser(token: string): Promise<void> {
+    const decodedToken = this.decodeToken(token);
     const userData: StoredUserData = {
-      address: this.decodedToken.wallets[0].public_key,
-      email: this.decodedToken.email,
-      name: this.decodedToken.name,
-      profileImage: this.decodedToken.profileImage,
-      token: this.token,
+      address: this.publicKeyToAddress(decodedToken.wallets[0].public_key),
+      email: decodedToken.email,
+      name: decodedToken.name,
+      profileImage: decodedToken.profileImage,
+      token: token,
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
@@ -30,39 +45,25 @@ export class User {
     await this.storage.addNewUser(userData);
   }
 
-  public async update(): Promise<void> {
+  public async updateUser(token: string): Promise<void> {
+    const decodedToken = this.decodeToken(token);
     const updatedData: Partial<StoredUserData> = {
-      email: this.decodedToken.email,
-      name: this.decodedToken.name,
-      profileImage: this.decodedToken.profileImage,
-      token: this.token,
+      email: decodedToken.email,
+      name: decodedToken.name,
+      profileImage: decodedToken.profileImage,
+      token: token,
       updatedAt: Date.now(),
     };
 
-    await this.storage.updateUserData(this.decodedToken.wallets[0].public_key, updatedData);
+    await this.storage.updateUserData(this.publicKeyToAddress(decodedToken.wallets[0].public_key), updatedData);
   }
 
-  public static async getUser(storage: UserDataStorage, param: { address?: string; email?: string }): Promise<User | null> {
-    const userData = await storage.getUser(param);
-    if (userData) {
-      return new User(userData.token, storage);
-    }
-    return null;
+  public async getUser(param: { address?: string; email?: string }): Promise<StoredUserData | null> {
+    return await this.storage.getUser(param);
   }
 
-  public getAddress(): string {
-    return this.decodedToken.wallets[0].public_key;
-  }
-
-  public getEmail(): string {
-    return this.decodedToken.email;
-  }
-
-  public getName(): string {
-    return this.decodedToken.name;
-  }
-
-  public getProfileImage(): string {
-    return this.decodedToken.profileImage;
+  public getAddressFromToken(token: string): string {
+    const decodedToken = this.decodeToken(token);
+    return this.publicKeyToAddress(decodedToken.wallets[0].public_key);
   }
 }

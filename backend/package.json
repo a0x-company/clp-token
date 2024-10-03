@@ -59,6 +59,7 @@
     "cors": "^2.8.5",
     "ethers": "^6.13.2",
     "express": "^4.21.0",
+    "js-sha3": "^0.9.3",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.0",
