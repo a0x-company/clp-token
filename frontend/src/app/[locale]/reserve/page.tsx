@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 // next
-import Image from 'next/image';
+import Image from "next/image";
 
 // http client
-import axios from 'axios';
+import axios from "axios";
 
 // ethers
-import { ethers } from 'ethers';
+import { ethers } from "ethers";
 
 // recharts
 import {
@@ -20,7 +20,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 
 interface ReserveData {
   balance: number;
@@ -31,9 +31,9 @@ const ABI = [
   {
     constant: true,
     inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', type: 'uint256' }],
-    type: 'function',
+    name: "totalSupply",
+    outputs: [{ name: "", type: "uint256" }],
+    type: "function",
   },
 ];
 
@@ -48,52 +48,52 @@ export default function Reserve() {
     const fetchBankBalance = async () => {
       try {
         const response = await axios.get(
-          'https://development-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/storage'
+          "https://development-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/storage"
         );
         setBankBalance(response.data.balance);
       } catch (error) {
-        console.error('Error al obtener el balance del banco:', error);
+        console.error("Error al obtener el balance del banco:", error);
       }
     };
 
     const fetchTokenSupply = async () => {
       try {
         const provider = new ethers.providers.JsonRpcProvider(
-          'https://eth-sepolia.public.blastapi.io'
+          "https://eth-sepolia.public.blastapi.io"
         );
-        const contractAddress = '0x28DAab58fFD02cc19A7E4655e1d6766023F5FeAC';
+        const contractAddress = "0x28DAab58fFD02cc19A7E4655e1d6766023F5FeAC";
         const contract = new ethers.Contract(contractAddress, ABI, provider);
 
         const supply = await contract.totalSupply();
         const formattedSupply = ethers.utils.formatUnits(supply, 18);
 
-        console.log('formattedSupply', formattedSupply);
+        console.log("formattedSupply", formattedSupply);
         setTokenSupply(formattedSupply);
       } catch (error) {
-        console.error('Error al obtener el total supply del token:', error);
+        console.error("Error al obtener el total supply del token:", error);
       }
     };
 
     const fetchReserveData = async () => {
       try {
         const response = await axios.get(
-          'https://development-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/history?period=week',
+          "https://development-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/history?period=week",
           {
             headers: {
-              'Content-Type': 'application/json',
-              'api-key': 'a0xkey85vu5yu%1*',
+              "Content-Type": "application/json",
+              "api-key": "a0xkey85vu5yu%1*",
             },
           }
         );
         setReserveData(response.data.balanceHistory);
       } catch (error) {
-        console.error('Error al obtener los datos de reserva:', error);
+        console.error("Error al obtener los datos de reserva:", error);
       }
     };
 
     const fetchData = async () => {
       await Promise.all([fetchBankBalance(), fetchTokenSupply(), fetchReserveData()]);
-      setIsMatching(bankBalance === parseFloat(tokenSupply || '0'));
+      setIsMatching(bankBalance === parseFloat(tokenSupply || "0"));
     };
 
     fetchData();
@@ -103,19 +103,19 @@ export default function Reserve() {
   }, [bankBalance, tokenSupply, reserveData]);
 
   const boxStyle =
-    'border-2 border-black rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-2 sm:p-8';
+    "border-2 border-black rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-2 sm:p-8";
 
   const processedReserveData = reserveData
     .filter((item) => item.balance > 0)
     .map((item) => ({
       ...item,
-      date: new Date(item.timestamp).toLocaleDateString('es-ES', {
-        month: 'short',
-        day: 'numeric',
+      date: new Date(item.timestamp).toLocaleDateString("es-ES", {
+        month: "short",
+        day: "numeric",
       }),
-      time: new Date(item.timestamp).toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit',
+      time: new Date(item.timestamp).toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
       }),
     }));
 
@@ -165,7 +165,7 @@ export default function Reserve() {
             {bankBalance !== null ? (
               <p className="text-5xl font-bold text-black font-helvetica">
                 $
-                {bankBalance.toLocaleString('es-ES', {
+                {bankBalance.toLocaleString("es-ES", {
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0,
                 })}
@@ -190,7 +190,7 @@ export default function Reserve() {
             <h2 className="text-2xl font-semibold mb-4 font-romaben">Cantidad de tokens CLPa</h2>
             {tokenSupply !== null ? (
               <p className="text-5xl font-bold text-blue-600 font-helvetica">
-                {parseFloat(tokenSupply).toLocaleString('es-ES', {
+                {parseFloat(tokenSupply).toLocaleString("es-ES", {
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0,
                 })}
@@ -215,10 +215,10 @@ export default function Reserve() {
 
         {isMatching !== null && (
           <div
-            className={`mt-8 ${boxStyle} ${isMatching ? 'bg-green-300' : 'bg-red-300'} text-center`}
+            className={`mt-8 ${boxStyle} ${isMatching ? "bg-green-300" : "bg-red-300"} text-center`}
           >
             <p className="text-xl font-semibold font-helvetica">
-              {isMatching ? 'Los valores coinciden ✅' : 'Los valores no coinciden ❌'}
+              {isMatching ? "Los valores coinciden ✅" : "Los valores no coinciden ❌"}
             </p>
           </div>
         )}
@@ -242,29 +242,29 @@ export default function Reserve() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
-                  tick={{ fill: '#666', fontSize: 12 }}
-                  tickLine={{ stroke: '#666' }}
+                  tick={{ fill: "#666", fontSize: 12 }}
+                  tickLine={{ stroke: "#666" }}
                 />
                 <YAxis
-                  tick={{ fill: '#666', fontSize: 12 }}
-                  tickLine={{ stroke: '#666' }}
-                  tickFormatter={(value) => `$${value.toLocaleString('es-ES')}`}
+                  tick={{ fill: "#666", fontSize: 12 }}
+                  tickLine={{ stroke: "#666" }}
+                  tickFormatter={(value) => `$${value.toLocaleString("es-ES")}`}
                 />
 
                 <Tooltip
-                  formatter={(value) => [`$${(value as number).toLocaleString('es-ES')}`, 'Saldo']}
+                  formatter={(value) => [`$${(value as number).toLocaleString("es-ES")}`, "Saldo"]}
                   labelFormatter={(label, payload) => {
                     if (payload && payload.length > 0) {
                       return `${payload[0].payload.date} ${payload[0].payload.time}`;
                     }
                     return label;
                   }}
-                  labelStyle={{ color: '#666' }}
+                  labelStyle={{ color: "#666" }}
                   contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    padding: '10px',
+                    backgroundColor: "white",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    padding: "10px",
                   }}
                 />
 

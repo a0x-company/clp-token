@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 // next
-import Image from 'next/image';
+import Image from "next/image";
 
-type NavOption = 'deposit' | 'withdraw' | 'invest' | 'change';
+type NavOption = "deposit" | "withdraw" | "invest" | "change";
 
 const AppNavbar = () => {
-  const [selectedOption, setSelectedOption] = useState<NavOption>('deposit');
+  const [selectedOption, setSelectedOption] = useState<NavOption>("deposit");
 
   const getButtonStyle = (option: NavOption) => {
     const baseStyle =
-      'flex w-[192px] p-[16px] justify-center items-center gap-[8px] rounded-[12px] cursor-pointer transition-all duration-300';
-    const selectedStyle = 'border-[2px] border-black bg-[#FBC1CF]';
-    const unselectedStyle = 'border-[2px] border-transparent hover:border-black';
+      "flex w-[192px] p-[16px] justify-center items-center gap-[8px] rounded-[12px] cursor-pointer transition-all duration-300";
+    const selectedStyle = "border-[2px] border-black bg-[#FBC1CF]";
+    const unselectedStyle = "border-[2px] border-transparent hover:border-black";
 
     return `${baseStyle} ${selectedOption === option ? selectedStyle : unselectedStyle}`;
   };
@@ -26,15 +26,15 @@ const AppNavbar = () => {
       </div>
 
       <div className="flex flex-row p-[16px] items-center gap-[16px] rounded-[12px] border-[2px] border-black">
-        <div className={getButtonStyle('deposit')} onClick={() => setSelectedOption('deposit')}>
+        <div className={getButtonStyle("deposit")} onClick={() => setSelectedOption("deposit")}>
           <p className="text-black text-center font-helvetica text-[24px] font-[700]">Depositar</p>
         </div>
 
-        <div className={getButtonStyle('withdraw')} onClick={() => setSelectedOption('withdraw')}>
+        <div className={getButtonStyle("withdraw")} onClick={() => setSelectedOption("withdraw")}>
           <p className="text-black text-center font-helvetica text-[24px] font-[700]">Retirar</p>
         </div>
 
-        <div className={getButtonStyle('invest')} onClick={() => setSelectedOption('invest')}>
+        <div className={getButtonStyle("invest")} onClick={() => setSelectedOption("invest")}>
           <p className="text-black text-center font-helvetica text-[24px] font-[700]">Invierte</p>
         </div>
 
