@@ -76,7 +76,7 @@ const ChartReserve = ({ activeData }: { activeData: any }) => {
               }}
               label={<span className="text-black">Reserva</span>}
               formatter={(value) => {
-                return [`Reserva $${value}`];
+                return [`Reserva $${value} CLP`];
               }}
             />
             <YAxis
