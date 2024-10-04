@@ -131,16 +131,20 @@ contract ACLP is ERC20, Ownable, FunctionsClient {
         emit RemoveAgent();
     }
 
-    // Función para que los agentes puedan mintear tokens
+    // Function for agents to mint tokens
     function mint(address user, uint256 amount) external onlyAgent {
+        require(!frozenAccounts[user] && !blacklisted[user], "User is frozen or blacklisted");
         pendingMintAmount = amount;  // Store the pending mint amount
         pendingUser = user;  // Store the pending user
         sendRequest(subscriptionId);  // Call the function to get the balance
     }
 
-    // Función para mintear tokens en lote para múltiples usuarios
+    // Function to mint tokens in batch for multiple users
     function mintBatch(address[] calldata users, uint256[] calldata amounts) external onlyAgent {
         require(users.length == amounts.length, "Users and amounts length mismatch");
+        for (uint256 i = 0; i < users.length; i++) {
+            require(!frozenAccounts[users[i]] && !blacklisted[users[i]], "User is frozen or blacklisted");
+        }
         pendingUsers = users;  // Store the pending users
         pendingAmounts = amounts;  // Store the pending amounts
         sendRequest(subscriptionId);  // Start the balance request

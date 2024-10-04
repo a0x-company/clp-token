@@ -6,5 +6,5 @@ remappings = [
     "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
     "@chainlink/contracts/=lib/chainlink/contracts/"
 ]
-
+EVM_VERSION = "shanghai"
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
