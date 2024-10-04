@@ -14,9 +14,19 @@ const config: Config = {
           "50%": { transform: "translateX(-80%)" },
           "100%": { transform: "translateX(80%)" },
         },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
       },
       animation: {
         "infinite-scroll": "infinite-scroll 50s linear infinite",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
       colors: {
         background: "var(--background)",

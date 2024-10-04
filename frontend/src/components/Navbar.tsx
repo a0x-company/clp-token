@@ -31,14 +31,14 @@ const links = [
     href: "/",
     label: "stableCoin",
   },
-  {
-    href: "/earn",
-    label: "earnWithPesos",
-  },
-  {
-    href: "/about",
-    label: "aboutUs",
-  },
+  // {
+  //   href: "/earn",
+  //   label: "earnWithPesos",
+  // },
+  // {
+  //   href: "/about",
+  //   label: "aboutUs",
+  // },
   {
     href: "/reserve",
     label: "reserve",
@@ -55,11 +55,11 @@ const Navbar: React.FC<NavbarProps> = () => {
   const currentLang = pathname.startsWith("/es") ? "es" : "en";
 
   return (
-    <nav className="bg-brand-blue px-6 py-2 lg:px-12 lg:py-4 flex justify-between items-center sticky top-0 z-50 h-auto lg:h-24">
+    <nav className="bg-brand-blue px-6 py-2 lg:px-12 lg:py-4 flex justify-between items-center sticky top-0 z-50 h-auto lg:h-24 max-w-screen">
       {/* Desktop */}
       <div className="hidden md:flex flex-1 space-x-4 items-center justify-evenly font-bold font-helvetica">
         <Link href="/">
-          <Image src="/images/clpa-logo-white.svg" alt="CLPa logo" width={64} height={64} />
+          <Image src="/images/clpa-logo-white.svg" alt="CLPD logo" width={64} height={64} />
         </Link>
         <div className="flex flex-1 space-x-4 items-center justify-evenly font-bold font-helvetica">
           {links.map((link) => (
@@ -82,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = () => {
       {/* Mobile */}
       <div className="md:hidden flex flex-1 justify-between items-center">
         <Link href="/">
-          <Image src="/images/clpa-logo-white.svg" alt="CLPa logo" width={64} height={64} />
+          <Image src="/images/clpa-logo-white.svg" alt="CLPD logo" width={64} height={64} />
         </Link>
 
         <div className="flex items-center gap-2">
@@ -104,10 +104,10 @@ const Navbar: React.FC<NavbarProps> = () => {
                 {links.map((link) => (
                   <Link
                     key={link.href}
-                    href={link.href === "/" ? `/${currentLang}` : `/${currentLang}/${link.href}`}
+                    href={link.href === "/" ? `/${currentLang}` : `/${currentLang}${link.href}`}
                     className={cn(
                       pathname ===
-                        (link.href === "/" ? `/${currentLang}` : `/${currentLang}/${link.href}`)
+                        (link.href === "/" ? `/${currentLang}` : `/${currentLang}${link.href}`)
                         ? currentPathStyle
                         : "text-white text-xl hover:text-blue-200 font-helvetica"
                     )}

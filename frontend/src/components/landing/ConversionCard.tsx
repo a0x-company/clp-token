@@ -18,9 +18,9 @@ const ConversionCard: React.FC = () => {
       <div className="flex justify-center items-center bg-[#E7F1FF] rounded-xl p-4 border-2 border-black gap-4 shadow-brutalist-sm">
         <div className="flex flex-col items-start">
           <span className="font-semibold text-[20px] text-black mr-2">{t("receive")}</span>
-          <span className="font-bold text-[28px] text-black mr-2">1 CLPa</span>
+          <span className="font-bold text-[28px] text-black mr-2">1 CLPD</span>
         </div>
-        <CLPFlag type="CLPa" />
+        <CLPFlag type="CLPD" />
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { baseSepolia, sepolia } from "viem/chains";
 import CLPD_ABI from "@/constants/CLPD-abi.json";
 import { NextResponse } from "next/server";
 
-const contractAddress = "0xbEA4c5A2515A6D9bF4A4175af336663FB8976031";
+export const contractAddress = "0xbEA4c5A2515A6D9bF4A4175af336663FB8976031";
 
 export async function GET(request: Request) {
   console.log("[GET][/api/reserve]");

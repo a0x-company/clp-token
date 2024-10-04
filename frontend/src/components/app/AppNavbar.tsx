@@ -22,7 +22,7 @@ const AppNavbar = () => {
   return (
     <div className="flex flex-row py-[32px] px-[48px] justify-between items-center">
       <div className="w-[169px] content-center items-center gap-[10px]">
-        <Image src="/images/clpa-logo.svg" alt="CLPa logo" width={64} height={64} />
+        <Image src="/images/clpa-logo.svg" alt="CLPD logo" width={64} height={64} />
       </div>
 
       <div className="flex flex-row p-[16px] items-center gap-[16px] rounded-[12px] border-[2px] border-black">

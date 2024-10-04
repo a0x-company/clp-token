@@ -33,11 +33,11 @@ const EarnSection: React.FC = () => {
             <p className="text-xl font-bold">{t("receive")}</p>
             <p className="text-[22px] 2xl:text-[28px] text-brand-blue font-bold flex items-center gap-2">
               <Image src="/images/landing/arrow-vector.svg" alt="Arrow" width={32} height={32} />
-              {t("feeCLPa")}
+              {t("feeCLPD")}
             </p>
           </div>
 
-          <CLPFlag type="CLPa" />
+          <CLPFlag type="CLPD" />
         </div>
       </div>
 
