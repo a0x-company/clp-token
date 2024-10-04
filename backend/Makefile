@@ -70,7 +70,7 @@ deploy: validate-app-name validate-github-username build
 	@echo "[deploy-dev $(APP_NAME)] deploying service in dev mode..."
 	$(eval GITHUB_USERNAME := $(shell git config user.github))
 	$(eval DEPLOY_APP_NAME := development-$(APP_NAME)-$(GITHUB_USERNAME))
-	@docker buildx build --platform linux/amd64,linux/arm64 --build-arg APP_NAME=$(APP_NAME) -t gcr.io/$(PROJECT_ID)/$(DEPLOY_APP_NAME):$(GIT_SHA) -f src/cmd/$(APP_NAME)/Dockerfile . --push
+	@docker buildx build --platform linux/amd64 --build-arg APP_NAME=$(APP_NAME) -t gcr.io/$(PROJECT_ID)/$(DEPLOY_APP_NAME):$(GIT_SHA) -f src/cmd/$(APP_NAME)/Dockerfile . --push
 	@gcloud secrets versions add $(DEPLOY_APP_NAME) --data-file=src/cmd/$(APP_NAME)/.env || gcloud secrets create $(DEPLOY_APP_NAME) --data-file=src/cmd/$(APP_NAME)/.env
 	@gcloud run deploy $(DEPLOY_APP_NAME) \
 		--image gcr.io/$(PROJECT_ID)/$(DEPLOY_APP_NAME):$(GIT_SHA) \

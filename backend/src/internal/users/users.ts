@@ -1,8 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { keccak256 } from 'js-sha3';
+import { ec as EC } from 'elliptic';
 import { UserDataStorage, StoredUserData } from './storage';
 
 export class UserService {
+  private ec = new EC('secp256k1');
+
   private storage: UserDataStorage;
 
   constructor(storage: UserDataStorage) {
@@ -12,11 +15,16 @@ export class UserService {
   private publicKeyToAddress(publicKey: string): string {
     const cleanPublicKey = publicKey.startsWith('0x') ? publicKey.slice(2) : publicKey;
     
-    if (cleanPublicKey.length !== 128) {
-      throw new Error('La clave pública debe tener 64 bytes');
+    let pubKeyPoint;
+    try {
+      pubKeyPoint = this.ec.keyFromPublic(cleanPublicKey, 'hex').getPublic();
+    } catch (error) {
+      console.error('Invalid public key:', error);
+      throw new Error('Invalid public key');
     }
-    
-    const hash = keccak256(Buffer.from(cleanPublicKey, 'hex'));
+
+    const uncompressedPubKey = pubKeyPoint.encode('hex').slice(2); // remove '04' prefix
+    const hash = keccak256(Buffer.from(uncompressedPubKey, 'hex'));
     const address = '0x' + hash.slice(-40);
     
     return address.toLowerCase();
