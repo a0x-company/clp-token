@@ -75,9 +75,7 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
     return () => clearInterval(interval);
   }, [bankBalance, tokenSupply, reserveData]);
 
-  const boxStyle =
-    "border-2 border-black rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-2 sm:p-8";
-
+  const boxStyle = " rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-2 sm:p-8";
   const processedReserveData = reserveData
     .filter((item) => item.balance > 0)
     .map((item) => ({
@@ -91,7 +89,6 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
         minute: "2-digit",
       }),
     }));
-
   return (
     <main className="max-w-4xl mx-auto">
       <div className="min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-gray-100">
