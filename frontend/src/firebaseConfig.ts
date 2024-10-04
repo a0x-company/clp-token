@@ -8,6 +8,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app, "clp-token");
+const db = getFirestore(app, "clpa");
 
 export { db };

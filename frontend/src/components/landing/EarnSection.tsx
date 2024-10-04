@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 const EarnSection: React.FC = () => {
   const t = useTranslations("landing");
   return (
-    <section className="flex items-center justify-center relative px-32 py-[180px] gap-16">
+    <section className="flex items-center justify-center relative px-16 xl:px-32 py-[180px] gap-16">
       <div className="flex flex-col flex-1 gap-4">
         <div className="bg-black text-white rounded-xl p-4 flex justify-between items-center w-full">
           <div>
@@ -31,7 +31,7 @@ const EarnSection: React.FC = () => {
         <div className="bg-white border-2 border-black rounded-xl p-4 flex justify-between items-center w-full">
           <div>
             <p className="text-xl font-bold">{t("receive")}</p>
-            <p className="text-[28px] text-brand-blue font-bold flex items-center gap-2">
+            <p className="text-[22px] 2xl:text-[28px] text-brand-blue font-bold flex items-center gap-2">
               <Image src="/images/landing/arrow-vector.svg" alt="Arrow" width={32} height={32} />
               {t("feeCLPa")}
             </p>

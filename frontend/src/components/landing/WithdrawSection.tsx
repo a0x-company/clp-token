@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 const WithdrawSection: React.FC = () => {
   const t = useTranslations("landing");
   return (
-    <section className="flex items-center justify-center relative px-32 py-[180px] gap-16">
+    <section className="flex items-center justify-center relative px-16 xl:px-32 py-[180px] gap-16">
       <div className="flex flex-col flex-[1.5] gap-4 w-full">
         <h2 className="text-[64px] font-romaben">{t("withdraw.title")}</h2>
         <p className="text-[32px]">{t("withdraw.description")}</p>
@@ -56,7 +56,7 @@ const WithdrawSection: React.FC = () => {
           alt="Divider"
           width={1080}
           height={7}
-          className="absolute right-1/2 translate-x-1/2 -bottom-[calc(7px/2)]"
+          className="absolute right-1/2 translate-x-1/2 -bottom-[calc(7px/2)] max-[1280px]:w-[980px]"
         />
       </div>
     </section>
