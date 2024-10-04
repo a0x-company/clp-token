@@ -1,10 +1,15 @@
+// ethers
 import { ethers } from "ethers";
-import { baseSepolia, sepolia } from "viem/chains";
 
+// viem
+import { baseSepolia } from "viem/chains";
+
+// constants
 import CLPD_ABI from "@/constants/CLPD-abi.json";
-import { NextResponse } from "next/server";
+import { contractAddress } from "@/constants/address";
 
-export const contractAddress = "0xbEA4c5A2515A6D9bF4A4175af336663FB8976031";
+// next
+import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   console.log("[GET][/api/reserve]");

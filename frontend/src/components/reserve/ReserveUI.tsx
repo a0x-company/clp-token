@@ -4,17 +4,19 @@ import React, { useEffect, useRef, useState } from "react";
 
 // next
 import Image from "next/image";
+import Link from "next/link";
 
 // http client
 import axios from "axios";
 
-// ethers
-
-// recharts
-import { useTranslations } from "next-intl";
-import Link from "next/link";
+// components
 import ChartReserve from "./ChartReserve";
-import { contractAddress } from "@/app/api/reserve/route";
+
+// tranlations
+import { useTranslations } from "next-intl";
+
+// constants
+import { contractAddress } from "@/constants/address";
 
 interface ReserveData {
   balance: number;
