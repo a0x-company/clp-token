@@ -2,7 +2,7 @@
 pragma solidity ^0.8.25;
 
 import "forge-std/Script.sol";
-import "../src/ACLP.sol";
+import "../src/CLPD.sol";
 
 contract DeployACLP is Script {
     // Address to receive the tokens
@@ -15,11 +15,11 @@ contract DeployACLP is Script {
         // Start broadcasting the transaction
         vm.startBroadcast(deployerPrivateKey);
 
-        // Deploy the ACLP contract
-        ACLP aclp = new ACLP(receiver);
+        // Deploy the CLPD contract
+        CLPD clpd = new CLPD(receiver);
 
         // Log the deployed contract address
-        console.log("ACLP contract deployed at:", address(aclp));
+        console.log("CLPD contract deployed at:", address(clpd));
 
         // Stop broadcasting
         vm.stopBroadcast();
