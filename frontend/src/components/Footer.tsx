@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
         alt="Stamp Chilean"
         width={100}
         height={100}
-        className="absolute left-0 top-1/2 -translate-y-1/2"
+        className="absolute -left-10 md:left-0 top-1/2 -translate-y-1/2"
       />
       <div className="flex items-center justify-center gap-2">
         <Image src="/images/landing/clpa-logo-blue.svg" alt="CLPa logo" width={64} height={64} />

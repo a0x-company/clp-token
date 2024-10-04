@@ -13,8 +13,8 @@ import { useTranslations } from "next-intl";
 const DepositSection: React.FC = () => {
   const t = useTranslations("landing");
   return (
-    <section className="flex items-center justify-center relative px-16 xl:px-32 pt-[48px] pb-[120px] gap-16">
-      <div className="flex flex-col flex-1 gap-4">
+    <section className="flex flex-col-reverse md:flex-row items-center justify-center relative px-8 lg:px-16 xl:px-32 pt-[48px] pb-[120px] gap-16">
+      <div className="flex flex-col flex-1 gap-4 w-full">
         <div className="bg-black text-white rounded-xl p-4 flex justify-between items-center w-full">
           <div>
             <div className="text-xl font-bold">{t("send")}</div>
@@ -54,7 +54,15 @@ const DepositSection: React.FC = () => {
           alt="Divider"
           width={1080}
           height={7}
-          className="absolute right-1/2 translate-x-1/2 -bottom-[calc(7px/2)] max-[1280px]:w-[980px]"
+          className="absolute right-1/2 translate-x-1/2 -bottom-[calc(7px/2)] max-md:hidden md:w-[500px] lg:w-[980px] 2xl:w-[1280px]"
+        />
+
+        <Image
+          src="/images/landing/divider-sm-vector.svg"
+          alt="Divider"
+          width={307}
+          height={7}
+          className="absolute right-1/2 translate-x-1/2 -bottom-[calc(7px/2)] w-[307px] max-md:block hidden"
         />
       </div>
     </section>

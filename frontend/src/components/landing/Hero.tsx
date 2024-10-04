@@ -14,13 +14,13 @@ interface HeroProps {}
 
 const Hero: React.FC<HeroProps> = () => {
   return (
-    <section className="flex flex-col items-center justify-center h-screen w-full overflow-hidden bg-gradient-to-b from-brand-blue to-white">
-      <div className="flex relative overflow-hidden [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)]">
-        <h1 className="text-[120px] md:text-[240px] text-white font-romaben text-nowrap font-bold animate-infinite-scroll inline-block w-max mr-[4rem]">
+    <section className="flex flex-col items-center justify-center h-screen w-full overflow-hidden bg-gradient-to-b from-brand-blue to-white gap-16">
+      <div className="flex relative max-lg:mt-16 [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)]">
+        <h1 className="text-[120px] leading-none md:text-[240px] text-white font-romaben text-nowrap font-bold animate-infinite-scroll inline-block w-max mr-[4rem]">
           * Chile Stable Coin * Chile Stable Coin * Chile Stable Coin{" "}
         </h1>
         <h1
-          className="text-[120px] md:text-[240px] text-white font-romaben text-nowrap font-bold animate-infinite-scroll inline-block w-max before:content-['*']"
+          className="text-[120px] leading-none md:text-[240px] text-white font-romaben text-nowrap font-bold animate-infinite-scroll inline-block w-max before:content-['*']"
           aria-hidden="true"
         >
           {" "}
@@ -30,7 +30,7 @@ const Hero: React.FC<HeroProps> = () => {
 
       <ConversionCard />
 
-      <div className="w-full place-content-end -mb-14 z-10">
+      <div className="w-full absolute overflow-hidden -mb-14 z-10 h-full">
         {Array.from({ length: 4 }).map((_, index) => (
           <Image
             src="/images/landing/araucaria-vector.svg"
@@ -38,11 +38,13 @@ const Hero: React.FC<HeroProps> = () => {
             width={386}
             height={422}
             className={cn("absolute", {
-              "-bottom-[6rem] xl:-bottom-[4rem] 2xl:-bottom-[4rem] -left-[8rem]": index === 0,
-              "-bottom-[6rem] xl:bottom-[0rem] 2xl:bottom-[0rem] left-[18rem]": index === 1,
-              "hidden xl:block xl:-bottom-[5rem] 2xl:-bottom-[2rem] right-[25rem] max-md:hidden":
+              "-bottom-[2rem] md:-bottom-[2rem] lg:-bottom-[1rem] xl:-bottom-[4rem] 2xl:bottom-[0rem] -left-20 md:-left-20":
+                index === 0,
+              "bottom-[3rem] xl:bottom-[0rem] 2xl:bottom-[6rem] left-[40%] md:left-[20%]":
+                index === 1,
+              "hidden xl:block xl:-bottom-[5rem] 2xl:bottom-[4rem] right-[20%] max-md:hidden":
                 index === 2,
-              "bottom-[0rem] xl:-bottom-[2rem] 2xl:-bottom-[1rem] right-[0rem] max-md:hidden":
+              "bottom-[0rem] xl:-bottom-[2rem] 2xl:-bottom-[1rem] right-0 max-md:hidden":
                 index === 3,
             })}
             key={index}
@@ -54,7 +56,7 @@ const Hero: React.FC<HeroProps> = () => {
           alt="Mountain Divider"
           width={1441}
           height={190}
-          className="w-full h-auto"
+          className="absolute w-full h-auto max-md:h-[190px] bottom-0"
         />
       </div>
     </section>
