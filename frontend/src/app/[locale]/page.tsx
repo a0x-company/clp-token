@@ -14,7 +14,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "CLPD | Peso Chileno Digital",
   description:
-    "CLP Digital es la primera y única stablecoin del peso chileno con pruebas de reserva garantizada y verificable. Siempre existirá 1 CLP en reservas por cada $CLPa en circulación.",
+    "CLP Digital es la primera y única stablecoin del peso chileno con pruebas de reserva garantizada y verificable. Siempre existirá 1 CLP en reservas por cada $CLPD en circulación.",
   openGraph: {
     images: ["/images/landing/og.png"],
     type: "website",

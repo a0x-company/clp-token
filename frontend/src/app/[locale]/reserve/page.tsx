@@ -1,24 +1,17 @@
 // next
+import { Metadata } from "next";
 
 // http client
 import axios from "axios";
 
-// ethers
-import { ethers } from "ethers";
-
 //components
 import ReserveUI from "@/components/reserve/ReserveUI";
 
-// constants
-import CLPD_ABI from "@/constants/CLPD-abi.json";
-import { sepolia } from "viem/chains";
-import { Metadata } from "next";
+// utils
 import { formatNumber } from "@/lib/utils";
-
-interface ReserveData {
-  balance: number;
-  timestamp: number;
-}
+import Navbar from "@/components/Navbar";
+import FAQSection from "@/components/reserve/FAQSection";
+import Footer from "@/components/Footer";
 
 const fetchBankBalance = async () => {
   try {
@@ -36,7 +29,7 @@ const fetchTokenSupply = async () => {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/reserve`);
     return response.data.supply;
   } catch (error) {
-    console.error("Error al obtener el total supply del token:");
+    console.error("Error al obtener el total supply del token:", error);
   }
 };
 
@@ -56,9 +49,8 @@ export async function generateMetadata(): Promise<Metadata> {
   if (typeof tokenSupply === "string") {
     tokenSupply = formatNumber(Number(tokenSupply));
   }
-  if (typeof bankBalance === "string") {
-    bankBalance = formatNumber(Number(bankBalance));
-  }
+  bankBalance = formatNumber(bankBalance);
+
   const imageUrl = `${process.env.NEXT_PUBLIC_URL}/api/og-reserve?bankBalance=${bankBalance}&tokenSupply=${tokenSupply}`;
   return {
     title: "Reservas | CLPD",
@@ -81,8 +73,11 @@ export default async function Reserve() {
   }
 
   return (
-    <main className="max-w-4xl mx-auto">
+    <main className="min-h-screen max-w-screen overflow-hidden bg-white text-black">
+      <Navbar />
       <ReserveUI bankBalance={bankBalance} tokenSupply={tokenSupply} />
+      <FAQSection />
+      <Footer />
     </main>
   );
 }

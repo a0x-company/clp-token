@@ -23,7 +23,7 @@ const WithdrawSection: React.FC = () => {
         <div className="bg-white border-2 border-black rounded-xl p-4 flex justify-between items-center w-full">
           <div>
             <div className="text-xl font-bold">{t("receive")}</div>
-            <div className="text-[28px] font-bold">1 CLPa</div>
+            <div className="text-[28px] font-bold">1 CLPD</div>
           </div>
 
           <CLPFlag type="CLP" />
@@ -39,7 +39,7 @@ const WithdrawSection: React.FC = () => {
             <div className="text-[28px] font-bold">1 Peso</div>
           </div>
 
-          <CLPFlag type="CLPa" />
+          <CLPFlag type="CLPD" />
         </div>
       </div>
 

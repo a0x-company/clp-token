@@ -2,7 +2,7 @@
   "navbar": {
     "login": "Login",
     "stableCoin": "Stable Coin",
-    "earnWithPesos": "Earn with CLPa",
+    "earnWithPesos": "Earn with CLPD",
     "aboutUs": "About Us",
     "reserve": "Reserve"
   },
@@ -10,24 +10,24 @@
     "send": "Send",
     "receive": "Receive",
     "redeem": "Redeem",
-    "feeCLPa": "Fee in CLPa",
+    "feeCLPD": "Fee in CLPD",
     "save": "Save money",
     "earn": {
       "title": "Earn",
-      "description": "Save and earn interest automatically with your $CLPa. Plus get direct access to international digital and real-world asset markets to further grow your investment."
+      "description": "Save and earn interest automatically with your $CLPD. Plus get direct access to international digital and real-world asset markets to further grow your investment."
     },
     "deposit": {
       "title": "Deposit",
-      "description": "The first Chilean stablecoin fully backed by Chilean Pesos. Deposit Chilean Pesos from your bank account, get $CLPa and unlock the best of digital money."
+      "description": "The first Chilean stablecoin fully backed by Chilean Pesos. Deposit Chilean Pesos from your bank account, get $CLPD and unlock the best of digital money."
     },
     "withdraw": {
       "title": "Withdraw",
-      "description": "Each $CLPa is backed 100% by Chilean Pesos in a secure bank account. You can change them for pesos in your bank account 24 hours a day, without delay."
+      "description": "Each $CLPD is backed 100% by Chilean Pesos in a secure bank account. You can change them for pesos in your bank account 24 hours a day, without delay."
     },
     "features": {
       "title": "The future of digital money, now",
-      "description1": "$CLPa is the first and only Chilean peso stablecoin with guaranteed reserve audits and verifiable reserves. There will always be 1 CLP in reserves for every $CLPa in circulation.",
-      "description2": "Using $CLPa, you get instant, national and international transfers, secure and low-cost. Plus, it's programmable through smart contracts, opening infinite possibilities for its use and distribution."
+      "description1": "$CLPD is the first and only Chilean peso stablecoin with guaranteed reserve audits and verifiable reserves. There will always be 1 CLP in reserves for every $CLPD in circulation.",
+      "description2": "Using $CLPD, you get instant, national and international transfers, secure and low-cost. Plus, it's programmable through smart contracts, opening infinite possibilities for its use and distribution."
     },
     "roadmap": {
       "title": "Roadmap",
@@ -38,11 +38,11 @@
       },
       "q1-2": {
         "title": "Local Businesses",
-        "description": "Enable payments with $CLPa in local business points of sale."
+        "description": "Enable payments with $CLPD in local business points of sale."
       },
       "q1-3": {
         "title": "E-commerce Integration Kit",
-        "description": "Start receiving payments in your e-commerce with $CLPa and earn immediate interest rewards."
+        "description": "Start receiving payments in your e-commerce with $CLPD and earn immediate interest rewards."
       },
       "q2": "Q2 * 2025",
       "q2-1": {
@@ -76,5 +76,10 @@
         "description": ""
       }
     }
+  },
+  "reserve": {
+    "secure": "100% Backed",
+    "secure1": "CLPD is backed 1:1 in Chilean pesos,",
+    "secure2": " guaranteeing that each issued token has an exact equivalent in Chilean pesos deposited in a Chilean bank as proof of reserve."
   }
 }
