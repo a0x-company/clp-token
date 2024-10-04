@@ -1,11 +1,18 @@
 /* eslint-disable quotes */
-import { VAULT_PASSWORD, VAULT_RUT } from "@internal/config";
+import { VAULT_PASSWORD, VAULT_RUT, DISCORD_WEBHOOK_URL } from "@internal/config";
+import { DiscordNotificationService, NotificationType } from "@internal/notifications";
 import puppeteer from "puppeteer";
 
 export class SantanderClScraper {
   private readonly RUT = VAULT_RUT || "";
 
   private readonly PASS = VAULT_PASSWORD || "";
+
+  private discordService: DiscordNotificationService;
+
+  constructor() {
+    this.discordService = new DiscordNotificationService(DISCORD_WEBHOOK_URL || "");
+  }
 
   public async getVaultBalance(rut: string = this.RUT, pass: string = this.PASS): Promise<number> {
     console.log("✅ Starting Santander CL scraper");
@@ -30,7 +37,12 @@ export class SantanderClScraper {
 
       const page = await browser.newPage();
 
-      await page.goto("https://banco.santander.cl/personas").catch(() => {
+      await page.goto("https://banco.santander.cl/personas").catch(async () => {
+        await this.discordService.sendNotification(
+          "Failed to load Santander homepage. Bank scraping process interrupted.",
+          NotificationType.ERROR,
+          "Santander Scraper Alert"
+        );
         throw new Error("Failed to load Santander homepage");
       });
       console.log("✅ Page loaded correctly");
@@ -89,7 +101,12 @@ export class SantanderClScraper {
       await iframe.click('button[type="submit"]');
       console.log("✅ Click performed on 'Ingresar' button");
 
-      await page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {
+      await page.waitForNavigation({ waitUntil: "networkidle0" }).catch(async () => {
+        await this.discordService.sendNotification(
+          "Navigation after login failed. Unable to access account information.",
+          NotificationType.WARNING,
+          "Santander Scraper Alert"
+        );
         throw new Error("❌ Navigation after login failed");
       });
       console.log("✅ Page loaded after login");

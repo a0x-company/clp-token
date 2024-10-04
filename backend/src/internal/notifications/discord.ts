@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-enum NotificationType {
+export enum NotificationType {
   INFO = 'INFO',
   SUCCESS = 'SUCCESS',
   WARNING = 'WARNING',
