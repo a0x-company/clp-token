@@ -6,8 +6,11 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    const hasTitle = searchParams.has("title");
-    const hasDescription = searchParams.has("description");
+    const hasBankBalance = searchParams.has("bankBalance");
+    const hasTokenSupply = searchParams.has("tokenSupply");
+
+    const bankBalance = hasBankBalance ? searchParams.get("bankBalance") : "0";
+    const tokenSupply = hasTokenSupply ? searchParams.get("tokenSupply") : "0";
 
     // Font
     const fontDataRomaben = await fetch(
@@ -104,7 +107,7 @@ export async function GET(request: Request) {
                     marginBottom: "1rem",
                   }}
                 >
-                  $10,000
+                  ${bankBalance}
                 </p>
               </div>
               <div
@@ -167,7 +170,7 @@ export async function GET(request: Request) {
                     marginBottom: "1rem",
                   }}
                 >
-                  $10,000
+                  {tokenSupply}
                 </p>
               </div>
               <div
