@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 
 // next
+import Link from "next/link";
 import Image from "next/image";
 
 // http client
@@ -102,8 +103,7 @@ export default function Reserve() {
     return () => clearInterval(interval);
   }, [bankBalance, tokenSupply, reserveData]);
 
-  const boxStyle =
-    "border-2 border-black rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-2 sm:p-8";
+  const boxStyle = " rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-2 sm:p-8";
 
   const processedReserveData = reserveData
     .filter((item) => item.balance > 0)
@@ -119,166 +119,121 @@ export default function Reserve() {
       }),
     }));
 
+  const gradientStyle = { background: "linear-gradient(180deg, #06F 0%, #FFF 100%)" };
+
   return (
-    <main className="max-w-4xl mx-auto">
-      <div className="min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-gray-100">
-        <div className={`${boxStyle} mb-12 flex flex-col md:flex-row items-start`}>
-          <div className="md:w-1/2 pr-8">
-            <h2 className="text-3xl font-bold mb-6 text-left font-romaben">
-              Respaldo de Nuestra Stablecoin
-            </h2>
-            <p className="text-lg leading-relaxed text-gray-700 mb-6">
-              Nuestra stablecoin está respaldada al 100% en pesos chilenos, garantizando que cada
-              token emitido tenga un equivalente exacto en pesos chilenos depositada en un banco en
-              Chile 🇨🇱 (cuenta bancaria de reserva)
-            </p>
-          </div>
+    <main className="flex flex-col w-full">
+      <div className="flex flex-row items-center w-full relative" style={gradientStyle}>
+        <Image
+          src="/images/reserve/star-left.svg"
+          alt="star-left"
+          width={316}
+          height={802}
+          className="absolute z-10"
+        />
 
-          <div className="md:w-1/2 bg-gray-100 p-6 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_#000]">
-            <h3 className="text-xl font-semibold mb-4">Proceso de Respaldo:</h3>
-            <ul className="space-y-3 text-gray-700 text-left">
-              <li className="flex items-start">
-                <span className="mr-2 font-bold">1.</span>
-                <span>Depósito de pesos chilenos por usuarios con cuenta bancaria chilena.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 font-bold">2.</span>
-                <span>La empresa actúa como custodio de los fondos.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 font-bold">3.</span>
-                <span>Almacenamiento seguro y consulta disponible en todo momento.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 font-bold">4.</span>
-                <span>
-                  Transparencia total sobre el respaldo de los tokens ACLP en circulación.
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className={`${boxStyle} text-center`}>
-            <h2 className="text-2xl font-semibold mb-4 font-romaben">Cuenta del banco</h2>
-            {bankBalance !== null ? (
-              <p className="text-5xl font-bold text-black font-helvetica">
-                $
-                {bankBalance.toLocaleString("es-ES", {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                })}
-              </p>
-            ) : (
-              <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
-            )}
-            <div className="mt-4 flex items-center justify-center">
-              <Image
-                src="/reserve/santander.png"
-                alt="Banco Santander Logo"
-                width={50}
-                height={50}
-                className="w-10 h-10 rounded-full border-2 border-black"
-              />
-              <p className="ml-2 text-sm text-gray-600 font-romaben">
-                Cuenta en Banco Santander Chile
+        <div className="flex flex-col w-full py-[64px] px-[140px]">
+          <div className="w-full mb-8 z-20">
+            <div className="inline-block bg-white p-[16px] border-2 border-black rounded-[12px] shadow-[4px_4px_0px_0px_#000]">
+              <p className="text-black font-helvetica text-[20px] font-[700]">
+                Balances en tiempo real *
               </p>
             </div>
           </div>
-          <div className={`${boxStyle} text-center`}>
-            <h2 className="text-2xl font-semibold mb-4 font-romaben">Cantidad de tokens CLPa</h2>
-            {tokenSupply !== null ? (
-              <p className="text-5xl font-bold text-blue-600 font-helvetica">
-                {parseFloat(tokenSupply).toLocaleString("es-ES", {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                })}
-              </p>
-            ) : (
-              <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
-            )}
-            <div className="mt-4 flex items-center justify-center">
-              <Image
-                src="/reserve/base.png"
-                alt="Base Network Logo"
-                width={50}
-                height={50}
-                className="w-10 h-10 rounded-full border-2 border-black"
-              />
-              <p className="ml-2 text-sm text-gray-600 font-helvetica">
-                Token deployado en la red de Base
-              </p>
+
+          <div className="flex flex-row w-full justify-between">
+            <div className={`flex flex-col items-start z-20 w-[45%]`}>
+              <h2 className="text-black font-romaben text-[128px] font-[400]">Banco</h2>
+
+              {bankBalance !== null ? (
+                <p className="text-black font-helvetica text-[128px] font-[400]">
+                  $
+                  {bankBalance.toLocaleString("es-ES", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}
+                </p>
+              ) : (
+                <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
+              )}
+
+              <div className="flex items-center justify-center gap-[8px]">
+                <Image
+                  src="/images/reserve/santander.png"
+                  alt="Banco Santander Logo"
+                  width={32}
+                  height={32}
+                  className="w-[32px] h-[32px] rounded-full border-2 border-black"
+                />
+
+                <p className="text-black font-helvetica text-[32px] font-[400]">
+                  Total de Pesos en el Banco
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {isMatching !== null && (
-          <div
-            className={`mt-8 ${boxStyle} ${isMatching ? "bg-green-300" : "bg-red-300"} text-center`}
-          >
-            <p className="text-xl font-semibold font-helvetica">
-              {isMatching ? "Los valores coinciden ✅" : "Los valores no coinciden ❌"}
-            </p>
-          </div>
-        )}
+            <Image src="/images/reserve/divider.svg" alt="divider" width={8} height={32} />
 
-        <div className={`mt-12 ${boxStyle}`}>
-          <h2 className="text-2xl font-semibold mb-6 font-romaben text-center">
-            Historial del balance en la cuenta de reserva
-          </h2>
+            <div className={`flex flex-col items-end z-20 w-[45%]`}>
+              <h2 className="text-black font-romaben text-[128px] font-[400]">Tokens</h2>
 
-          <div className="balance-history-chart w-full h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={processedReserveData}
-                margin={{
-                  top: 5,
-                  right: 5,
-                  left: 5,
-                  bottom: 5,
-                }}
+              {tokenSupply !== null ? (
+                <p className="text-black font-helvetica text-[128px] font-[400]">
+                  {parseFloat(tokenSupply).toLocaleString("es-ES", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}
+                </p>
+              ) : (
+                <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
+              )}
+
+              <Link
+                href="https://sepolia.basescan.org/token/0x28DAab58fFD02cc19A7E4655e1d6766023F5FeAC"
+                target="_blank"
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fill: "#666", fontSize: 12 }}
-                  tickLine={{ stroke: "#666" }}
-                />
-                <YAxis
-                  tick={{ fill: "#666", fontSize: 12 }}
-                  tickLine={{ stroke: "#666" }}
-                  tickFormatter={(value) => `$${value.toLocaleString("es-ES")}`}
-                />
+                <div className="flex items-center justify-center gap-[8px] cursor-pointer">
+                  <p className="text-black font-helvetica text-[32px] font-[400]">
+                    Total de CLPa en la red Base
+                  </p>
 
-                <Tooltip
-                  formatter={(value) => [`$${(value as number).toLocaleString("es-ES")}`, "Saldo"]}
-                  labelFormatter={(label, payload) => {
-                    if (payload && payload.length > 0) {
-                      return `${payload[0].payload.date} ${payload[0].payload.time}`;
-                    }
-                    return label;
-                  }}
-                  labelStyle={{ color: "#666" }}
-                  contentStyle={{
-                    backgroundColor: "white",
-                    border: "1px solid #ccc",
-                    borderRadius: "4px",
-                    padding: "10px",
-                  }}
-                />
-
-                <Line
-                  type="monotone"
-                  dataKey="balance"
-                  stroke="#0000FF"
-                  strokeWidth={3}
-                  dot={false}
-                  activeDot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+                  <Image
+                    src="/images/reserve/base.png"
+                    alt="Base Network Logo"
+                    width={32}
+                    height={32}
+                    className="w-[32px] h-[32px] rounded-full border-2 border-black"
+                  />
+                </div>
+              </Link>
+            </div>
           </div>
+        </div>
+
+        <Image
+          src="/images/reserve/star-right.svg"
+          alt="star-right"
+          width={316}
+          height={802}
+          className="absolute right-0 z-10"
+        />
+      </div>
+
+      <div className="flex flex-col h-[520px] px-[64px] content-center items-center gap-[64px]">
+        <Image
+          src="/images/reserve/secure.svg"
+          alt="Banco Santander Logo"
+          width={205}
+          height={205}
+        />
+
+        <div className="flex flex-col w-[860px] content-center items-center gap-[12px]">
+          <p className="text-black font-romaben text-[64px] font-[400]">Tu respaldo</p>
+
+          <p className="text-black font-helvetica text-[32px] font-[400] ">
+            CLPa está respaldada 100% en pesos chilenos, garantizando que cada token emitido tenga
+            un equivalente exacto en pesos chilenos depositada en un banco en Chile.
+          </p>
         </div>
       </div>
     </main>
