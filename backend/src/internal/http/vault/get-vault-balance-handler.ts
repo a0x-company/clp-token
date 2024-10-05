@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import { VaultContext } from "./routes";
 import { Firestore } from '@google-cloud/firestore';
+import { config } from "@internal";
 
 const LOCK_COLLECTION = 'locks';
 const LOCK_DOCUMENT = 'vault_lock';
 const ACQUIRE_LOCK_TIMEOUT = 45000;
 const LOCK_RETRY_DELAY = 1000;
 
-const firestore = new Firestore();
+const firestore = new Firestore({ projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV });
 
 async function initializeLockDocument(): Promise<void> {
   const lockRef = firestore.collection(LOCK_COLLECTION).doc(LOCK_DOCUMENT);

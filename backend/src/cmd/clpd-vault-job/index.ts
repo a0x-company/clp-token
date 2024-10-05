@@ -4,11 +4,11 @@ import { BigQuery } from '@google-cloud/bigquery';
 import axios from 'axios';
 import { config } from "@internal";
 
-if (!config.PROJECT_ID || !config.A0X_API_KEY) {
+if (!config.PROJECT_ID || !config.API_KEY) {
   throw new Error("❌ Required environment variables are missing");
 }
 
-const VAULT_API_URL = 'https://development-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance';
+const VAULT_API_URL = 'https://development-clpd-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance';
 const DATASET_ID = 'vault_data';
 const TABLE_ID = 'balance_history';
 
@@ -20,7 +20,7 @@ async function getVaultBalance(): Promise<VaultBalance> {
   try {
     const response = await axios.get<VaultBalance>(VAULT_API_URL, {
       headers: {
-        'api-key': config.A0X_API_KEY
+        'api-key': config.API_KEY
       }
     });
     return response.data;
