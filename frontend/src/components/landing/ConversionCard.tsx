@@ -14,7 +14,13 @@ const ConversionCard: React.FC = () => {
         </div>
         <CLPFlag type="CLP" />
       </div>
-      <Image src="/images/landing/swap-vector.svg" alt="Swap" width={48} height={48} />
+      <Image
+        src="/images/landing/swap-vector.svg"
+        alt="Swap"
+        width={48}
+        height={48}
+        className="max-md:rotate-90"
+      />
       <div className="flex justify-center items-center bg-[#E7F1FF] rounded-xl p-4 border-2 border-black gap-4 shadow-brutalist-sm">
         <div className="flex flex-col items-start">
           <span className="font-semibold text-[20px] text-black mr-2">{t("receive")}</span>

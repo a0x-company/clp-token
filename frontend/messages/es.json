@@ -80,6 +80,6 @@
   "reserve": {
     "secure": "100% Respaldado",
     "secure1": "CLPD está respaldada 1:1 en pesos chilenos,",
-    "secure2": " garantizando que cada token emitido tenga un equivalente exacto en pesos chilenos depositada en un banco en Chile como prueba de reserva."
+    "secure2": " garantizando que cada token emitido tenga un equivalente exacto en pesos chilenos depositados en una cuenta bancaria segura en Chile como prueba de reserva."
   }
 }
