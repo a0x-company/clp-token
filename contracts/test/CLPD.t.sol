@@ -91,6 +91,29 @@ contract CLPDTest is Test {
         clpd.removeFromBlacklist(targetAddress);
         assertFalse(clpd.blacklisted(targetAddress), "Target address should be removed from blacklist");
     }
+
+    // ---------------------------------------------- RemoveAgent tests ----------------------------------------------  
+    function testRemoveAgent() public {
+        address agent = account1;
+        address targetAddress1 = account2;
+        address targetAddress2 = owner;
+
+        // Remove from blacklist with account1
+        vm.prank(agent);
+        clpd.removeFromBlacklist(targetAddress1);
+        assertFalse(clpd.blacklisted(targetAddress1), "Target address should be removed from blacklist");
+
+        // Remove account1 as an agent
+        vm.prank(owner);
+        clpd.removeAgent(agent);
+        assertFalse(clpd.agents(agent), "account1 should not be an agent");
+
+        // Try to remove agent with account2 (should fail)
+        vm.prank(agent);
+        vm.expectRevert("Only agents can execute this function");
+        clpd.removeFromBlacklist(targetAddress2);     
+    }
+    
     
     // ---------------------------------------------- Mint tests ----------------------------------------------   
     function testMintByNonAgent() public {
@@ -636,29 +659,40 @@ contract CLPDTest is Test {
         assertEq(clpd.balanceOf(recipient), initialBalanceRecipient + transferAmount, "Recipient's balance should increase");
     }
     
-    // ---------------------------------------------- setTokenDetails tests ---------------------------------------------- 
-    /*function testSetTokenDetails() public {
-        address agent = minter;
-        string memory newName = "ACLP";
-        string memory newSymbol = "ACLP";
+    // ---------------------------------------------- RevokeAgent tests ---------------------------------------------- 
+    function testRevoke() public {
+        address agent = account2;
+
+        // Make account2 an agent
+        vm.prank(owner);
+        clpd.addAgent(agent);
         
-        // Store initial token details
-        string memory initialName = clpd.name();
-        string memory initialSymbol = clpd.symbol();
+        // Verify that account2 is now an agent
+        assertTrue(clpd.agents(agent), "account2 should be an agent");
+
+        address sender = account1;
+        uint256 transferAmount = 100000000000000000000;
         
-        // Verify initial token details
-        assertEq(initialName, "CLPD", "Initial token name should be CLPD");
-        assertEq(initialSymbol, "CLPD", "Initial token symbol should be CLPD");
-        
-        // Set new token details
+        uint256 initialBalanceSender = clpd.balanceOf(sender);
+        uint256 initialBalanceReceiver = clpd.balanceOf(clpd.receiver());
+
+        // Ensure the sender has enough balance
+        vm.assume(clpd.balanceOf(sender) >= transferAmount);
+
+        // Freeze the sender
         vm.prank(agent);
-        clpd.setTokenDetails(newName, newSymbol);
-        
-        // Verify that the token details have been updated
-        assertEq(clpd.name(), newName, "Token name should be updated");
-        assertEq(clpd.symbol(), newSymbol, "Token symbol should be updated");
+        clpd.freezeAccount(sender);  
+
+        // Ensure the sender is frozen
+        assertTrue(clpd.frozenAccounts(sender), "Account should be frozen");
+
+        // Revoke agent
+        vm.prank(agent);
+        clpd.revoke(sender, transferAmount);
+
+        assertEq(clpd.balanceOf(sender), initialBalanceSender - transferAmount, "Sender's balance should decrease");
+        assertEq(clpd.balanceOf(clpd.receiver()), initialBalanceReceiver + transferAmount, "Receiver's balance should increase");
     }
-    */
 
     // ---------------------------------------------- setReceiver tests ---------------------------------------------- 
     function testSetReceiver() public {
@@ -682,4 +716,27 @@ contract CLPDTest is Test {
         assertEq(clpd.receiver(), newReceiver, "New receiver should be set");
     }
    
+   // ---------------------------------------------- setTokenDetails tests ---------------------------------------------- 
+    /*function testSetTokenDetails() public {
+        address agent = minter;
+        string memory newName = "ACLP";
+        string memory newSymbol = "ACLP";
+        
+        // Store initial token details
+        string memory initialName = clpd.name();
+        string memory initialSymbol = clpd.symbol();
+        
+        // Verify initial token details
+        assertEq(initialName, "CLPD", "Initial token name should be CLPD");
+        assertEq(initialSymbol, "CLPD", "Initial token symbol should be CLPD");
+        
+        // Set new token details
+        vm.prank(agent);
+        clpd.setTokenDetails(newName, newSymbol);
+        
+        // Verify that the token details have been updated
+        assertEq(clpd.name(), newName, "Token name should be updated");
+        assertEq(clpd.symbol(), newSymbol, "Token symbol should be updated");
+    }
+    */
 }
