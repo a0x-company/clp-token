@@ -95,6 +95,9 @@ contract CLPDTest is Test {
     // ---------------------------------------------- RemoveAgent tests ----------------------------------------------  
     function testRemoveAgent() public {
         address agent = account1;
+        vm.prank(owner);
+        clpd.addAgent(agent);
+
         address targetAddress1 = account2;
         address targetAddress2 = owner;
 
@@ -129,28 +132,27 @@ contract CLPDTest is Test {
         
         assertEq(clpd.balanceOf(nonAgent), initialBalance);
     }
-/*
-    function testMintByAgent() public {
-        address agent = minter;
-        uint256 mintAmount = 10000;
-        
-        // Make the owner add the minter as an agent
-        vm.prank(owner);
-        clpd.addAgent(agent);
-        
-        assertTrue(clpd.agents(agent), "Minter should be an agent");
-        
-        uint256 initialBalance = clpd.balanceOf(agent);
-        
-        // Now that the minter is an agent, they can mint
-        vm.prank(agent);
-        clpd.mint(agent, mintAmount);
-        
-        // Check if the balance has increased by the minted amount
-        assertEq(clpd.balanceOf(agent), initialBalance + mintAmount, "Balance should increase by minted amount");
-    }
-*/
 
+    function testMintByAgent() public {
+        address agent = account1;
+        address redeemer = owner;
+        address recipient = account2;
+        uint256 redeemAmount = 1000000000000000000000;
+        uint256 mintAmount = 1000000000000000000000;
+
+        uint256 initialTotalSupply = clpd.totalSupply();
+
+        vm.prank(redeemer);
+        clpd.redeem(redeemAmount);
+
+        assertEq(clpd.totalSupply(), initialTotalSupply - redeemAmount, "Total supply should decrease by redeemed amount");
+        
+        vm.prank(agent);
+        clpd.mint(recipient, mintAmount);
+
+        assertEq(clpd.getVaultBalance(), clpd.totalSupply() + mintAmount, "They must to be equal");
+    }
+    /*
     // ---------------------------------------------- Redeem tests ----------------------------------------------   
     function testRedeem() public {
         address spender = account1;
@@ -210,7 +212,7 @@ contract CLPDTest is Test {
         vm.assume(clpd.balanceOf(sender) >= transferAmount);
         
         uint256 initialBalanceSender = clpd.balanceOf(sender);
-        uint256 initialBalanceReceiver = clpd.balanceOf(recipient);
+        uint256 initialBalanceRecipient = clpd.balanceOf(recipient);
         
         // Freeze the account
         vm.prank(agent);
@@ -226,7 +228,7 @@ contract CLPDTest is Test {
         
         // Verify that the transfer didn't occur
         assertEq(clpd.balanceOf(sender), initialBalanceSender, "Sender's balance should remain unchanged");
-        assertEq(clpd.balanceOf(recipient), initialBalanceReceiver, "Recipient's balance should remain unchanged");
+        assertEq(clpd.balanceOf(recipient), initialBalanceRecipient, "Recipient's balance should remain unchanged");
     }
 
     function testUnfreezeAccountSender() public {
