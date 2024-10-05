@@ -6,7 +6,7 @@ import "../src/CLPD.sol";
 
 contract DeployACLP is Script {
     // Address to receive the tokens
-    address public receiver = 0x1234567890123456789012345678901234567890;
+    address public receiver = 0xd806A01E295386ef7a7Cea0B9DA037B242622743;
 
     function run() external {
         // Read private key or account from environment variables
@@ -15,7 +15,7 @@ contract DeployACLP is Script {
         // Start broadcasting the transaction
         vm.startBroadcast(deployerPrivateKey);
 
-        // Deploy the CLPD contract
+        // Deploy the CLPD contract with updated constructor parameters
         CLPD clpd = new CLPD(receiver);
 
         // Log the deployed contract address
@@ -24,5 +24,4 @@ contract DeployACLP is Script {
         // Stop broadcasting
         vm.stopBroadcast();
     }
-
 }
