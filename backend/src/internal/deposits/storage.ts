@@ -15,6 +15,7 @@ export interface StoredDepositData {
   status: DepositStatus;
   proofImageUrl?: string;
   rejectionReason?: string;
+  mintTransactionHash?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -74,6 +75,25 @@ export class DepositDataStorage {
     }
   }
 
+
+  public async updateMultipleDeposits(
+    updates: { id: string; data: Partial<StoredDepositData> }[]
+  ): Promise<void> {
+    const batch = this.firestore.batch();
+
+    updates.forEach(({ id, data }) => {
+      const docRef = this.depositCollection.doc(id);
+      batch.update(docRef, { ...data, updatedAt: Date.now() });
+    });
+
+    try {
+      await batch.commit();
+      console.log(`✅ Batch update completed for ${updates.length} deposits`);
+    } catch (error) {
+      console.error(`❌ Error in batch update:`, error);
+      throw error;
+    }
+  }
   public async getDepositsByStatus(status: DepositStatus): Promise<StoredDepositData[]> {
     try {
       const query: Query = this.depositCollection.where("status", "==", status);
