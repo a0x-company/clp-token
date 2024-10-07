@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { DepositService } from "@internal/deposits/deposits";
 
 interface MintDepositRequest {
-  depositId: string;
+  id: string;
   transactionHash: string;
 }
 
@@ -34,8 +34,8 @@ export function mintDepositsHandler(depositService: DepositService) {
       const deposits = validationResult;
 
       if (deposits.length === 1) {
-        const { depositId, transactionHash } = deposits[0];
-        await depositService.markDepositAsMinted(depositId, transactionHash);
+        const { id, transactionHash } = deposits[0];  // Cambiado de depositId a id
+        await depositService.markDepositAsMinted(id, transactionHash);
         return res.status(200).json({ message: "Deposit marked as minted successfully" });
       } else {
         await depositService.markMultipleDepositsAsMinted(deposits);
