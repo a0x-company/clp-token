@@ -79,12 +79,26 @@ export class DepositService {
     console.log(`✅ Deposit approved: ID ${depositId}`);
   }
 
-  public async markDepositAsMinted(depositId: string): Promise<void> {
+  public async markDepositAsMinted(depositId: string, transactionHash: string): Promise<void> {
     await this.storage.updateDepositData(depositId, {
       status: DepositStatus.ACCEPTED_MINTED,
+      mintTransactionHash: transactionHash,
       updatedAt: Date.now(),
     });
-    console.log(`🪙 Deposit marked as minted: ID ${depositId}`);
+    console.log(`🪙 Deposit marked as minted: ID ${depositId}, Transaction Hash: ${transactionHash}`);
+  }
+
+  public async markMultipleDepositsAsMinted(deposits: { id: string; transactionHash: string }[]): Promise<void> {
+    const updates = deposits.map(({ id, transactionHash }) => ({
+      id,
+      data: {
+        status: DepositStatus.ACCEPTED_MINTED,
+        mintTransactionHash: transactionHash,
+      },
+    }));
+
+    await this.storage.updateMultipleDeposits(updates);
+    console.log(`🪙 Batch minting completed for ${deposits.length} deposits`);
   }
 
   public async rejectDeposit(depositId: string, reason: string): Promise<void> {
