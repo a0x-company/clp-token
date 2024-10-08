@@ -1,5 +1,5 @@
 // firebase
-import { db } from "@/firebaseConfig";
+import { db, userDataCollection } from "@/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 
 // jose
@@ -46,13 +46,11 @@ export async function POST(request: Request) {
   pKey += decipher.final("utf8");
 
   try {
-    const appPubKey = getPublicCompressed(
-      Buffer.from(pKey.padStart(64, "0"), "hex")
-    ).toString("hex");
-
-    const jwks = jose.createRemoteJWKSet(
-      new URL("https://api-auth.web3auth.io/jwks")
+    const appPubKey = getPublicCompressed(Buffer.from(pKey.padStart(64, "0"), "hex")).toString(
+      "hex"
     );
+
+    const jwks = jose.createRemoteJWKSet(new URL("https://api-auth.web3auth.io/jwks"));
 
     const jwtDecoded = await jose.jwtVerify(idToken, jwks, {
       algorithms: ["ES256"],
@@ -62,26 +60,22 @@ export async function POST(request: Request) {
       (x: { type: string }) => x.type === "web3auth_app_key"
     );
 
-    if (
-      !verifiedWallet ||
-      verifiedWallet.public_key.toLowerCase() !== appPubKey.toLowerCase()
-    ) {
-      return NextResponse.json(
-        { error: "Verification Failed" },
-        { status: 400 }
-      );
+    if (!verifiedWallet || verifiedWallet.public_key.toLowerCase() !== appPubKey.toLowerCase()) {
+      return NextResponse.json({ error: "Verification Failed" }, { status: 400 });
     }
 
     const payload = jwtDecoded.payload as any;
     const userId = payload.email;
 
-    const userDoc = doc(db, "user-data", address);
-    const userSnapshot = await getDoc(userDoc);
+    const userRef = doc(userDataCollection, address);
+    const userDoc = await getDoc(userRef);
+
+    console.log("userSnapshot", userDoc);
 
     let userDataToReturn;
 
-    if (userSnapshot.exists()) {
-      userDataToReturn = userSnapshot.data();
+    if (userDoc.exists()) {
+      userDataToReturn = userDoc.data();
     } else {
       try {
         const response = await axios.post(
@@ -101,10 +95,7 @@ export async function POST(request: Request) {
         userDataToReturn = response.data;
       } catch (error) {
         console.error("Error creating user:", error);
-        return NextResponse.json(
-          { error: "Database connection error" },
-          { status: 500 }
-        );
+        return NextResponse.json({ error: "Database connection error" }, { status: 500 });
       }
     }
 
@@ -130,9 +121,6 @@ export async function POST(request: Request) {
     return NextResponse.json(userDataToReturn);
   } catch (error) {
     console.error("Error processing user:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

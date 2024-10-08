@@ -4,7 +4,11 @@
     "stableCoin": "Stable Coin",
     "earnWithPesos": "Earn with CLPD",
     "aboutUs": "About Us",
-    "reserve": "Reserve"
+    "reserve": "Reserve",
+    "deposit": "Deposit",
+    "withdraw": "Withdraw",
+    "invest": "Invest",
+    "change": "Change"
   },
   "landing": {
     "send": "Send",
@@ -28,6 +32,10 @@
       "title": "The future of digital money, now",
       "description1": "$CLPD is the first and only Chilean peso stablecoin with guaranteed reserve audits and verifiable reserves. There will always be 1 CLP in reserves for every $CLPD in circulation.",
       "description2": "Using $CLPD, you get instant, national and international transfers, secure and low-cost. Plus, it's programmable through smart contracts, opening infinite possibilities for its use and distribution."
+    },
+    "automate": {
+      "title": "Automate",
+      "description": "CLPD is easily programmable to be integrated into your payment flows, automated contracts, dividend distributions, and others."
     },
     "roadmap": {
       "title": "Roadmap",
@@ -78,8 +86,33 @@
     }
   },
   "reserve": {
-    "secure": "100% Backed",
-    "secure1": "CLPD is backed 1:1 in Chilean pesos,",
-    "secure2": " guaranteeing that each issued token has an exact equivalent in Chilean pesos deposited in a Chilean bank as proof of reserve."
+    "secure": "Transparency and Stability",
+    "secure1": "The CLPD can always be exchanged 1:1 for Chilean pesos. Always.",
+    "secure2": "Each issued token has an exact equivalent in Chilean pesos deposited in a Chilean bank as proof of reserve.",
+    "composition": "Reserve Composition",
+    "realTime": "REAL-TIME BALANCES",
+    "balances": "Balances",
+    "inCirculation": "In Circulation",
+    "inReserve": "In Reserve",
+    "CLPDCirculation": "CLPD in circulation",
+    "bankReserve": "Cash in the reserve bank"
+  },
+  "deposit": {
+    "deposit": "Deposit CLP",
+    "bankInfo": {
+      "info": "Bank Account Information",
+      "bank": "Bank",
+      "accountNumber": "Account Number"
+    },
+    "transferStatus": "Transfer Status",
+    "initiated": "Initiated",
+    "processing": "Processing",
+    "completed": "Completed",
+    "createOrder": "Create Order",
+    "proof": "Proof of Transfer",
+    "upload": "Select PDF or Image",
+    "amount": "Amount to Deposit",
+    "amountPlaceholder": "100.000",
+    "done": "Done"
   }
 }

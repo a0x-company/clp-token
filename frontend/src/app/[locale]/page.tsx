@@ -10,6 +10,7 @@ import FeatureSection from "@/components/landing/FeatureSection";
 import Navbar from "@/components/Navbar";
 import Roadmap from "@/components/landing/Roadmap";
 import Footer from "@/components/Footer";
+import AutomateSection from "@/components/landing/AutomateSection";
 
 export const metadata: Metadata = {
   title: "CLPD | Peso Chileno Digital",
@@ -25,13 +26,14 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="min-h-screen w-screen bg-white text-black">
+    <main className="min-h-screen max-w-screen bg-white text-black">
       <Navbar />
       <Hero />
+      <FeatureSection />
       <DepositSection />
       <WithdrawSection />
       <EarnSection />
-      <FeatureSection />
+      <AutomateSection />
       <Roadmap />
       <Footer />
     </main>

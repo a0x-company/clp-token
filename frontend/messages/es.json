@@ -4,7 +4,11 @@
     "stableCoin": "Stable Coin",
     "earnWithPesos": "Gana con Pesos",
     "aboutUs": "Sobre Nosotros",
-    "reserve": "Reserva"
+    "reserve": "Reserva",
+    "deposit": "Depositar",
+    "withdraw": "Retirar",
+    "invest": "Invertir",
+    "change": "Cambiar"
   },
   "landing": {
     "send": "Envías",
@@ -28,6 +32,10 @@
       "title": "El futuro del dinero digital, ahora",
       "description1": "$CLPD es la primera y única stablecoin del peso chileno con pruebas de reserva garantizada y verificable. Siempre existirá 1 CLP en reservas por cada $CLPD en circulación.",
       "description2": "Utilizando $CLPD accedes a transferencias y pagos instantáneos, nacionales e internacionales, seguro y de bajo costo. Además es programable a través de smart contracts, lo que abre infinitas posibilidades para su uso y distribución."
+    },
+    "automate": {
+      "title": "Automatiza",
+      "description": "El CLPD es fácilmente programable para ser integrado en tus flujos de pago, contratos automatizados, distribuciones de dividendos y otros."
     },
     "roadmap": {
       "title": "Roadmap",
@@ -78,8 +86,33 @@
     }
   },
   "reserve": {
-    "secure": "100% Respaldado",
-    "secure1": "CLPD está respaldada 1:1 en pesos chilenos,",
-    "secure2": " garantizando que cada token emitido tenga un equivalente exacto en pesos chilenos depositados en una cuenta bancaria segura en Chile como prueba de reserva."
+    "secure": "Transparencia y Estabilidad",
+    "secure1": "El CLPD siempre se puede intercambiar 1 a 1 por pesos chilenos. Siempre.",
+    "secure2": "Cada token emitido tiene un equivalente exacto en pesos chilenos depositados en una cuenta bancaria segura en Chile como prueba de reserva.",
+    "composition": "Composición de Reserva",
+    "realTime": "SALDOS EN TIEMPO REAL",
+    "balances": "Saldos",
+    "inCirculation": "En circulación",
+    "inReserve": "En reserva",
+    "CLPDCirculation": "CLPD en circulación",
+    "bankReserve": "Efectivo en el banco de reserva"
+  },
+  "deposit": {
+    "deposit": "Depositar CLP",
+    "bankInfo": {
+      "info": "Información de la cuenta bancaria",
+      "bank": "Banco",
+      "accountNumber": "Número de Cuenta"
+    },
+    "transferStatus": "Estado de la transferencia",
+    "initiated": "Iniciada",
+    "processing": "En Proceso",
+    "completed": "Completada",
+    "createOrder": "Crear Orden",
+    "proof": "Comprobante de Transferencia",
+    "upload": "Selecciona PDF o Imagen",
+    "amount": "Monto a depositar",
+    "amountPlaceholder": "100.000",
+    "done": "Hecho"
   }
 }
