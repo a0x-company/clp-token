@@ -3,7 +3,7 @@ import { DepositService } from "@internal/deposits/deposits";
 import { StoredUserData } from "@internal/users/storage";
 
 type RequestWithUser = Request & {
-  user?: Omit<StoredUserData, 'token' | 'createdAt' | 'updatedAt'>;
+  user?: StoredUserData;
 };
 
 interface DepositRequest {
@@ -38,8 +38,7 @@ export function registerDepositHandler(depositService: DepositService) {
       const { amount, user } = validationResult;
 
       const deposit = await depositService.registerDeposit(
-        user.email,
-        user.address,
+        user,
         amount
       );
 

@@ -6,7 +6,8 @@ import { DiscordNotificationService, NotificationType } from "../notifications/d
 import { fromBuffer } from 'pdf2pic';
 import sharp from 'sharp';
 import path from 'path';
-
+import fs from 'fs/promises';
+import { StoredUserData } from "@internal/users";
 
 export class DepositService {
   private storage: DepositDataStorage;
@@ -41,14 +42,13 @@ export class DepositService {
   }
 
   public async registerDeposit(
-    email: string,
-    address: string,
+    user: StoredUserData,
     amount: number
   ): Promise<StoredDepositData> {
     const depositData: StoredDepositData = {
       id: uuidv4(),
-      email,
-      address,
+      email: user.email,
+      address: user.address,
       amount,
       status: DepositStatus.PENDING,
       createdAt: Date.now(),
@@ -58,7 +58,7 @@ export class DepositService {
     const result = await this.storage.addNewDeposit(depositData);
     console.log(`✅ New deposit registered with ID ${result.id}`);
     await this.discordNotificationService.sendNotification(
-      `New deposit registered:\nAmount: ${amount}\nAddress: ${address}\nDeposit ID: ${depositData.id  }\n`,
+      `New deposit registered:\nAmount: ${amount}\nUser Name: ${user.name}\nEmail: ${user.email}\nDeposit ID: ${depositData.id}\n`,
       NotificationType.INFO,
       "New Deposit"
     );
@@ -71,9 +71,9 @@ export class DepositService {
     proofFile: Buffer,
     fileName: string
   ): Promise<void> {
-  
+
     await this.ensureBucketExists();
-  
+
     const bucket = this.bucketStorage.bucket(this.bucketName);
     const fileExtension = path.extname(fileName).toLowerCase();
     
@@ -87,17 +87,17 @@ export class DepositService {
         savePath: "/tmp",
         type: "GraphicsMagick"
       };
-  
+
       const storeAsImage = fromBuffer(proofFile, options);
-  
+
       try {
         const result = await storeAsImage(1);
-  
-        const base64 = (result as any).base64;
-        if (!base64) {
+
+        if (!result.path) {
           throw new Error("Failed to convert PDF to image");
         }
-        pngBuffer = Buffer.from(base64, 'base64');
+
+        pngBuffer = await fs.readFile(result.path);
       } catch (error) {
         console.error("Error converting PDF to PNG:", error);
         throw error;
@@ -105,21 +105,21 @@ export class DepositService {
     } else {
       pngBuffer = await sharp(proofFile).png().toBuffer();
     }
-  
+
     const pngFile = bucket.file(`${depositId}/proof.png`);
     await pngFile.save(pngBuffer, {
       metadata: {
         contentType: 'image/png',
       },
     });
-  
+
     const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${depositId}/proof.png`;
-  
+
     await this.storage.updateDepositData(depositId, {
       proofImageUrl: publicUrl,
       updatedAt: Date.now(),
     });
-  
+
     await this.discordNotificationService.sendNotification(
       `A new deposit proof has been uploaded for ID: ${depositId}.\n\nProof Image:`,
       NotificationType.INFO,

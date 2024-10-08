@@ -14,7 +14,7 @@ if (!config.PROJECT_ID || !config.API_KEY) {
 const VAULT_API_URL = 'https://development-clpd-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance';
 const DATASET_ID = 'vault_data';
 const TABLE_ID = 'balance_history';
-const SEPOLIA_RPC_URL = 'https://sepolia.base.org';
+const RPC_URL = config.RPC_URL;
 const CONTRACT_ADDRESS = '0xbEA4c5A2515A6D9bF4A4175af336663FB8976031'; 
 const ABI = ['function totalSupply() view returns (uint256)'];
 
@@ -117,7 +117,7 @@ async function sendDiscrepancyAlert(balance: number, totalSupply: number, discre
 
 async function getTotalSupply(): Promise<number> {
   try {
-    const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
     const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
     const totalSupply = await contract.totalSupply();
     return Number(ethers.formatUnits(totalSupply, 18));
