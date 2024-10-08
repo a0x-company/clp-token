@@ -36,13 +36,13 @@ export default function Web3AuthConnectorInstance(chains: Chain[]) {
     clientId: clientId,
     chainConfig,
     privateKeyProvider,
-    uiConfig: {
-      appName: name,
-      defaultLanguage: "en",
-      logoLight: "https://web3auth.io/images/web3authlog.png",
-      logoDark: "https://web3auth.io/images/web3authlogodark.png",
-      mode: "dark",
-    },
+    // uiConfig: {
+    //   appName: name,
+    //   defaultLanguage: "en",
+    //   logoLight: "https://web3auth.io/images/web3authlog.png",
+    //   logoDark: "https://web3auth.io/images/web3authlogodark.png",
+    //   mode: "dark",
+    // },
     web3AuthNetwork: web3AuthNetwork,
     enableLogging: true,
   });
