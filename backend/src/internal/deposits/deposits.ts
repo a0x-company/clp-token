@@ -71,9 +71,9 @@ export class DepositService {
     proofFile: Buffer,
     fileName: string
   ): Promise<void> {
-
+  
     await this.ensureBucketExists();
-
+  
     const bucket = this.bucketStorage.bucket(this.bucketName);
     const fileExtension = path.extname(fileName).toLowerCase();
     
@@ -85,13 +85,15 @@ export class DepositService {
         width: 1000,
         height: 1000,
         savePath: "/tmp",
+        type: "GraphicsMagick" // Especificar el tipo de herramienta
       };
-
+  
       const storeAsImage = fromBuffer(proofFile, options);
-
+  
       try {
         const result = await storeAsImage(1);
-
+  
+        // Utilizar 'base64' con as any debido a la definición de tipos
         const base64 = (result as any).base64;
         if (!base64) {
           throw new Error("Failed to convert PDF to image");
@@ -104,21 +106,21 @@ export class DepositService {
     } else {
       pngBuffer = await sharp(proofFile).png().toBuffer();
     }
-
+  
     const pngFile = bucket.file(`${depositId}/proof.png`);
     await pngFile.save(pngBuffer, {
       metadata: {
         contentType: 'image/png',
       },
     });
-
+  
     const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${depositId}/proof.png`;
-
+  
     await this.storage.updateDepositData(depositId, {
       proofImageUrl: publicUrl,
       updatedAt: Date.now(),
     });
-
+  
     await this.discordNotificationService.sendNotification(
       `A new deposit proof has been uploaded for ID: ${depositId}.\n\nProof Image:`,
       NotificationType.INFO,
