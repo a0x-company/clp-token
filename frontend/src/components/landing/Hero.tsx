@@ -17,14 +17,14 @@ const Hero: React.FC<HeroProps> = () => {
     <section className="flex flex-col items-center justify-center h-screen w-full overflow-hidden bg-gradient-to-b from-brand-blue to-white gap-16">
       <div className="flex relative max-lg:mt-16 [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)]">
         <h1 className="text-[120px] leading-none md:text-[240px] text-white font-romaben text-nowrap font-bold animate-infinite-scroll inline-block w-max mr-[4rem]">
-          * Chile Stable Coin * Chile Stable Coin * Chile Stable Coin{" "}
+          * CLPD El Peso Digital * CLPD El Peso Digital * CLPD El Peso Digital{" "}
         </h1>
         <h1
           className="text-[120px] leading-none md:text-[240px] text-white font-romaben text-nowrap font-bold animate-infinite-scroll inline-block w-max before:content-['*']"
           aria-hidden="true"
         >
           {" "}
-          Chile Stable Coin * Chile Stable Coin * Chile Stable Coin
+          CLPD El Peso Digital * CLPD El Peso Digital * CLPD El Peso Digital
         </h1>
       </div>
 

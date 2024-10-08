@@ -1,7 +1,7 @@
 "use client";
 
 // react
-import React from "react";
+import React, { useCallback } from "react";
 
 // next
 import Link from "next/link";
@@ -23,6 +23,9 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { LucideMenu } from "lucide-react";
+import { useConnect } from "wagmi";
+import { useGoogleConnect } from "@/hooks/useGoogleConnect";
+import { useUserStore } from "@/context/global-store";
 
 interface NavbarProps {}
 
@@ -50,6 +53,8 @@ const currentPathStyle =
 
 const Navbar: React.FC<NavbarProps> = () => {
   const t = useTranslations("navbar");
+  const { handleConnect, isConnected, loadingUser } = useGoogleConnect();
+  const { user } = useUserStore();
   const pathname = usePathname();
 
   const currentLang = pathname.startsWith("/es") ? "es" : "en";
@@ -67,16 +72,27 @@ const Navbar: React.FC<NavbarProps> = () => {
               key={link.href}
               href={link.href === "/" ? `/${currentLang}` : `/${currentLang}${link.href}`}
               className={cn(
-                pathname === link.href ? currentPathStyle : "text-white text-xl hover:text-blue-200"
+                pathname === (link.href === "/" ? `/${currentLang}` : `/${currentLang}${link.href}`)
+                  ? currentPathStyle
+                  : "text-white text-xl hover:text-blue-200"
               )}
             >
               {t(link.label)}
             </Link>
           ))}
         </div>
-        <Button className="bg-black text-white h-auto px-6 py-2 text-xl rounded-xl border-2 border-black font-bold shadow-brutalist">
-          {t("login")}
-        </Button>
+        {!isConnected ? (
+          <Button
+            onClick={handleConnect}
+            className="bg-black text-white h-auto px-6 py-2 text-xl rounded-xl border-2 border-black font-bold shadow-brutalist"
+          >
+            {loadingUser ? "loading..." : t("login")}
+          </Button>
+        ) : (
+          <Button className="bg-black text-white h-auto px-6 py-2 text-xl rounded-xl border-2 border-black font-bold shadow-brutalist">
+            {user.name}
+          </Button>
+        )}
       </div>
 
       {/* Mobile */}

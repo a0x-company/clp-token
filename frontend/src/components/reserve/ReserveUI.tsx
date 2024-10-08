@@ -89,45 +89,37 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
 
   console.log(processedReserveData);
 
-  const gradientStyle = { background: "linear-gradient(180deg, #06F 0%, #FFF 100%)" };
+  const gradientStyle = { background: "linear-gradient(180deg, #06F 0%, #FFF 70%)" };
   return (
-    <section className="flex flex-col w-full relative">
-      <div className="flex flex-row items-center w-full relative" style={gradientStyle}>
-        <Image
-          src="/images/reserve/star-left.svg"
-          alt="star-left"
-          width={316}
-          height={802}
-          className="absolute max-md:hidden z-10"
-        />
+    <section className="flex flex-col w-full relative gap-16" style={gradientStyle}>
+      <div className="flex flex-col h-auto px-6 lg:px-[64px] content-center items-center gap-8 lg:gap-[64px] pt-16 lg:pt-[120px] relative">
+        <div className="flex flex-col max-md:w-full max-lg:w-[860px] w-[1080px] content-center items-center gap-[12px]">
+          <p className="text-white font-romaben text-[40px] md:text-[72px] font-[400]">
+            {t("secure")}
+          </p>
 
-        <Image
-          src="/images/reserve/star-top.svg"
-          alt="star-left"
-          width={802}
-          height={316}
-          className="absolute top-0 md:hidden z-10"
-        />
+          <p className="text-white font-helvetica text-[24px] font-bold text-center">
+            {t("secure1")}
+          </p>
+          <p className="text-white font-helvetica text-[24px] text-center">{t("secure2")}</p>
+        </div>
+      </div>
 
-        <div className="flex flex-col w-full md:py-[64px] px-6 lg:px-16 xl:px-[140px]">
-          <div className="max-md:hidden w-full mb-8 z-20">
-            <div className="inline-block bg-white p-[16px] border-2 border-black rounded-[12px] shadow-[4px_4px_0px_0px_#000]">
-              <p className="text-black font-helvetica text-[20px] font-[700]">
-                Balances en tiempo real *
-              </p>
-            </div>
-          </div>
+      <div className="flex flex-row items-center justify-center w-full relative">
+        <div className="flex flex-col max-md:w-[90vw] max-lg:w-[860px] w-[1080px] py-8 md:py-[64px] px-6 lg:px-16 xl:px-[140px] bg-white rounded-xl border-2 border-black shadow-brutalist">
+          <h3 className="text-black text-4xl font-bold text-center">{t("composition")}</h3>
+          <h4 className="text-black text-sm font-bold text-center">{t("realTime")}</h4>
 
-          <div className="flex flex-col md:flex-row w-full justify-between">
-            <div
-              className={`flex flex-col items-center md:items-start z-20 w-full max-md:mb-[15vh] md:w-[45%]`}
-            >
-              <h2 className="text-black font-romaben text-[64px] md:text-[128px] font-[400]">
-                Banco
-              </h2>
+          <div className="w-full h-0.5 my-8 dashed-border opacity-50" />
 
+          <h4 className="text-black text-lg font-bold text-center">{t("balances")}</h4>
+
+          <div className="w-full h-0.5 my-8 dashed-border opacity-50" />
+
+          <div className={`flex items-center justify-center z-20 w-full gap-16`}>
+            <div className="flex flex-col items-center">
               {bankBalance !== null ? (
-                <p className="text-black font-helvetica text-[48px] md:text-[128px] font-[400]">
+                <p className="text-brand-blue font-helvetica text-[36px] font-bold">
                   $
                   {bankBalance.toLocaleString("es-ES", {
                     minimumFractionDigits: 0,
@@ -138,52 +130,14 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
                 <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
               )}
 
-              <div className="flex items-center justify-center gap-[8px]">
-                <Image
-                  src="/images/reserve/santander.png"
-                  alt="Banco Santander Logo"
-                  width={32}
-                  height={32}
-                  className="w-[32px] h-[32px] rounded-full border-2 border-black"
-                />
-
-                <p className="text-black font-helvetica text-xl lg:text-[24px] xl:text-[32px] font-[400]">
-                  Total de Pesos en el Banco
-                </p>
-              </div>
+              <h2 className="text-black font-romaben text-sm font-[400]">{t("inCirculation")}</h2>
+              <div className="w-20 h-96 bg-brand-blue border-2 border-black shadow-brutalist-sm rounded-xl mt-6" />
             </div>
 
-            <Image
-              src="/images/reserve/divider.svg"
-              alt="divider"
-              width={8}
-              height={32}
-              className="max-md:hidden"
-            />
-            <div className="md:hidden w-full relative flex items-center">
-              <div className="inline-block bg-white p-[16px] border-2 border-black rounded-[12px] shadow-[4px_4px_0px_0px_#000] self-center mx-auto z-10">
-                <p className="text-black font-helvetica text-[20px] font-[700]">
-                  Balances en tiempo real
-                </p>
-              </div>
-              <Image
-                src="/images/reserve/divider-mobile.svg"
-                alt="divider"
-                width={388}
-                height={8}
-                className="md:hidden self-center absolute bottom-1/2 translate-y-1/2"
-              />
-            </div>
-
-            <div
-              className={`flex flex-col items-center md:items-end z-20 w-full max-md:mt-[15vh] md:w-[45%]`}
-            >
-              <h2 className="text-black font-romaben text-[64px] md:text-[128px] font-[400]">
-                Tokens
-              </h2>
-
+            <div className="flex flex-col items-center">
               {tokenSupply !== null ? (
-                <p className="text-black font-helvetica text-[48px] md:text-[128px] font-[400]">
+                <p className="text-brand-blue font-helvetica text-[36px] font-bold">
+                  $
                   {parseFloat(tokenSupply).toLocaleString("es-ES", {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0,
@@ -193,59 +147,26 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
                 <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
               )}
 
-              <Link href={`https://sepolia.basescan.org/token/${contractAddress}`} target="_blank">
-                <div className="flex items-center justify-center gap-[8px] cursor-pointer">
-                  <p className="text-black font-helvetica text-xl lg:text-[24px] xl:text-[32px] font-[400]">
-                    Total de CLPD en la red Base
-                  </p>
+              <h2 className="text-black font-romaben text-sm font-[400]">{t("inReserve")}</h2>
+              <div className="w-20 h-96 bg-brand-orange-pastel border-2 border-black shadow-brutalist-sm rounded-xl mt-6" />
+            </div>
+          </div>
 
-                  <Image
-                    src="/images/reserve/base.png"
-                    alt="Base Network Logo"
-                    width={32}
-                    height={32}
-                    className="w-[32px] h-[32px] rounded-full border-2 border-black"
-                  />
-                </div>
-              </Link>
+          <div className="w-full h-0.5 my-8 dashed-border opacity-50" />
+
+          <div className="flex flex-row items-center justify-center w-full gap-16">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-brand-blue rounded-full" />
+              <p className="text-black font-helvetica text-sm">{t("CLPDCirculation")}</p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-brand-orange-pastel rounded-full" />
+              <p className="text-black font-helvetica text-sm">{t("bankReserve")}</p>
             </div>
           </div>
         </div>
 
-        <Image
-          src="/images/reserve/star-bottom.svg"
-          alt="star-bottom"
-          width={802}
-          height={316}
-          className="absolute bottom-0 md:hidden z-10"
-        />
-
-        <Image
-          src="/images/reserve/star-right.svg"
-          alt="star-right"
-          width={316}
-          height={802}
-          className="absolute max-md:hidden right-0 z-10"
-        />
-      </div>
-
-      <div className="flex flex-col h-auto px-6 lg:px-[64px] content-center items-center gap-8 lg:gap-[64px] py-16 lg:py-[120px] relative">
-        <Image
-          src="/images/reserve/secure.svg"
-          alt="Banco Santander Logo"
-          width={205}
-          height={205}
-        />
-
-        <div className="flex flex-col max-md:w-full max-lg:w-[860px] w-[1080px] content-center items-center gap-[12px]">
-          <p className="text-black font-romaben text-[40px] md:text-[64px] font-[400]">
-            {t("secure")}
-          </p>
-
-          <p className="text-black font-helvetica text-[24px] md:text-[32px] font-[400] text-center">
-            <span className="font-bold">{t("secure1")}</span> {t("secure2")}
-          </p>
-        </div>
         <Image
           src="/images/reserve/waves-vector-2.svg"
           alt="Waves Vector"

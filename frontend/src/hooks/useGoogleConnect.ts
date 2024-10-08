@@ -28,6 +28,8 @@ export const useGoogleConnect = () => {
   const router = useRouter();
   const pathname = usePathname();
 
+  const currentLang = pathname.startsWith("/es") ? "es" : "en";
+
   useEffect(() => {
     const checkUserInfo = async () => {
       setLoadingUser(true);
@@ -40,11 +42,7 @@ export const useGoogleConnect = () => {
 
         const encryptionKey = crypto.randomBytes(32).toString("hex");
         const iv = crypto.randomBytes(16);
-        const cipher = crypto.createCipheriv(
-          "aes-256-cbc",
-          Buffer.from(encryptionKey, "hex"),
-          iv
-        );
+        const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(encryptionKey, "hex"), iv);
 
         let encryptedPKey = cipher.update(publicKey as string, "utf8", "hex");
 
@@ -63,13 +61,16 @@ export const useGoogleConnect = () => {
               },
             }
           );
-          setUser(response.data);
-          if (response.data) {
-            localStorage.setItem("rwa_email", response.data.email);
+          if (response.status === 200) {
+            console.log("response", response.data.user);
+            setUser(response.data.user);
+            localStorage.setItem("clpd_email", response.data.user.email);
             if (pathname.includes("onboarding")) {
               const redirectPath = `/onboarding?kyc=true&email=${response.data.email}`;
               router.push(redirectPath);
             }
+          } else {
+            console.log("response", response);
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
