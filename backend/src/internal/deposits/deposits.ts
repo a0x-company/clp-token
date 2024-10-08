@@ -8,6 +8,8 @@ export class DepositService {
   private storage: DepositDataStorage;
   private bucketStorage: Storage;
   private discordNotificationService: DiscordNotificationService;
+  private bucketName: string = 'deposit-proofs';
+
 
   constructor(
     firestore: Firestore,
@@ -17,6 +19,21 @@ export class DepositService {
     this.storage = new DepositDataStorage(firestore);
     this.bucketStorage = bucketStorage;
     this.discordNotificationService = new DiscordNotificationService(discordWebhookUrl);
+  }
+
+  private async ensureBucketExists(): Promise<void> {
+    try {
+      const [bucketExists] = await this.bucketStorage.bucket(this.bucketName).exists();
+      if (!bucketExists) {
+        await this.bucketStorage.createBucket(this.bucketName);
+        console.log(`Bucket ${this.bucketName} created.`);
+      } else {
+        console.log(`Bucket ${this.bucketName} already exists.`);
+      }
+    } catch (error) {
+      console.error(`Error checking/creating bucket ${this.bucketName}:`, error);
+      throw error;
+    }
   }
 
   public async registerDeposit(
@@ -36,6 +53,12 @@ export class DepositService {
 
     const result = await this.storage.addNewDeposit(depositData);
     console.log(`✅ New deposit registered with ID ${result.id}`);
+    await this.discordNotificationService.sendNotification(
+      `New deposit registered:\nAmount: ${amount}\nAddress: ${address}\nDeposit ID: ${depositData.id  }\n\nUse the admin panel to review this deposit.`,
+      NotificationType.INFO,
+      "New Deposit"
+    );
+    
     return result;
   }
 
@@ -44,13 +67,16 @@ export class DepositService {
     proofImage: Buffer,
     fileName: string
   ): Promise<void> {
-    const bucket = this.bucketStorage.bucket("deposit-proofs");
+
+    await this.ensureBucketExists(); // Comprueba y crea el bucket si es necesario
+
+    const bucket = this.bucketStorage.bucket(this.bucketName);
     const file = bucket.file(`${depositId}/${fileName}`);
 
     await file.save(proofImage);
 
     await this.storage.updateDepositData(depositId, {
-      proofImageUrl: `gs://deposit-proofs/${depositId}/${fileName}`,
+      proofImageUrl: `gs://${this.bucketName}/${depositId}/${fileName}`,
       updatedAt: Date.now(),
     });
 
