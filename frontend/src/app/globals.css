@@ -42,9 +42,16 @@ body {
   }
 
   @font-face {
-    font-family: "Romaben";
+    font-family: "Beauford";
     font-weight: 500;
     font-style: normal;
-    src: url("/fonts/Romaben-Regular.ttf") format("ttf");
+    src: url("/fonts/Beauford-Regular.otf") format("otf");
+  }
+
+  @font-face {
+    font-family: "Beauford";
+    font-weight: 700;
+    font-style: normal;
+    src: url("/fonts/Beauford-Bold.otf") format("otf");
   }
 }

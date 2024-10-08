@@ -42,7 +42,7 @@ const EarnSection: React.FC = () => {
       </div>
 
       <div className="flex flex-col flex-[1.5] gap-4 w-full">
-        <h2 className="text-[64px] font-romaben">{t("earn.title")}</h2>
+        <h2 className="text-[64px] font-beauford font-bold">{t("earn.title")}</h2>
         <p className="text-[32px]">{t("earn.description")}</p>
       </div>
     </section>

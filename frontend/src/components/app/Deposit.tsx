@@ -48,7 +48,7 @@ const Deposit: React.FC = () => {
 
   return (
     <Card className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-3xl bg-white border-2 border-black rounded-xl">
-      <CardHeader className="text-black">
+      <CardHeader className="text-black font-beauford font-bold">
         <CardTitle className="flex items-center gap-2">
           {t("deposit")}{" "}
           <FlagIcon code={currencies.CLP.code as FlagIconCode} size={24} className="rounded-md" />

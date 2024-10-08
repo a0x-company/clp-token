@@ -15,7 +15,7 @@ const WithdrawSection: React.FC = () => {
   return (
     <section className="flex flex-col md:flex-row items-center justify-center relative px-8 lg:px-16 xl:px-32 py-[180px] gap-16">
       <div className="flex flex-col flex-[1.5] gap-4 w-full">
-        <h2 className="text-[64px] font-romaben">{t("withdraw.title")}</h2>
+        <h2 className="text-[64px] font-beauford font-bold">{t("withdraw.title")}</h2>
         <p className="text-[32px]">{t("withdraw.description")}</p>
       </div>
 

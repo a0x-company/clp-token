@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
       />
       <div className="flex items-center justify-center gap-2">
         <Image src="/images/landing/clpa-logo-blue.svg" alt="CLPD logo" width={64} height={64} />
-        <h2 className="text-[64px] text-brand-blue font-romaben leading-none mt-2.5">CLPD</h2>
+        <h2 className="text-[64px] text-brand-blue font-beauford-bold leading-none mt-2.5">CLPD</h2>
       </div>
       <p className="text-black font-bold">Un producto de A0x © 2024</p>
     </footer>

@@ -73,7 +73,7 @@ export default async function Reserve() {
   }
 
   return (
-    <main className="min-h-screen max-w-screen overflow-hidden bg-white text-black">
+    <main className="min-h-screen max-w-screen bg-white text-black">
       <Navbar />
       <ReserveUI bankBalance={bankBalance} tokenSupply={tokenSupply} />
       <FAQSection />

@@ -39,7 +39,8 @@ const config: Config = {
       },
       fontFamily: {
         helvetica: "var(--font-helvetica)",
-        romaben: "var(--font-romaben)",
+        beauford: "var(--font-beauford)",
+        "beauford-bold": "var(--font-beauford-bold)",
       },
       boxShadow: {
         brutalist: "4px 4px 0px 0px rgba(0,0,0,1)",
