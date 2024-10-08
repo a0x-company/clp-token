@@ -3,6 +3,10 @@ import { Storage } from "@google-cloud/storage";
 import { v4 as uuidv4 } from 'uuid';
 import { DepositDataStorage, StoredDepositData, DepositStatus } from "./storage";
 import { DiscordNotificationService, NotificationType } from "../notifications/discord";
+import { fromBuffer } from 'pdf2pic';
+import sharp from 'sharp';
+import path from 'path';
+
 
 export class DepositService {
   private storage: DepositDataStorage;
@@ -54,36 +58,72 @@ export class DepositService {
     const result = await this.storage.addNewDeposit(depositData);
     console.log(`✅ New deposit registered with ID ${result.id}`);
     await this.discordNotificationService.sendNotification(
-      `New deposit registered:\nAmount: ${amount}\nAddress: ${address}\nDeposit ID: ${depositData.id  }\n\nUse the admin panel to review this deposit.`,
+      `New deposit registered:\nAmount: ${amount}\nAddress: ${address}\nDeposit ID: ${depositData.id  }\n`,
       NotificationType.INFO,
       "New Deposit"
     );
-    
+
     return result;
   }
 
   public async uploadProofOfDeposit(
     depositId: string,
-    proofImage: Buffer,
+    proofFile: Buffer,
     fileName: string
   ): Promise<void> {
 
-    await this.ensureBucketExists(); // Comprueba y crea el bucket si es necesario
+    await this.ensureBucketExists();
 
     const bucket = this.bucketStorage.bucket(this.bucketName);
-    const file = bucket.file(`${depositId}/${fileName}`);
+    const fileExtension = path.extname(fileName).toLowerCase();
+    
+    let pngBuffer: Buffer;
+    if (fileExtension === '.pdf') {
+      const options = {
+        density: 100,
+        format: "png",
+        width: 1000,
+        height: 1000,
+        savePath: "/tmp",
+      };
 
-    await file.save(proofImage);
+      const storeAsImage = fromBuffer(proofFile, options);
+
+      try {
+        const result = await storeAsImage(1);
+
+        const base64 = (result as any).base64;
+        if (!base64) {
+          throw new Error("Failed to convert PDF to image");
+        }
+        pngBuffer = Buffer.from(base64, 'base64');
+      } catch (error) {
+        console.error("Error converting PDF to PNG:", error);
+        throw error;
+      }
+    } else {
+      pngBuffer = await sharp(proofFile).png().toBuffer();
+    }
+
+    const pngFile = bucket.file(`${depositId}/proof.png`);
+    await pngFile.save(pngBuffer, {
+      metadata: {
+        contentType: 'image/png',
+      },
+    });
+
+    const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${depositId}/proof.png`;
 
     await this.storage.updateDepositData(depositId, {
-      proofImageUrl: `gs://${this.bucketName}/${depositId}/${fileName}`,
+      proofImageUrl: publicUrl,
       updatedAt: Date.now(),
     });
 
     await this.discordNotificationService.sendNotification(
-      `A new deposit proof has been uploaded for ID: ${depositId}. Please verify it.`,
+      `A new deposit proof has been uploaded for ID: ${depositId}.\n\nProof Image:`,
       NotificationType.INFO,
-      "New Deposit Proof"
+      "New Deposit Proof",
+      publicUrl
     );
     console.log(`📤 Proof of deposit uploaded for ID ${depositId}`);
   }
