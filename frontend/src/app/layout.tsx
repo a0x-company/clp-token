@@ -19,8 +19,8 @@ import { decrypt } from "@/lib/auth";
 import { UserInitializer } from "@/hooks/useUserInitializer";
 
 export const metadata: Metadata = {
-  title: "CLP Token",
-  description: "CLP Token",
+  title: "CLPD Token",
+  description: "CLPD Token",
 };
 
 export default async function RootLayout({

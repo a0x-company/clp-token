@@ -65,15 +65,15 @@ export default async function Reserve() {
   let bankBalance: number | null = null;
   let tokenSupply: string | null = null;
   try {
-    bankBalance = await fetchBankBalance();
-    tokenSupply = await fetchTokenSupply();
+    [bankBalance, tokenSupply] = await Promise.all([fetchBankBalance(), fetchTokenSupply()]);
+    console.log("bankBalance", bankBalance);
     console.log("tokenSupply", tokenSupply);
   } catch (error) {
     console.error("Error al obtener los datos de reserva:", error);
   }
 
   return (
-    <main className="min-h-screen max-w-screen overflow-hidden bg-white text-black">
+    <main className="min-h-screen max-w-screen bg-white text-black">
       <Navbar />
       <ReserveUI bankBalance={bankBalance} tokenSupply={tokenSupply} />
       <FAQSection />

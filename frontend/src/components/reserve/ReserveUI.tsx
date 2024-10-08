@@ -94,7 +94,7 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
     <section className="flex flex-col w-full relative gap-16" style={gradientStyle}>
       <div className="flex flex-col h-auto px-6 lg:px-[64px] content-center items-center gap-8 lg:gap-[64px] pt-16 lg:pt-[120px] relative">
         <div className="flex flex-col max-md:w-full max-lg:w-[860px] w-[1080px] content-center items-center gap-[12px]">
-          <p className="text-white font-romaben text-[40px] md:text-[72px] font-[400]">
+          <p className="text-white font-beauford text-[40px] md:text-[72px] font-[400]">
             {t("secure")}
           </p>
 
@@ -130,7 +130,7 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
                 <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
               )}
 
-              <h2 className="text-black font-romaben text-sm font-[400]">{t("inCirculation")}</h2>
+              <h2 className="text-black text-sm font-[400]">{t("inCirculation")}</h2>
               <div className="w-20 h-96 bg-brand-blue border-2 border-black shadow-brutalist-sm rounded-xl mt-6" />
             </div>
 
@@ -147,7 +147,7 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
                 <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
               )}
 
-              <h2 className="text-black font-romaben text-sm font-[400]">{t("inReserve")}</h2>
+              <h2 className="text-black text-sm font-[400]">{t("inReserve")}</h2>
               <div className="w-20 h-96 bg-brand-orange-pastel border-2 border-black shadow-brutalist-sm rounded-xl mt-6" />
             </div>
           </div>

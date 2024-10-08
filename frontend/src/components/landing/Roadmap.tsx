@@ -50,7 +50,7 @@ const Quarter = ({
           side === "left" ? "ml-auto" : "mr-auto"
         )}
       >
-        <h3 className="text-[64px] font-romaben text-black">{title}</h3>
+        <h3 className="text-[64px] font-beauford font-bold text-black">{title}</h3>
       </div>
 
       <ul className="list-disc list-outside text-[20px] text-black bg-white rounded-xl px-8 py-4 border-2 border-black shadow-brutalist">
@@ -66,7 +66,7 @@ const Roadmap: React.FC = () => {
   return (
     <section className="min-h-screen flex items-start justify-start bg-brand-orange-pastel py-16 px-8 lg:px-16 xl:px-32 relative overflow-hidden gap-8 lg:gap-16">
       <div className="flex flex-col flex-1 items-start gap-[160px]">
-        <h2 className="text-[64px] font-romaben text-white">{t("title")}</h2>
+        <h2 className="text-[64px] font-beauford font-bold text-white">{t("title")}</h2>
 
         {isMobile && (
           /* Q4 */
@@ -148,7 +148,7 @@ const Roadmap: React.FC = () => {
           </li>
         </Quarter>
 
-        <h2 className="text-[64px] font-romaben text-white absolute bottom-16 right-8 lg:right-16 xl:right-32">
+        <h2 className="text-[64px] font-beauford font-bold text-white absolute bottom-16 right-8 lg:right-16 xl:right-32">
           {t("title")}
         </h2>
       </div>

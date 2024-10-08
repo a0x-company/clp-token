@@ -13,8 +13,8 @@ export async function GET(request: Request) {
     const tokenSupply = hasTokenSupply ? searchParams.get("tokenSupply") : "0";
 
     // Font
-    const fontDataRomaben = await fetch(
-      new URL("../../../../public/fonts/Romaben-Regular.ttf", import.meta.url)
+    const fontDataBeauford = await fetch(
+      new URL("../../../../public/fonts/Beauford-Bold.otf", import.meta.url)
     ).then((res) => res.arrayBuffer());
 
     const fontDataHelvetica = await fetch(
@@ -57,7 +57,7 @@ export async function GET(request: Request) {
                 color: "black",
                 fontSize: "2rem",
                 fontWeight: "700",
-                fontFamily: "Romaben",
+                fontFamily: "Beauford",
               }}
             >
               Balances en tiempo real
@@ -95,7 +95,7 @@ export async function GET(request: Request) {
                     fontSize: "64px",
                     fontWeight: "700",
                     marginBottom: "0.5rem",
-                    fontFamily: "Romaben",
+                    fontFamily: "Beauford",
                   }}
                 >
                   Banco
@@ -158,7 +158,7 @@ export async function GET(request: Request) {
                     fontWeight: "700",
                     marginBottom: "0.5rem",
                     marginRight: "-0.5rem",
-                    fontFamily: "Romaben",
+                    fontFamily: "Beauford",
                   }}
                 >
                   Tokens
@@ -180,7 +180,7 @@ export async function GET(request: Request) {
                   color: "black",
                 }}
               >
-                <span style={{ fontSize: "2rem" }}>Total de Pesos en el Banco</span>
+                <span style={{ fontSize: "2rem" }}>Total de Tokens</span>
               </div>
             </div>
           </div>
@@ -192,8 +192,8 @@ export async function GET(request: Request) {
 
         fonts: [
           {
-            name: "Romaben",
-            data: fontDataRomaben,
+            name: "Beauford",
+            data: fontDataBeauford,
             style: "normal",
             weight: 500,
           },

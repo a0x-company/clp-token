@@ -9,9 +9,6 @@ import { NextIntlClientProvider } from "next-intl";
 // global styles
 import "./globals.css";
 
-// coponents
-import Navbar from "@/components/Navbar";
-
 export const metadata: Metadata = {
   title: "CLP Token",
   description: "CLP Token",
@@ -31,14 +28,24 @@ const helvetica = localFont({
   variable: "--font-helvetica",
 });
 
-const romaben = localFont({
+const beauford = localFont({
   src: [
     {
-      path: "../../../public/fonts/Romaben-Regular.ttf",
+      path: "../../../public/fonts/Beauford-Regular.otf",
       weight: "500",
     },
   ],
-  variable: "--font-romaben",
+  variable: "--font-beauford",
+});
+
+const beaufordBold = localFont({
+  src: [
+    {
+      path: "../../../public/fonts/Beauford-Bold.otf",
+      weight: "700",
+    },
+  ],
+  variable: "--font-beauford-bold",
 });
 
 export default async function RootLayout({
@@ -64,7 +71,11 @@ export default async function RootLayout({
       now={new Date()}
     >
       <html lang="en">
-        <body className={`${helvetica.variable} ${romaben.variable} antialiased`}>{children}</body>
+        <body
+          className={`${helvetica.variable} ${beauford.variable} ${beaufordBold.variable} antialiased`}
+        >
+          {children}
+        </body>
       </html>
     </NextIntlClientProvider>
   );

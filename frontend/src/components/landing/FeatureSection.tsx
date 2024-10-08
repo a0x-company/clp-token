@@ -10,7 +10,7 @@ const FeatureSection: React.FC = () => {
   return (
     <section className="min-h-screen max-[420px]:h-[158vh] max-[768px]:h-[140vh] flex flex-col items-start justify-start bg-white pt-12 lg:pt-16 px-8 lg:px-16 xl:px-32 relative overflow-hidden gap-16">
       <div className="flex flex-col items-start justify-center gap-8">
-        <h2 className="text-[48px] lg:text-[64px] font-romaben text-black text-start">
+        <h2 className="text-[48px] lg:text-[64px] font-beauford font-bold text-black text-start">
           {t("features.title")}
         </h2>
         <p className="text-[24px] lg:text-[32px] text-start text-black">
