@@ -65,8 +65,8 @@ export default async function Reserve() {
   let bankBalance: number | null = null;
   let tokenSupply: string | null = null;
   try {
-    bankBalance = await fetchBankBalance();
-    tokenSupply = await fetchTokenSupply();
+    [bankBalance, tokenSupply] = await Promise.all([fetchBankBalance(), fetchTokenSupply()]);
+    console.log("bankBalance", bankBalance);
     console.log("tokenSupply", tokenSupply);
   } catch (error) {
     console.error("Error al obtener los datos de reserva:", error);

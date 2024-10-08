@@ -17,7 +17,7 @@ export const clientId =
 
 export default function Web3AuthConnectorInstance(chains: Chain[]) {
   // Create Web3Auth Instance
-  const name = "CLP Token";
+  const name = "CLPD Token";
   const chainConfig = {
     chainNamespace: CHAIN_NAMESPACES.EIP155,
     chainId: "0x" + chains[0].id.toString(16),
