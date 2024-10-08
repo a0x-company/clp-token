@@ -12,6 +12,7 @@ import { getDepositsByStatusHandler } from "./get-deposits-handler";
 import { mintDepositsHandler } from "./mint-deposits-handler";
 import { registerDepositHandler } from "./register-deposit-handler";
 import { uploadProofOfDepositHandler } from "./upload-proof-of-deposit-handler";
+import { renderApprovalFormHandler } from "./render-approval-form-handler";
 
 // middleware
 import { AuthMiddleware } from "@internal/http/middlewares/authentication";
@@ -28,7 +29,11 @@ export function setupDepositRoutes(
   depositRouter.post("/", AuthMiddleware(userService), registerDepositHandler(depositService));
   depositRouter.post("/:depositId/proof", AuthMiddleware(userService), upload.single('proofImage'), uploadProofOfDepositHandler(depositService));
   depositRouter.get("/status/:status", AuthMiddleware(userService), getDepositsByStatusHandler(depositService));
-  depositRouter.post("/:depositId/approve-reject", AuthMiddleware(userService), approveRejectDepositHandler(depositService));
+  
+  depositRouter.get("/approval-form/:depositId/:token", renderApprovalFormHandler(depositService));
+  
+  depositRouter.post("/:depositId/approve-reject/:token", approveRejectDepositHandler(depositService));
+  
   depositRouter.post("/mint", AuthMiddleware(userService), mintDepositsHandler(depositService));
 
   router.use("/deposits", depositRouter);
