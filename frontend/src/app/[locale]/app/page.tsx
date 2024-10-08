@@ -12,7 +12,7 @@ export default function App({
   return (
     <main className="min-h-screen min-w-screen bg-white text-black">
       <AppNavbar />
-      {(searchParams.tab === "deposit" || searchParams.tab === "") && <Deposit />}
+      {(searchParams.tab === "deposit" || !searchParams.tab) && <Deposit />}
       {searchParams.tab === "withdraw" && <Withdraw />}
     </main>
   );
