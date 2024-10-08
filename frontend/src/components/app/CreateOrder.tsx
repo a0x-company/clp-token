@@ -59,24 +59,23 @@ const CreateOrder: React.FC<CreateOrderProps> = ({ open, setOpen, setTransferSta
     const userInfo = await web3AuthInstance.getUserInfo();
     const idToken = userInfo?.idToken;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      // const response = await axios.post(
-      //   "/api/create-order",
-      //   { file, amount },
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${idToken}`,
-      //       "Content-Type": "multipart/form-data",
-      //     },
-      //   }
-      // );
-      // console.log(response);
-      // if (response.status === 201 || response.status === 200) {
-      setFile(null);
-      setAmount("");
-      setOpen(false);
-      setTransferStatus("processing");
-      // }
+      const response = await axios.post(
+        "/api/create-order",
+        { file, amount },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(response);
+      if (response.status === 201 || response.status === 200) {
+        setFile(null);
+        setAmount("");
+        setOpen(false);
+        setTransferStatus("processing");
+      }
     } catch (error) {
       console.log(error);
     } finally {

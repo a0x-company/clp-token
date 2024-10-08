@@ -26,10 +26,11 @@ const currencies = {
 };
 
 const bankInfo = {
-  name: "Banco Internacional",
-  accountNumber: "1234567890",
-  swiftCode: "INTLBANKXXX",
-  address: "123 Calle Principal, Ciudad, País",
+  name: "Banco Santander",
+  accountType: "Cuenta Vista",
+  owner: "Cristian Ignacio Valdivia Ramirez",
+  accountNumber: "0 070 08 99853 6",
+  email: "c@mistokens.com",
 };
 
 const Deposit: React.FC = () => {
@@ -54,7 +55,7 @@ const Deposit: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 text-black">
-        <Card>
+        <Card className="rounded-xl">
           <CardHeader>
             <CardTitle className="text-lg">{t("bankInfo.info")}</CardTitle>
           </CardHeader>
@@ -64,6 +65,12 @@ const Deposit: React.FC = () => {
             </p>
             <p>
               <strong>{t("bankInfo.accountNumber")}:</strong> {bankInfo.accountNumber}
+            </p>
+            <p>
+              <strong>{t("bankInfo.owner")}:</strong> {bankInfo.owner}
+            </p>
+            <p>
+              <strong>{t("bankInfo.email")}:</strong> {bankInfo.email}
             </p>
           </CardContent>
         </Card>

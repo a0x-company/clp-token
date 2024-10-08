@@ -102,7 +102,9 @@
     "bankInfo": {
       "info": "Bank Account Information",
       "bank": "Bank",
-      "accountNumber": "Account Number"
+      "accountNumber": "Account Number",
+      "owner": "Owner",
+      "email": "Email"
     },
     "transferStatus": "Transfer Status",
     "initiated": "Initiated",

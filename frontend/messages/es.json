@@ -102,7 +102,9 @@
     "bankInfo": {
       "info": "Información de la cuenta bancaria",
       "bank": "Banco",
-      "accountNumber": "Número de Cuenta"
+      "accountNumber": "Número de Cuenta",
+      "owner": "Titular",
+      "email": "Email"
     },
     "transferStatus": "Estado de la transferencia",
     "initiated": "Iniciada",
