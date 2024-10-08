@@ -85,7 +85,7 @@ export class DepositService {
         width: 1000,
         height: 1000,
         savePath: "/tmp",
-        type: "GraphicsMagick" // Especificar el tipo de herramienta
+        type: "GraphicsMagick"
       };
   
       const storeAsImage = fromBuffer(proofFile, options);
@@ -93,7 +93,6 @@ export class DepositService {
       try {
         const result = await storeAsImage(1);
   
-        // Utilizar 'base64' con as any debido a la definición de tipos
         const base64 = (result as any).base64;
         if (!base64) {
           throw new Error("Failed to convert PDF to image");
