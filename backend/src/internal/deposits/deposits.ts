@@ -126,14 +126,30 @@ export class DepositService {
       "New Deposit Proof",
       publicUrl
     );
+  
+    const approvalToken = await this.storage.generateApprovalToken(depositId);
+    const approvalLink = `https://development-clpa-api-claucondor-61523929174.us-central1.run.app/deposits/approval-form/${depositId}/${approvalToken}`;
+
+    await this.discordNotificationService.sendNotification(
+      `New deposit proof uploaded for ID: ${depositId}.\n\nProof Image: ${publicUrl}\n\nApproval Link: ${approvalLink}`,
+      NotificationType.WARNING,
+      "New Deposit Proof - Action Required"
+    );
     console.log(`📤 Proof of deposit uploaded for ID ${depositId}`);
+
   }
 
-  public async approveDeposit(depositId: string): Promise<void> {
+  public async approveDeposit(depositId: string, token: string): Promise<void> {
+    if (!(await this.validateApprovalToken(depositId, token))) {
+      throw new Error("Invalid or expired approval token");
+    }
+
     await this.storage.updateDepositData(depositId, {
       status: DepositStatus.ACCEPTED_NOT_MINTED,
       updatedAt: Date.now(),
     });
+
+    await this.storage.deleteApprovalToken(token);
 
     const deposit = await this.storage.getDeposit(depositId);
     if (deposit) {
@@ -168,12 +184,24 @@ export class DepositService {
     console.log(`🪙 Batch minting completed for ${deposits.length} deposits`);
   }
 
-  public async rejectDeposit(depositId: string, reason: string): Promise<void> {
+  public async rejectDeposit(depositId: string, reason: string, token: string): Promise<void> {
+    if (!(await this.validateApprovalToken(depositId, token))) {
+      throw new Error("Invalid or expired approval token");
+    }
+
     await this.storage.updateDepositData(depositId, {
       status: DepositStatus.REJECTED,
       rejectionReason: reason,
       updatedAt: Date.now(),
     });
+
+    await this.storage.deleteApprovalToken(token);
+
+    await this.discordNotificationService.sendNotification(
+      `Deposit with ID ${depositId} has been rejected. Reason: ${reason}`,
+      NotificationType.ERROR,
+      "Deposit Rejected"
+    );
     console.log(`❌ Deposit rejected: ID ${depositId}`);
   }
 
@@ -198,4 +226,12 @@ export class DepositService {
   public async getRejectedDeposits(): Promise<StoredDepositData[]> {
     return this.getDepositsByStatus(DepositStatus.REJECTED);
   }
+
+  public async validateApprovalToken(depositId: string, token: string): Promise<boolean> {
+    return await this.storage.validateApprovalToken(depositId, token);
+  }
+
+
+
+  
 }

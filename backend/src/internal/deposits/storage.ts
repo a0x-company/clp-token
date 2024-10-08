@@ -1,4 +1,5 @@
 import { Firestore, CollectionReference, Query } from "@google-cloud/firestore";
+import crypto from 'crypto';
 
 export enum DepositStatus {
   PENDING = "pending",
@@ -7,6 +8,10 @@ export enum DepositStatus {
   REJECTED = "rejected"
 }
 
+export interface ApprovalToken {
+  depositId: string;
+  expiresAt: number;
+}
 export interface StoredDepositData {
   id: string;
   email: string;
@@ -23,6 +28,7 @@ export interface StoredDepositData {
 export class DepositDataStorage {
   private firestore: Firestore;
   private depositCollectionName: string = "deposits";
+  private approvalTokenCollectionName: string = "approvalTokens";
 
   constructor(firestore: Firestore) {
     this.firestore = firestore;
@@ -30,6 +36,10 @@ export class DepositDataStorage {
 
   private get depositCollection(): CollectionReference {
     return this.firestore.collection(this.depositCollectionName);
+  }
+
+  private get approvalTokenCollection(): CollectionReference {
+    return this.firestore.collection(this.approvalTokenCollectionName);
   }
 
   public async addNewDeposit(depositData: StoredDepositData): Promise<StoredDepositData> {
@@ -105,6 +115,52 @@ export class DepositDataStorage {
       } else {
         throw new Error("Error getting deposits by status: Unknown error");
       }
+    }
+  }
+
+  public async generateApprovalToken(depositId: string): Promise<string> {
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours validity
+
+    try {
+      await this.approvalTokenCollection.doc(token).set({
+        depositId,
+        expiresAt
+      });
+      console.log(`✅ Approval token generated for deposit ID ${depositId}`);
+      return token;
+    } catch (error) {
+      console.error(`❌ Error generating approval token for deposit ID ${depositId}:`, error);
+      throw error;
+    }
+  }
+
+  public async validateApprovalToken(depositId: string, token: string): Promise<boolean> {
+    try {
+      const doc = await this.approvalTokenCollection.doc(token).get();
+      if (!doc.exists) {
+        return false;
+      }
+
+      const tokenData = doc.data() as ApprovalToken;
+      if (tokenData.depositId !== depositId || tokenData.expiresAt < Date.now()) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error(`❌ Error validating approval token:`, error);
+      return false;
+    }
+  }
+
+  public async deleteApprovalToken(token: string): Promise<void> {
+    try {
+      await this.approvalTokenCollection.doc(token).delete();
+      console.log(`✅ Approval token deleted`);
+    } catch (error) {
+      console.error(`❌ Error deleting approval token:`, error);
+      throw error;
     }
   }
 }
