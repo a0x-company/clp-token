@@ -41,7 +41,7 @@ export default function Web3AuthConnectorInstance(chains: Chain[]) {
       defaultLanguage: "en",
       logoLight: "https://web3auth.io/images/web3authlog.png",
       logoDark: "https://web3auth.io/images/web3authlogodark.png",
-      mode: "light",
+      mode: "dark",
     },
     web3AuthNetwork: web3AuthNetwork,
     enableLogging: true,
