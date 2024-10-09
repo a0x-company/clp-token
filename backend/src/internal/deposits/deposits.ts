@@ -67,7 +67,7 @@ export class DepositService {
     );
 
     await this.emailNotificationService.sendNotification(
-      'tu-email@ejemplo.com',
+      user.email,
       EmailType.NEW_DEPOSIT,
       { amount, userName: user.name, depositId: depositData.id }
     );    

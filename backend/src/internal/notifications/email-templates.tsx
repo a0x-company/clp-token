@@ -29,66 +29,72 @@ const buttonStyles = {
   marginTop: '20px',
 };
 
+
 export const NewDepositEmail = ({ amount, userName, depositId }) => (
-  <Html>
-    <Head />
-    <Body style={baseStyles}>
-      <Container style={containerStyles}>
-        <Section style={headerStyles}>
-          <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
-        </Section>
-        <Text>Dear Administrator,</Text>
-        <Text>A new deposit has been registered with the following details:</Text>
-        <Text><strong>Amount:</strong> ${amount}</Text>
-        <Text><strong>User:</strong> {userName}</Text>
-        <Text><strong>Deposit ID:</strong> {depositId}</Text>
-        <Button href="https://yourcompany.com/admin/deposits" style={buttonStyles}>
-          Review Deposit
-        </Button>
-      </Container>
-    </Body>
-  </Html>
-);
+    <Html>
+      <Head />
+      <Body style={baseStyles}>
+        <Container style={containerStyles}>
+          <Section style={headerStyles}>
+            <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
+          </Section>
+          <Text>Dear {userName},</Text>
+          <Text>We have received your deposit request and proof of payment. Thank you for choosing our tokenization service.</Text>
+          <Text>Here are the details of your deposit:</Text>
+          <Text><strong>Amount:</strong> ${amount}</Text>
+          <Text><strong>Deposit ID:</strong> {depositId}</Text>
+          <Text>Our team will validate your deposit shortly. Once approved, we will issue your tokens at a 1:1 ratio with your deposit amount.</Text>
+          <Text>We'll notify you as soon as the validation process is complete.</Text>
+          <Button href="https://yourcompany.com/account/deposits" style={buttonStyles}>
+            Track Deposit Status
+          </Button>
+        </Container>
+      </Body>
+    </Html>
+  );
 
-export const DepositApprovedEmail = ({ amount, depositId }) => (
-  <Html>
-    <Head />
-    <Body style={baseStyles}>
-      <Container style={containerStyles}>
-        <Section style={headerStyles}>
-          <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
-        </Section>
-        <Text>Dear Valued Customer,</Text>
-        <Text>Great news! Your deposit has been approved:</Text>
-        <Text><strong>Amount:</strong> ${amount}</Text>
-        <Text><strong>Deposit ID:</strong> {depositId}</Text>
-        <Text>Thank you for choosing our services. Your funds are now available in your account.</Text>
-        <Button href="https://yourcompany.com/account" style={buttonStyles}>
-          View Account
-        </Button>
-      </Container>
-    </Body>
-  </Html>
-);
-
-export const DepositRejectedEmail = ({ amount, depositId, reason }) => (
-  <Html>
-    <Head />
-    <Body style={baseStyles}>
-      <Container style={containerStyles}>
-        <Section style={headerStyles}>
-          <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
-        </Section>
-        <Text>Dear Valued Customer,</Text>
-        <Text>We regret to inform you that your deposit has been rejected:</Text>
-        <Text><strong>Amount:</strong> ${amount}</Text>
-        <Text><strong>Deposit ID:</strong> {depositId}</Text>
-        <Text><strong>Reason:</strong> {reason}</Text>
-        <Text>If you have any questions or need further clarification, please don't hesitate to contact our support team.</Text>
-        <Button href="https://yourcompany.com/support" style={buttonStyles}>
-          Contact Support
-        </Button>
-      </Container>
-    </Body>
-  </Html>
-);
+  export const DepositApprovedEmail = ({ amount, depositId, userName }) => (
+    <Html>
+      <Head />
+      <Body style={baseStyles}>
+        <Container style={containerStyles}>
+          <Section style={headerStyles}>
+            <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
+          </Section>
+          <Text>Dear {userName},</Text>
+          <Text>Great news! Your deposit has been approved and tokens have been programed to be issued:</Text>
+          <Text><strong>Amount Deposited:</strong> ${amount}</Text>
+          <Text><strong>Tokens Issued:</strong> {amount} (1:1 ratio)</Text>
+          <Text><strong>Deposit ID:</strong> {depositId}</Text>
+          <Text>Thank you for choosing our tokenization service. Your tokens will show be available in your wallet shortly.</Text>
+          <Text>If you don't recognize this transaction, please contact us immediately.</Text>
+          <Button href="https://yourcompany.com/account" style={buttonStyles}>
+            View Wallet
+          </Button>
+        </Container>
+      </Body>
+    </Html>
+  );
+  
+  export const DepositRejectedEmail = ({ amount, depositId, reason, userName }) => (
+    <Html>
+      <Head />
+      <Body style={baseStyles}>
+        <Container style={containerStyles}>
+          <Section style={headerStyles}>
+            <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
+          </Section>
+          <Text>Dear {userName},</Text>
+          <Text>We regret to inform you that your deposit for tokenization has been rejected:</Text>
+          <Text><strong>Amount:</strong> ${amount}</Text>
+          <Text><strong>Deposit ID:</strong> {depositId}</Text>
+          <Text><strong>Reason:</strong> {reason}</Text>
+          <Text>If you have any questions or need further clarification about the tokenization process, please don't hesitate to contact our support team. We're here to help you with your deposit and token issuance.</Text>
+          <Text>If you haven't attempted any deposit, please inform us immediately.</Text>
+          <Button href="https://yourcompany.com/support" style={buttonStyles}>
+            Contact Support
+          </Button>
+        </Container>
+      </Body>
+    </Html>
+  );

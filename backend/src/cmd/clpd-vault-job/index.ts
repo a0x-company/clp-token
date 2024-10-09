@@ -15,7 +15,7 @@ const VAULT_API_URL = 'https://development-clpd-vault-api-claucondor-61523929174
 const DATASET_ID = 'vault_data';
 const TABLE_ID = 'balance_history';
 const RPC_URL = config.RPC_URL;
-const CONTRACT_ADDRESS = '0xbEA4c5A2515A6D9bF4A4175af336663FB8976031'; 
+const CONTRACT_ADDRESS = '0xe97d2Ed8261b6aeE31fD216916E2FcE7252F44ed'; 
 const ABI = ['function totalSupply() view returns (uint256)'];
 
 const firestore = new Firestore({projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV});
