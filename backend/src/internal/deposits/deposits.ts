@@ -172,6 +172,12 @@ export class DepositService {
         NotificationType.SUCCESS,
         "Deposit Approved"
       );
+
+      await this.emailNotificationService.sendNotification(
+        deposit.email,
+        EmailType.DEPOSIT_APPROVED,
+        { amount: deposit.amount, depositId: deposit.id }
+      );
     }
     console.log(`✅ Deposit approved: ID ${depositId} by ${memberName}`);
     return memberName;
@@ -216,11 +222,20 @@ export class DepositService {
 
     await this.storage.deleteApprovalToken(token);
 
-    await this.discordNotificationService.sendNotification(
-      `Deposit with ID ${depositId} has been rejected by ${memberName}. Reason: ${reason}`,
-      NotificationType.ERROR,
-      "Deposit Rejected"
-    );
+    const deposit = await this.storage.getDeposit(depositId);
+    if (deposit) {
+      await this.discordNotificationService.sendNotification(
+        `Deposit with ID ${depositId} has been rejected by ${memberName}. Reason: ${reason}`,
+        NotificationType.ERROR,
+        "Deposit Rejected"
+      );
+  
+      await this.emailNotificationService.sendNotification(
+        deposit.email,
+        EmailType.DEPOSIT_REJECTED,
+        { amount: deposit.amount, depositId: deposit.id, reason }
+      );
+    }
     console.log(`❌ Deposit rejected: ID ${depositId} by ${memberName}`);
     return memberName;
   }
