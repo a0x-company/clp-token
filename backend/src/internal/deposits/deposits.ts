@@ -2,7 +2,7 @@ import { Firestore } from "@google-cloud/firestore";
 import { Storage } from "@google-cloud/storage";
 import { v4 as uuidv4 } from 'uuid';
 import { DepositDataStorage, StoredDepositData, DepositStatus } from "./storage";
-import { DiscordNotificationService, NotificationType } from "../notifications/discord";
+import { DiscordNotificationService, NotificationType, EmailNotificationService , EmailType} from "../notifications";
 import { fromBuffer } from 'pdf2pic';
 import sharp from 'sharp';
 import path from 'path';
@@ -13,17 +13,20 @@ export class DepositService {
   private storage: DepositDataStorage;
   private bucketStorage: Storage;
   private discordNotificationService: DiscordNotificationService;
+  private emailNotificationService: EmailNotificationService;  
   private bucketName: string = 'deposit-proofs';
 
 
   constructor(
     firestore: Firestore,
     bucketStorage: Storage,
-    discordWebhookUrl: string
+    discordWebhookUrl: string,
+    resendApiKey: string
   ) {
     this.storage = new DepositDataStorage(firestore);
     this.bucketStorage = bucketStorage;
     this.discordNotificationService = new DiscordNotificationService(discordWebhookUrl);
+    this.emailNotificationService = new EmailNotificationService(resendApiKey);
   }
 
   private async ensureBucketExists(): Promise<void> {
@@ -62,6 +65,12 @@ export class DepositService {
       NotificationType.INFO,
       "New Deposit"
     );
+
+    await this.emailNotificationService.sendNotification(
+      'tu-email@ejemplo.com',
+      EmailType.NEW_DEPOSIT,
+      { amount, userName: user.name, depositId: depositData.id }
+    );    
 
     return result;
   }

@@ -41,15 +41,15 @@ export class EmailNotificationService {
     switch (type) {
       case EmailType.NEW_DEPOSIT:
         subject = 'Nuevo depósito registrado';
-        htmlContent = render(NewDepositEmail(data));
+        htmlContent = await render(NewDepositEmail(data));
         break;
       case EmailType.DEPOSIT_APPROVED:
         subject = 'Tu depósito ha sido aprobado';
-        htmlContent = render(DepositApprovedEmail(data));
+        htmlContent = await render(DepositApprovedEmail(data));
         break;
       case EmailType.DEPOSIT_REJECTED:
         subject = 'Tu depósito ha sido rechazado';
-        htmlContent = render(DepositRejectedEmail(data));
+        htmlContent = await render(DepositRejectedEmail(data));
         break;
       default:
         throw new Error('Tipo de correo electrónico no válido');
