@@ -18,7 +18,7 @@ export class EmailNotificationService {
   private async sendEmail(to: string, subject: string, htmlContent: string): Promise<void> {
     try {
       await this.resend.emails.send({
-        from: 'noreply@yourdomain.com',
+        from: 'a0x<hello@zurf.social>',
         to,
         subject,
         html: htmlContent,
