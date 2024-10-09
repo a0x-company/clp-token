@@ -11,10 +11,9 @@ type RequestWithApiKey = Request & {
 };
 
 export const Permission = async (req: RequestWithApiKey, res: Response, next: NextFunction) => {
-  // Lista de rutas que no requieren API key
   const whitelistedRoutes = [
     '/balance/storage',
-    '/deposits/approval-form',
+    '/deposits/approval-form/.+/.+',  
     '/deposits/.+/approve-reject/.+'
   ];
 
