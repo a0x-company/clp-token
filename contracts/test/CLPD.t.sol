@@ -152,7 +152,7 @@ contract CLPDTest is Test {
 
         assertEq(clpd.getVaultBalance(), clpd.totalSupply() + mintAmount, "They must to be equal");
     }
-    /*
+    
     // ---------------------------------------------- Redeem tests ----------------------------------------------   
     function testRedeem() public {
         address spender = account1;
@@ -718,27 +718,4 @@ contract CLPDTest is Test {
         assertEq(clpd.receiver(), newReceiver, "New receiver should be set");
     }
    
-   // ---------------------------------------------- setTokenDetails tests ---------------------------------------------- 
-    /*function testSetTokenDetails() public {
-        address agent = minter;
-        string memory newName = "ACLP";
-        string memory newSymbol = "ACLP";
-        
-        // Store initial token details
-        string memory initialName = clpd.name();
-        string memory initialSymbol = clpd.symbol();
-        
-        // Verify initial token details
-        assertEq(initialName, "CLPD", "Initial token name should be CLPD");
-        assertEq(initialSymbol, "CLPD", "Initial token symbol should be CLPD");
-        
-        // Set new token details
-        vm.prank(agent);
-        clpd.setTokenDetails(newName, newSymbol);
-        
-        // Verify that the token details have been updated
-        assertEq(clpd.name(), newName, "Token name should be updated");
-        assertEq(clpd.symbol(), newSymbol, "Token symbol should be updated");
-    }
-    */
 }

@@ -73,7 +73,7 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
     event TokenDetailsUpdated(string newName, string newSymbol);
     
     // Router address
-    address router = 0xf9B8fc078197181C841c296C876945aaa425B278;
+    address router = 0xf9B8fc078197181C841c296C876945aaa425B278; //Base Mainnet
 
     // JavaScript source code to make the request to the Vault API
     string source =
@@ -90,14 +90,13 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
     uint32 gasLimit = 300000;
 
     // donID
-    bytes32 donID =
-        0x66756e2d626173652d7365706f6c69612d310000000000000000000000000000;
+    bytes32 donID = 0x66756e2d626173652d6d61696e6e65742d310000000000000000000000000000; // Base Mainnet
 
     // Constructor to initialize the contract and define the receiver
     constructor(address _receiver) FunctionsClient(router) ERC20(_tokenName, _tokenSymbol) Ownable(msg.sender) {
         require(_receiver != address(0), "Receiver cannot be the zero address");
-        _tokenName = "CLPD";
-        _tokenSymbol = "CLPD";
+        _tokenName = "CLPDRUY";
+        _tokenSymbol = "CLPR";
         receiver = _receiver;
     }
 
@@ -116,7 +115,6 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
         require(!blacklisted[_to], "Recipient is blacklisted");
         _;
     }
-
 
     // Change the value of subscriptionId
     function setSubscriptionId(uint64 _subscriptionId) external onlyAgent {
@@ -160,7 +158,7 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
     // Function to send a request to get the Vault balance
     function sendRequest(
         uint64 _subscriptionId
-    ) public onlyAgent returns (bytes32 requestId) {
+    ) internal onlyAgent returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(source);
 
@@ -236,18 +234,17 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
 
     // Function for forced transfers of tokens
     function forceTransfer(address from, address to, uint256 amount) external onlyAgent notFrozenOrBlacklisted(msg.sender, receiver) {
+        require(to != address(0), "Recipient cannot be the zero address");
         require(balanceOf(from) >= amount, "Source address does not have enough tokens");
         _transfer(from, to, amount);
         emit ForceTransferExecuted(from, to, amount);
     }
 
     // Function to redeem tokens
-    function redeem(uint256 amount) external notFrozenOrBlacklisted(msg.sender, receiver) {
-        require(balanceOf(msg.sender) >= amount, "Not enough tokens to redeem");
-        _transfer(msg.sender, receiver, amount);
-        _burn(receiver, amount);
-        emit TokensBurned(msg.sender, amount);
-        emit RedeemExecuted(msg.sender, amount, receiver);
+    function redeem(uint256 amount, address recipient) external notFrozenOrBlacklisted(msg.sender, recipient) onlyAgent {
+        require(balanceOf(recipient) >= amount, "Not enough tokens to redeem");
+        burnFrom(recipient, amount);
+        emit RedeemExecuted(recipient, amount, receiver);
     }
 
     // Functions to freeze specific accounts and unfreeze them
@@ -292,10 +289,12 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
 
     // Overrides the transfer functions to apply restrictions
     function transfer(address recipient, uint256 amount) public override notFrozenOrBlacklisted(msg.sender, recipient) returns (bool) {
+        require(recipient != address(0), "Recipient cannot be the zero address");
         return super.transfer(recipient, amount);
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) public override notFrozenOrBlacklisted(sender, recipient) returns (bool) {
+        require(recipient != address(0), "Recipient cannot be the zero address");
         return super.transferFrom(sender, recipient, amount);
     }
 
@@ -304,5 +303,24 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
         receiver = _receiver;
         emit SetReceiver();
     }
-    
+
+    // Override the name and symbol functions
+    function name() public view override returns (string memory) {
+        return _tokenName;
+    }
+
+    function symbol() public view override returns (string memory) {
+        return _tokenSymbol;
+    }
+
+    function burn(uint256 amount) external onlyAgent {
+        _burn(msg.sender, amount);
+        emit TokensBurned(msg.sender, amount);
+    }
+
+    function burnFrom(address user, uint256 amount) internal onlyAgent {
+        _burn(user, amount);
+        emit TokensBurned(user, amount);
+    }
+
 }
