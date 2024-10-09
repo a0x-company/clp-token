@@ -23,16 +23,28 @@ export interface StoredDepositData {
   mintTransactionHash?: string;
   createdAt: number;
   updatedAt: number;
+  approvedBy?: string;
+}
+
+export interface ApprovalMember {
+  name: string;
+  passwordHash: string;
 }
 
 export class DepositDataStorage {
   private firestore: Firestore;
   private depositCollectionName: string = "deposits";
   private approvalTokenCollectionName: string = "approvalTokens";
+  private approvalMembersCollectionName: string = "approvalMembers";
 
   constructor(firestore: Firestore) {
     this.firestore = firestore;
   }
+
+  private get approvalMembersCollection(): CollectionReference {
+    return this.firestore.collection(this.approvalMembersCollectionName);
+  }
+
 
   private get depositCollection(): CollectionReference {
     return this.firestore.collection(this.depositCollectionName);
@@ -42,6 +54,8 @@ export class DepositDataStorage {
     return this.firestore.collection(this.approvalTokenCollectionName);
   }
 
+
+  
   public async addNewDeposit(depositData: StoredDepositData): Promise<StoredDepositData> {
     try {
       await this.depositCollection.doc(depositData.id).set(depositData);
@@ -74,26 +88,34 @@ export class DepositDataStorage {
 
   public async updateDepositData(
     depositId: string,
-    updateData: Partial<StoredDepositData>
+    updateData: Partial<StoredDepositData>,
+    memberName?: string
   ): Promise<void> {
     try {
-      await this.depositCollection.doc(depositId).update(updateData);
-      console.log(`✅ Deposit data updated for ID ${depositId}`);
+      const dataToUpdate = { ...updateData };
+      if (memberName) {
+        dataToUpdate.approvedBy = memberName;
+      }
+      await this.depositCollection.doc(depositId).update(dataToUpdate);
+      console.log(`✅ Deposit data updated for ID ${depositId}${memberName ? ` by ${memberName}` : ''}`);
     } catch (error) {
       console.error(`❌ Error updating deposit data for ID ${depositId}:`, error);
       throw error;
     }
   }
 
-
   public async updateMultipleDeposits(
-    updates: { id: string; data: Partial<StoredDepositData> }[]
+    updates: { id: string; data: Partial<StoredDepositData>; memberName?: string }[]
   ): Promise<void> {
     const batch = this.firestore.batch();
 
-    updates.forEach(({ id, data }) => {
+    updates.forEach(({ id, data, memberName }) => {
       const docRef = this.depositCollection.doc(id);
-      batch.update(docRef, { ...data, updatedAt: Date.now() });
+      const dataToUpdate = { ...data, updatedAt: Date.now() };
+      if (memberName) {
+        dataToUpdate.approvedBy = memberName;
+      }
+      batch.update(docRef, dataToUpdate);
     });
 
     try {
@@ -104,6 +126,8 @@ export class DepositDataStorage {
       throw error;
     }
   }
+
+
   public async getDepositsByStatus(status: DepositStatus): Promise<StoredDepositData[]> {
     try {
       const query: Query = this.depositCollection.where("status", "==", status);
@@ -162,5 +186,21 @@ export class DepositDataStorage {
       console.error(`❌ Error deleting approval token:`, error);
       throw error;
     }
+  }
+
+  public async addApprovalMember(name: string, password: string): Promise<void> {
+    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+    await this.approvalMembersCollection.add({ name, passwordHash });
+  }
+
+  public async validateApprovalMember(password: string): Promise<string | null> {
+    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+    const snapshot = await this.approvalMembersCollection.where('passwordHash', '==', passwordHash).get();
+    
+    if (snapshot.empty) {
+      return null;
+    }
+    
+    return snapshot.docs[0].data().name;
   }
 }

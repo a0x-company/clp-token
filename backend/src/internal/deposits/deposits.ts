@@ -139,14 +139,19 @@ export class DepositService {
 
   }
 
-  public async approveDeposit(depositId: string, token: string): Promise<void> {
-    if (!(await this.validateApprovalToken(depositId, token))) {
+  public async approveDeposit(depositId: string, token: string, password: string): Promise<string> {
+    const memberName = await this.validateApprovalMember(password);
+    if (!memberName) {
+      throw new Error("Invalid approval password");
+    }
+    if (!(await this.storage.validateApprovalToken(depositId, token))) {
       throw new Error("Invalid or expired approval token");
     }
 
     await this.storage.updateDepositData(depositId, {
       status: DepositStatus.ACCEPTED_NOT_MINTED,
       updatedAt: Date.now(),
+      approvedBy: memberName
     });
 
     await this.storage.deleteApprovalToken(token);
@@ -154,12 +159,13 @@ export class DepositService {
     const deposit = await this.storage.getDeposit(depositId);
     if (deposit) {
       await this.discordNotificationService.sendNotification(
-        `Deposit with ID ${depositId} has been approved. Amount: ${deposit.amount} for address ${deposit.address}`,
+        `Deposit with ID ${depositId} has been approved by ${memberName}. Amount: ${deposit.amount} for address ${deposit.address}`,
         NotificationType.SUCCESS,
         "Deposit Approved"
       );
     }
-    console.log(`✅ Deposit approved: ID ${depositId}`);
+    console.log(`✅ Deposit approved: ID ${depositId} by ${memberName}`);
+    return memberName;
   }
 
   public async markDepositAsMinted(depositId: string, transactionHash: string): Promise<void> {
@@ -184,8 +190,12 @@ export class DepositService {
     console.log(`🪙 Batch minting completed for ${deposits.length} deposits`);
   }
 
-  public async rejectDeposit(depositId: string, reason: string, token: string): Promise<void> {
-    if (!(await this.validateApprovalToken(depositId, token))) {
+  public async rejectDeposit(depositId: string, reason: string, token: string, password: string): Promise<string> {
+    const memberName = await this.storage.validateApprovalMember(password);
+    if (!memberName) {
+      throw new Error("Invalid approval password");
+    }
+    if (!(await this.storage.validateApprovalToken(depositId, token))) {
       throw new Error("Invalid or expired approval token");
     }
 
@@ -198,11 +208,12 @@ export class DepositService {
     await this.storage.deleteApprovalToken(token);
 
     await this.discordNotificationService.sendNotification(
-      `Deposit with ID ${depositId} has been rejected. Reason: ${reason}`,
+      `Deposit with ID ${depositId} has been rejected by ${memberName}. Reason: ${reason}`,
       NotificationType.ERROR,
       "Deposit Rejected"
     );
-    console.log(`❌ Deposit rejected: ID ${depositId}`);
+    console.log(`❌ Deposit rejected: ID ${depositId} by ${memberName}`);
+    return memberName;
   }
 
   public async getDeposit(depositId: string): Promise<StoredDepositData | null> {
@@ -231,7 +242,22 @@ export class DepositService {
     return await this.storage.validateApprovalToken(depositId, token);
   }
 
+  public async validateApprovalMember(password: string): Promise<string | null> {
+    return await this.storage.validateApprovalMember(password);
+  }
 
-
-  
+  public async addApprovalMember(name: string, password: string): Promise<void> {
+    try {
+      await this.storage.addApprovalMember(name, password);
+      console.log(`✅ New approval member added: ${name}`);
+      await this.discordNotificationService.sendNotification(
+        `New approval member added: ${name}`,
+        NotificationType.INFO,
+        "New Approval Member"
+      );
+    } catch (error) {
+      console.error('Error adding approval member:', error);
+      throw new Error('Failed to add approval member');
+    }
+  }
 }

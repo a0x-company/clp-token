@@ -46,40 +46,54 @@ export function renderApprovalFormHandler(depositService: DepositService) {
           </div>
           <img src="${deposit.proofImageUrl}" alt="Proof of deposit">
           <div class="actions">
-            <button class="approve" onclick="approveDeposit()">Approve</button>
-            <button class="reject" onclick="rejectDeposit()">Reject</button>
-          </div>
-          <script>
-            function approveDeposit() {
-              if (confirm('Are you sure you want to approve this deposit?')) {
-                sendAction('approve');
-              }
-            }
-            function rejectDeposit() {
-              const reason = prompt('Please enter the reason for rejection:');
-              if (reason) {
-                sendAction('reject', reason);
-              }
-            }
-            function sendAction(action, reason = '') {
-              fetch('/deposits/${depositId}/approve-reject/${token}', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action, reason })
-              })
-              .then(response => response.json())
-              .then(data => {
-                alert(data.message);
-                window.close();
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while processing the request');
-              });
-            }
-          </script>
+  <input type="password" id="approvalPassword" placeholder="Enter approval password">
+  <button class="approve" onclick="approveDeposit()">Approve</button>
+  <button class="reject" onclick="rejectDeposit()">Reject</button>
+</div>
+<script>
+  function approveDeposit() {
+    const password = document.getElementById('approvalPassword').value;
+    if (!password) {
+      alert('Please enter the approval password');
+      return;
+    }
+    if (confirm('Are you sure you want to approve this deposit?')) {
+      sendAction('approve', '', password);
+    }
+  }
+  function rejectDeposit() {
+    const password = document.getElementById('approvalPassword').value;
+    if (!password) {
+      alert('Please enter the approval password');
+      return;
+    }
+    const reason = prompt('Please enter the reason for rejection:');
+    if (reason) {
+      sendAction('reject', reason, password);
+    }
+  }
+  function sendAction(action, reason = '', password) {
+    fetch('/deposits/${depositId}/approve-reject/${token}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ action, reason, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      alert(data.message || 'Action completed successfully');
+      window.close();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred: ' + error.message);
+    });
+  }
+</script>
         </body>
         </html>
       `;

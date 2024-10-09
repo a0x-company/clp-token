@@ -11,7 +11,18 @@ type RequestWithApiKey = Request & {
 };
 
 export const Permission = async (req: RequestWithApiKey, res: Response, next: NextFunction) => {
-  if (req.path.endsWith('/balance/storage')) {
+  // Lista de rutas que no requieren API key
+  const whitelistedRoutes = [
+    '/balance/storage',
+    '/deposits/approval-form',
+    '/deposits/.+/approve-reject/.+'
+  ];
+
+  const isWhitelisted = whitelistedRoutes.some(route => {
+    const regex = new RegExp(`^${route}$`);
+    return regex.test(req.path);
+  });
+  if (isWhitelisted) {
     return next();
   }
 
@@ -19,13 +30,13 @@ export const Permission = async (req: RequestWithApiKey, res: Response, next: Ne
 
   if (!apiKey) {
     return res.status(401).send({
-      error: "the api-key header is required in this endpoint",
+      error: "The api-key header is required for this endpoint",
     });
   }
 
-  if (apiKey != API_KEY) {
+  if (apiKey !== API_KEY) {
     return res.status(401).send({
-      error: "the api key entered does not exist in clpa services",
+      error: "The api key entered does not exist in CLPA services",
     });
   }
 

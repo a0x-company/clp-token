@@ -13,6 +13,7 @@ import { mintDepositsHandler } from "./mint-deposits-handler";
 import { registerDepositHandler } from "./register-deposit-handler";
 import { uploadProofOfDepositHandler } from "./upload-proof-of-deposit-handler";
 import { renderApprovalFormHandler } from "./render-approval-form-handler";
+import { addApprovalMemberHandler } from "./add-approval-member-handler";
 
 // middleware
 import { AuthMiddleware } from "@internal/http/middlewares/authentication";
@@ -35,6 +36,8 @@ export function setupDepositRoutes(
   depositRouter.post("/:depositId/approve-reject/:token", approveRejectDepositHandler(depositService));
   
   depositRouter.post("/mint", AuthMiddleware(userService), mintDepositsHandler(depositService));
+
+  depositRouter.post("/add-approval-member", addApprovalMemberHandler(depositService));
 
   router.use("/deposits", depositRouter);
   console.log("Deposit routes set up");
