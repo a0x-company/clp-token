@@ -6,7 +6,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
 
-// Main contract for CLPD that inherits from ERC20, Ownable, and FunctionsClient
+/**
+ * @dev Contract deployed on Base Mainnet
+ * @notice You can view the deployed contract at:
+ * https://sepolia.basescan.org/address/0xec4ec868b9879C222877bd42Eaa0920705eE0eE3
+ */
+
+// Test contract for CLPD that inherits from ERC20, Ownable, and FunctionsClient
 contract CLPD is ERC20, Ownable, FunctionsClient {
     using FunctionsRequest for FunctionsRequest.Request;
 
@@ -160,7 +166,7 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
     // Function to send a request to get the Vault balance
     function sendRequest(
         uint64 _subscriptionId
-    ) public onlyAgent returns (bytes32 requestId) {
+    ) internal onlyAgent returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(source);
 
@@ -236,18 +242,17 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
 
     // Function for forced transfers of tokens
     function forceTransfer(address from, address to, uint256 amount) external onlyAgent notFrozenOrBlacklisted(msg.sender, receiver) {
+        require(to != address(0), "Recipient cannot be the zero address");
         require(balanceOf(from) >= amount, "Source address does not have enough tokens");
         _transfer(from, to, amount);
         emit ForceTransferExecuted(from, to, amount);
     }
 
     // Function to redeem tokens
-    function redeem(uint256 amount) external notFrozenOrBlacklisted(msg.sender, receiver) {
-        require(balanceOf(msg.sender) >= amount, "Not enough tokens to redeem");
-        _transfer(msg.sender, receiver, amount);
-        _burn(receiver, amount);
-        emit TokensBurned(msg.sender, amount);
-        emit RedeemExecuted(msg.sender, amount, receiver);
+    function redeem(uint256 amount, address recipient) external notFrozenOrBlacklisted(msg.sender, recipient) onlyAgent {
+        require(balanceOf(recipient) >= amount, "Not enough tokens to redeem");
+        burnFrom(recipient, amount);
+        emit RedeemExecuted(recipient, amount, receiver);
     }
 
     // Functions to freeze specific accounts and unfreeze them
@@ -292,10 +297,12 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
 
     // Overrides the transfer functions to apply restrictions
     function transfer(address recipient, uint256 amount) public override notFrozenOrBlacklisted(msg.sender, recipient) returns (bool) {
+        require(recipient != address(0), "Recipient cannot be the zero address");
         return super.transfer(recipient, amount);
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) public override notFrozenOrBlacklisted(sender, recipient) returns (bool) {
+        require(recipient != address(0), "Recipient cannot be the zero address");
         return super.transferFrom(sender, recipient, amount);
     }
 
@@ -303,6 +310,25 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
     function setReceiver(address _receiver) external onlyAgent {
         receiver = _receiver;
         emit SetReceiver();
+    }
+
+    // Override the name and symbol functions
+    function name() public view override returns (string memory) {
+        return _tokenName;
+    }
+
+    function symbol() public view override returns (string memory) {
+        return _tokenSymbol;
+    }
+
+    function burn(uint256 amount) external onlyAgent {
+        _burn(msg.sender, amount);
+        emit TokensBurned(msg.sender, amount);
+    }
+
+    function burnFrom(address user, uint256 amount) internal onlyAgent {
+        _burn(user, amount);
+        emit TokensBurned(user, amount);
     }
     
 }

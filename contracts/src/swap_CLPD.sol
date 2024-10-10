@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.25;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ISwapRouter02} from "@uniswap/contracts/interfaces/ISwapRouter02.sol";
 
-contract GenericTokenSwap {
+contract SwapCLPD {
     // Interface for interacting with Uniswap V3 SwapRouter
     ISwapRouter02 private immutable router;
 

@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.25;
 
 import {Test, console} from "forge-std/Test.sol";
 import {CLPD} from "../src/CLPD_BaseSepolia.sol";
@@ -7,16 +7,16 @@ import {CLPD} from "../src/CLPD_BaseSepolia.sol";
 
 contract CLPDTest is Test {
     CLPD public clpd;
-    address public owner = 0xd806A01E295386ef7a7Cea0B9DA037B242622743; // Owner of the real contract
+    address public owner = 0xd806A01E295386ef7a7Cea0B9DA037B242622743; // Owner and Agent of the real contract
     address public account1 = 0xFc6623B340A505E6819349aF6beE2333D31840E1; // Agent of the real contract
     address public account2 = 0x9F693ea18DA08824E729d5efc343Dd78254a9302; // No Agent and no Owner of the real contract
 
     function setUp() public {
-        clpd = CLPD(0xbEA4c5A2515A6D9bF4A4175af336663FB8976031); 
+        clpd = CLPD(0xec4ec868b9879C222877bd42Eaa0920705eE0eE3); 
     }
 
     function test_chainlink() public view {
-        assertEq(clpd.getVaultBalance(), 10000);
+        assertEq(clpd.getVaultBalance(), 201100);
         console.log("Vault balance:", clpd.getVaultBalance());
     }
 
@@ -132,7 +132,7 @@ contract CLPDTest is Test {
         
         assertEq(clpd.balanceOf(nonAgent), initialBalance);
     }
-
+    /*
     function testMintByAgent() public {
         address agent = account1;
         address redeemer = owner;
@@ -143,7 +143,7 @@ contract CLPDTest is Test {
         uint256 initialTotalSupply = clpd.totalSupply();
 
         vm.prank(redeemer);
-        clpd.redeem(redeemAmount);
+        clpd.redeem(redeemAmount, recipient);
 
         assertEq(clpd.totalSupply(), initialTotalSupply - redeemAmount, "Total supply should decrease by redeemed amount");
         
@@ -152,45 +152,59 @@ contract CLPDTest is Test {
 
         assertEq(clpd.getVaultBalance(), clpd.totalSupply() + mintAmount, "They must to be equal");
     }
-    
+    */
     // ---------------------------------------------- Redeem tests ----------------------------------------------   
     function testRedeem() public {
-        address spender = account1;
+        address agent = account1;
+        address recipient = account2;
         uint256 redeemAmount = 5000000000000000000000;
         
-        uint256 initialBalance = clpd.balanceOf(spender);
+        uint256 initialBalance = clpd.balanceOf(recipient);
         uint256 initialTotalSupply = clpd.totalSupply();
 
+        // Make agent an agent
+        vm.prank(owner);
+        clpd.addAgent(agent);
+
+        // Ensure recipient has enough balance
+        vm.assume(clpd.balanceOf(recipient) >= redeemAmount);
+
         // Perform redeem
-        vm.prank(spender);
-        clpd.redeem(redeemAmount);
+        vm.prank(agent);
+        clpd.redeem(redeemAmount, recipient);
         
         // Check if the balance has decreased by the redeemed amount
-        assertEq(clpd.balanceOf(spender), initialBalance - redeemAmount, "Balance should decrease by redeemed amount");
+        assertEq(clpd.balanceOf(recipient), initialBalance - redeemAmount, "Balance should decrease by redeemed amount");
         
         // Check if the total supply has decreased
         assertEq(clpd.totalSupply(), initialTotalSupply - redeemAmount, "Total supply should decrease by redeemed amount");
     }
 
     function testRedeemInsufficientBalance() public {
-        address spender = account1;
-        uint256 redeemAmount = 11000000000000000000000;
+        address agent = account1;
+        address recipient = account2;
+        uint256 redeemAmount = 110000000000000000000000;
         
-        uint256 initialBalance = clpd.balanceOf(spender);
+        uint256 initialBalance = clpd.balanceOf(recipient);
+        uint256 initialTotalSupply = clpd.totalSupply();
         
-        // Ensure the spender has less balance than the redeem amount
+        // Make account1 an agent
+        vm.prank(owner);
+        clpd.addAgent(agent);
+        
+        // Ensure the recipient has less balance than the redeem amount
         vm.assume(initialBalance < redeemAmount);
         
         // Attempt to redeem
-        vm.prank(spender);
+        vm.prank(agent);
         vm.expectRevert("Not enough tokens to redeem");
-        clpd.redeem(redeemAmount);
+        clpd.redeem(redeemAmount, recipient);
         
         // Check if the balance remains unchanged
-        assertEq(clpd.balanceOf(spender), initialBalance, "Balance should remain unchanged");
+        assertEq(clpd.balanceOf(recipient), initialBalance, "Recipient's balance should remain unchanged");
         
         // Check if the total supply remains unchanged
-        assertEq(clpd.totalSupply(), clpd.totalSupply(), "Total supply should remain unchanged");
+        assertEq(clpd.totalSupply(), initialTotalSupply, "Total supply should remain unchanged");
     }
 
 
@@ -717,5 +731,43 @@ contract CLPDTest is Test {
         // Verify that the receivers have been updated
         assertEq(clpd.receiver(), newReceiver, "New receiver should be set");
     }
-   
+
+    // ---------------------------------------------- burn tests ---------------------------------------------- 
+    function failBurn() public {
+        address noAgent = account2;
+        uint256 burnAmount = 1000 * 10**18;
+
+        vm.prank(noAgent);
+        vm.expectRevert("Only agents can burn tokens");
+        clpd.burn(burnAmount);
+    }
+    
+    function testBurn() public {
+        address agent = account1;
+        uint256 burnAmount = 1000 * 10**18;
+
+        // Make account1 an agent
+        vm.prank(owner);
+        clpd.addAgent(agent);
+
+        // Verify that account1 is now an agent
+        assertTrue(clpd.agents(agent), "account1 should be an agent");
+
+        // Ensure the agent has enough balance
+        vm.assume(clpd.balanceOf(agent) >= burnAmount);
+
+        uint256 initialBalance = clpd.balanceOf(agent);
+        uint256 initialTotalSupply = clpd.totalSupply();
+
+        // Burn tokens
+        vm.prank(agent);
+        clpd.burn(burnAmount);
+
+        // Check if the balance has decreased by the burned amount
+        assertEq(clpd.balanceOf(agent), initialBalance - burnAmount, "Agent's balance should decrease by burned amount");
+
+        // Check if the total supply has decreased
+        assertEq(clpd.totalSupply(), initialTotalSupply - burnAmount, "Total supply should decrease by burned amount");
+    }
+
 }

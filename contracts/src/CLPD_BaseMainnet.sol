@@ -6,6 +6,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
 
+/**
+ * @dev Contract deployed on Base Mainnet
+ * @notice You can view the deployed contract at:
+ * https://basescan.org/address/0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1
+ */
+
 // Main contract for CLPD that inherits from ERC20, Ownable, and FunctionsClient
 contract CLPD is ERC20, Ownable, FunctionsClient {
     using FunctionsRequest for FunctionsRequest.Request;
