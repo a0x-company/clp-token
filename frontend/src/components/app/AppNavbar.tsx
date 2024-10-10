@@ -28,8 +28,11 @@ import { useAccount } from "wagmi";
 import CopyButton, { copyToClipboard } from "./CopyButton";
 import { useCLPDBalance } from "@/hooks/useCLPDBalance";
 import { useUSDCBalance } from "@/hooks/useUSDCBalance";
-import { formatNumber } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
 import { useGoogleConnect } from "@/hooks/useGoogleConnect";
+import { Sheet, SheetContent, SheetDescription, SheetTrigger } from "../ui/sheet";
+import { LucideMenu } from "lucide-react";
+import { Button } from "../ui/button";
 
 type NavOption = "deposit" | "withdraw" | "invest" | "change";
 
@@ -95,12 +98,40 @@ const AppNavbar = () => {
   }, [searchParams]);
 
   return (
-    <div className="flex flex-row py-[32px] px-[48px] justify-between items-center">
+    <div className="flex flex-row py-[32px] px-6 md:px-[48px] justify-between items-center">
       <Link href={`/${currentLang}`} className="content-center items-center gap-[10px]">
         <Image src="/images/clpa-logo.svg" alt="CLPD logo" width={64} height={64} />
       </Link>
 
-      <div className="flex flex-row max-w-3xl p-[16px] items-center gap-[16px] rounded-[12px]  absolute left-1/2 -translate-x-1/2">
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button className="bg-black text-white h-auto p-1.5 max-md:text-sm text-xl rounded-xl border-2 border-black font-bold shadow-brutalist md:hidden">
+            <LucideMenu />
+          </Button>
+        </SheetTrigger>
+        <SheetContent
+          side="bottom"
+          className="bg-brand-blue border-t-2 border-x-2 border-black rounded-t-xl transition-all duration-300"
+        >
+          <SheetDescription className="flex flex-col gap-2 items-center justify-center">
+            {tabs.map((tab) => (
+              <Link
+                key={tab.href}
+                href={`/${currentLang}${tab.href}`}
+                className={cn(
+                  selectedOption === tab.label
+                    ? "bg-white text-black h-auto px-6 py-2 text-xl rounded-xl border-2 border-black font-bold shadow-brutalist"
+                    : "text-white text-xl hover:text-blue-200 font-helvetica"
+                )}
+              >
+                {t(tab.label)}
+              </Link>
+            ))}
+          </SheetDescription>
+        </SheetContent>
+      </Sheet>
+
+      <div className="max-md:hidden flex flex-row max-w-3xl p-[16px] items-center gap-[16px] rounded-[12px]  absolute left-1/2 -translate-x-1/2">
         {tabs.map((tab) => (
           <Link
             key={tab.href}
@@ -131,7 +162,7 @@ const AppNavbar = () => {
           className="w-60 bg-brand-blue border-2 border-black shadow-brutalist p-4"
           align="end"
         >
-          <div className="flex flex-col gap-2 items-start relative">
+          <div className="flex flex-col gap-2 items-start relative w-full overflow-hidden">
             <Image
               src="/images/clpa-logo-white.svg"
               alt="CLPD logo"
@@ -148,7 +179,9 @@ const AppNavbar = () => {
               className="rounded-[12px] border-[2px] border-white z-10"
             />
             <p className="font-helvetica text-xl font-[700] text-white">{user?.name}</p>
-            <p className="font-helvetica text-base font-[700] text-white">{user?.email}</p>
+            <p className="font-helvetica text-sm font-[700] text-white line-clamp-1 break-words w-full">
+              {user?.email}
+            </p>
 
             <Image
               src="/images/reserve/divider-mobile.svg"
@@ -160,10 +193,10 @@ const AppNavbar = () => {
 
             <p className="font-helvetica text-xl font-[700] text-white">Saldo:</p>
             <p className="font-helvetica text-xl font-[700] text-white">
-              {formatNumber(Number(1000000))} CLPD
+              {formatNumber(Number(clpdBalanceFormatted))} CLPD
             </p>
             <p className="font-helvetica text-xl font-[700] text-white">
-              {usdcBalanceFormatted} USDC
+              {usdcBalanceFormatted === "0.00" ? "0" : usdcBalanceFormatted} USDC
             </p>
             <p
               onClick={() => {

@@ -20,20 +20,20 @@
     "save": "Ahorras",
     "earn": {
       "title": "Invierte",
-      "description": "Ahorra y gana intereses de manera automática con tus $CLPD. Además obtén acceso directo a mercados internacionales de activos digitales y del mundo real para hacer crecer aún más tu inversión."
+      "description": "Ahorra y gana intereses de manera automática con tus CLPD. Además obtén acceso directo a mercados internacionales de activos digitales y del mundo real para hacer crecer aún más tu inversión."
     },
     "deposit": {
       "title": "Deposita",
-      "description": "La primera moneda estable completamente respaldada por pesos chilenos. Deposita pesos chilenos desde tu cuenta bancaria, obtén $CLPD y desbloquea lo mejor del dinero digital."
+      "description": "La primera moneda estable completamente respaldada por pesos chilenos. Deposita pesos chilenos desde tu cuenta bancaria, obtén CLPD y desbloquea lo mejor del dinero digital."
     },
     "withdraw": {
       "title": "Retira",
-      "description": "Cada $CLPD está respaldado 100% por pesos chilenos en una cuenta bancaria segura. Puedes cambiarlos por pesos en tu cuenta de banco 24 horas al día, sin demora."
+      "description": "Cada CLPD está respaldado 100% por pesos chilenos en una cuenta bancaria segura. Puedes cambiarlos por pesos en tu cuenta de banco 24 horas al día, sin demora."
     },
     "features": {
       "title": "El futuro del dinero digital, ahora",
-      "description1": "$CLPD es la primera y única stablecoin del peso chileno con pruebas de reserva garantizada y verificable. Siempre existirá 1 CLP en reservas por cada $CLPD en circulación.",
-      "description2": "Utilizando $CLPD accedes a transferencias y pagos instantáneos, nacionales e internacionales, seguro y de bajo costo. Además es programable a través de smart contracts, lo que abre infinitas posibilidades para su uso y distribución."
+      "description1": "CLPD es la primera y única stablecoin del peso chileno con pruebas de reserva garantizada y verificable. Siempre existirá 1 CLP en reservas por cada CLPD en circulación.",
+      "description2": "Utilizando CLPD accedes a transferencias y pagos instantáneos, nacionales e internacionales, seguro y de bajo costo. Además es programable a través de smart contracts, lo que abre infinitas posibilidades para su uso y distribución."
     },
     "automate": {
       "title": "Automatiza",
@@ -48,11 +48,11 @@
       },
       "q1-2": {
         "title": "Negocios locales",
-        "description": "Habilitación de pago con $CLPD en puntos de venta de negocios locales."
+        "description": "Habilitación de pago con CLPD en puntos de venta de negocios locales."
       },
       "q1-3": {
         "title": "Kit de integración para e-commerce",
-        "description": "Comienza a recibir pagos en tu e-commerce con $CLPD y gana recompensas inmediatas en interés."
+        "description": "Comienza a recibir pagos en tu e-commerce con CLPD y gana recompensas inmediatas en interés."
       },
       "q2": "Q2 * 2025",
       "q2-1": {
