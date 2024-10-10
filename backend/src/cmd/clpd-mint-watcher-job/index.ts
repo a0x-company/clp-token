@@ -2,13 +2,14 @@ import 'module-alias/register';
 
 import { ethers } from 'ethers';
 import { Firestore } from '@google-cloud/firestore';
+import { Storage } from "@google-cloud/storage";
+import { DepositService } from '@internal/deposits';
 import { config } from '@internal';
 import { DiscordNotificationService, NotificationType } from '@internal/notifications';
 
-if (!config.PROJECT_ID || !config.RPC_URL || !config.DISCORD_WEBHOOK_URL) {
+if (!config.PROJECT_ID || !config.RPC_URL || !config.DISCORD_WEBHOOK_URL || !config.RESEND_API_KEY) {
   throw new Error("❌ Required environment variables are missing");
 }
-
 
 const MAX_BLOCK_RANGE = 5000;
 const TOKEN_ADDRESS = '0xe97d2Ed8261b6aeE31fD216916E2FcE7252F44ed';
@@ -17,6 +18,7 @@ const INITIAL_BLOCK = 20856115;
 
 const firestore = new Firestore({ projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV });
 const discordService = new DiscordNotificationService(config.DISCORD_WEBHOOK_URL);
+const depositService = new DepositService(firestore, new Storage(), config.DISCORD_WEBHOOK_URL, config.RESEND_API_KEY);
 
 interface TokenMintedEvent {
   agent: string;
@@ -42,7 +44,6 @@ async function updateLastProcessedBlock(blockNumber: number): Promise<void> {
   await docRef.set({ lastBlock: blockNumber }, { merge: true });
   console.log(`✅ Updated last processed block to: ${blockNumber}`);
 }
-
 
 async function fetchAndProcessEvents(): Promise<void> {
   try {
@@ -100,11 +101,31 @@ async function fetchAndProcessEvents(): Promise<void> {
           console.log(`  Block: ${event.blockNumber}`);
           console.log("--------------------------------------------");
 
-          await discordService.sendNotification(
-            `✅ Successfully processed TokensMinted event:\n**Agent:** ${tokenEvent.agent}\n**User:** ${tokenEvent.user}\n**Amount:** ${tokenEvent.amount} CLPR2\n**TxHash:** ${event.transactionHash}\n**Block:** ${event.blockNumber}`,
-            NotificationType.SUCCESS,
-            'TokensMinted Event Processed'
+          // Buscar el depósito correspondiente
+          const deposits = await depositService.getAcceptedDeposits();
+          const matchingDeposit = deposits.find(d => 
+            d.address.toLowerCase() === tokenEvent.user.toLowerCase() && 
+            d.amount === tokenEvent.amount
           );
+
+          if (matchingDeposit) {
+            // Marcar el depósito como minteado
+            await depositService.markDepositAsMinted(matchingDeposit.id, event.transactionHash);
+            console.log(`✅ Deposit ${matchingDeposit.id} marked as minted`);
+
+            await discordService.sendNotification(
+              `✅ TokensMinted event processed and deposit updated:\n**Agent:** ${tokenEvent.agent}\n**User:** ${tokenEvent.user}\n**Amount:** ${tokenEvent.amount} CLPR2\n**TxHash:** ${event.transactionHash}\n**Block:** ${event.blockNumber}\n**Deposit ID:** ${matchingDeposit.id}`,
+              NotificationType.SUCCESS,
+              'TokensMinted Event Processed and Deposit Updated'
+            );
+          } else {
+            console.log(`❌ No matching deposit found for address ${tokenEvent.user} and amount ${tokenEvent.amount}`);
+            await discordService.sendNotification(
+              `❌ TokensMinted event processed but no matching deposit found:\n**Agent:** ${tokenEvent.agent}\n**User:** ${tokenEvent.user}\n**Amount:** ${tokenEvent.amount} CLPR2\n**TxHash:** ${event.transactionHash}\n**Block:** ${event.blockNumber}`,
+              NotificationType.WARNING,
+              'TokensMinted Event Processed - No Matching Deposit'
+            );
+          }
 
         } catch (error) {
           console.error("❌ Error processing the event:", error);

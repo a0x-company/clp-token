@@ -184,11 +184,28 @@ export class DepositService {
   }
 
   public async markDepositAsMinted(depositId: string, transactionHash: string): Promise<void> {
+    const deposit = await this.storage.getDeposit(depositId);
+    if (!deposit) {
+      throw new Error(`Deposit with ID ${depositId} not found`);
+    }
+  
     await this.storage.updateDepositData(depositId, {
       status: DepositStatus.ACCEPTED_MINTED,
       mintTransactionHash: transactionHash,
       updatedAt: Date.now(),
     });
+  
+    await this.emailNotificationService.sendNotification(
+      deposit.email,
+      EmailType.TOKENS_MINTED,
+      {
+        amount: deposit.amount,
+        depositId: deposit.id,
+        userName: deposit.email.split('@')[0],
+        transactionHash
+      }
+    );
+  
     console.log(`🪙 Deposit marked as minted: ID ${depositId}, Transaction Hash: ${transactionHash}`);
   }
 
