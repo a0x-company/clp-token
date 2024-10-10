@@ -26,6 +26,7 @@ import { LucideMenu } from "lucide-react";
 import { useConnect } from "wagmi";
 import { useGoogleConnect } from "@/hooks/useGoogleConnect";
 import { useUserStore } from "@/context/global-store";
+import { LoadingSpinner } from "./ui/spinner";
 
 interface NavbarProps {}
 
@@ -92,7 +93,7 @@ const Navbar: React.FC<NavbarProps> = () => {
             href={`/${currentLang}/app`}
             className="bg-black text-white h-auto px-6 py-2 text-xl rounded-xl border-2 border-black font-bold shadow-brutalist"
           >
-            {user.name}
+            {loadingUser ? <LoadingSpinner /> : user.name}
           </Link>
         )}
       </div>

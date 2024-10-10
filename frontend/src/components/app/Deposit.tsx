@@ -225,11 +225,6 @@ const Deposit: React.FC = () => {
     loading: statusLoading,
     error,
   } = useDepositStatus("50c7774e-8ffd-4add-a8c2-76591244d786");
-  console.log(
-    "status === DepositStatus.ACCEPTED_MINTED",
-    status === DepositStatus.ACCEPTED_MINTED,
-    status
-  );
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
