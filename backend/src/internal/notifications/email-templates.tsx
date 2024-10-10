@@ -98,3 +98,26 @@ export const NewDepositEmail = ({ amount, userName, depositId }) => (
       </Body>
     </Html>
   );
+
+  export const TokensMintedEmail = ({ amount, depositId, userName, transactionHash }) => (
+    <Html>
+      <Head />
+      <Body style={baseStyles}>
+        <Container style={containerStyles}>
+          <Section style={headerStyles}>
+            <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
+          </Section>
+          <Text>Dear {userName},</Text>
+          <Text>Great news! Your tokens have been successfully minted:</Text>
+          <Text><strong>Amount Minted:</strong> {amount} tokens</Text>
+          <Text><strong>Deposit ID:</strong> {depositId}</Text>
+          <Text><strong>Transaction Hash:</strong> {transactionHash}</Text>
+          <Text>Your tokens are now available in your wallet. You can use them for various purposes within our ecosystem.</Text>
+          <Text>If you have any questions about your minted tokens or how to use them, please don't hesitate to contact our support team.</Text>
+          <Button href="https://yourcompany.com/account" style={buttonStyles}>
+            View Wallet
+          </Button>
+        </Container>
+      </Body>
+    </Html>
+  );  

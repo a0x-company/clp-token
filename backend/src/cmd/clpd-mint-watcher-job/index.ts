@@ -9,6 +9,8 @@ if (!config.PROJECT_ID || !config.RPC_URL || !config.DISCORD_WEBHOOK_URL) {
   throw new Error("❌ Required environment variables are missing");
 }
 
+
+const MAX_BLOCK_RANGE = 5000;
 const TOKEN_ADDRESS = '0xe97d2Ed8261b6aeE31fD216916E2FcE7252F44ed';
 const ABI = ['event TokensMinted(address indexed agent, address indexed user, uint256 amount)'];
 const INITIAL_BLOCK = 20856115;
@@ -41,6 +43,7 @@ async function updateLastProcessedBlock(blockNumber: number): Promise<void> {
   console.log(`✅ Updated last processed block to: ${blockNumber}`);
 }
 
+
 async function fetchAndProcessEvents(): Promise<void> {
   try {
     const lastProcessedBlock = await getLastProcessedBlock();
@@ -55,18 +58,20 @@ async function fetchAndProcessEvents(): Promise<void> {
       return;
     }
 
-    const fromBlock = lastProcessedBlock + 1;
-    const toBlock = currentBlock;
-
-    console.log(`🔄 Fetching events from block ${fromBlock} to ${toBlock}...`);
-
     const contract = new ethers.Contract(TOKEN_ADDRESS, ABI, provider);
     const eventFilter = contract.filters.TokensMinted();
-    const events = await contract.queryFilter(eventFilter, fromBlock, toBlock);
 
-    console.log(`📄 Events found: ${events.length}`);
+    let fromBlock = lastProcessedBlock + 1;
+    let toBlock = Math.min(fromBlock + MAX_BLOCK_RANGE - 1, currentBlock);
 
-    for (const [index, event] of events.entries()) {
+    while (fromBlock <= currentBlock) {
+      console.log(`🔄 Fetching events from block ${fromBlock} to ${toBlock}...`);
+
+      const events = await contract.queryFilter(eventFilter, fromBlock, toBlock);
+
+      console.log(`📄 Events found in this range: ${events.length}`);
+
+      for (const [index, event] of events.entries()) {
         try {
           const parsedEvent = contract.interface.parseLog(event);
           if (parsedEvent === null) {
@@ -78,15 +83,15 @@ async function fetchAndProcessEvents(): Promise<void> {
             );
             continue;
           }
-      
+
           const { agent, user, amount } = parsedEvent.args;
-      
+
           const tokenEvent: TokenMintedEvent = {
             agent,
             user,
             amount: Number(ethers.formatUnits(amount, 18)),
           };
-      
+
           console.log(`\n🔹 Event ${index + 1}:`);
           console.log(`  Agent: ${tokenEvent.agent}`);
           console.log(`  User: ${tokenEvent.user}`);
@@ -94,13 +99,13 @@ async function fetchAndProcessEvents(): Promise<void> {
           console.log(`  TxHash: ${event.transactionHash}`);
           console.log(`  Block: ${event.blockNumber}`);
           console.log("--------------------------------------------");
-      
+
           await discordService.sendNotification(
             `✅ Successfully processed TokensMinted event:\n**Agent:** ${tokenEvent.agent}\n**User:** ${tokenEvent.user}\n**Amount:** ${tokenEvent.amount} CLPR2\n**TxHash:** ${event.transactionHash}\n**Block:** ${event.blockNumber}`,
             NotificationType.SUCCESS,
             'TokensMinted Event Processed'
           );
-      
+
         } catch (error) {
           console.error("❌ Error processing the event:", error);
           await discordService.sendNotification(
@@ -111,7 +116,12 @@ async function fetchAndProcessEvents(): Promise<void> {
         }
       }
 
-    await updateLastProcessedBlock(toBlock);
+      await updateLastProcessedBlock(toBlock);
+
+      fromBlock = toBlock + 1;
+      toBlock = Math.min(fromBlock + MAX_BLOCK_RANGE - 1, currentBlock);
+    }
+
   } catch (error: any) {
     console.error("❌ Error fetching and processing events:", error);
     await discordService.sendNotification(

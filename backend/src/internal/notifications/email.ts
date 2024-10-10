@@ -1,11 +1,12 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
-import { DepositApprovedEmail, DepositRejectedEmail, NewDepositEmail } from './email-templates';
+import { DepositApprovedEmail, DepositRejectedEmail, NewDepositEmail, TokensMintedEmail } from './email-templates';
 
 export enum EmailType {
   NEW_DEPOSIT = 'NEW_DEPOSIT',
   DEPOSIT_APPROVED = 'DEPOSIT_APPROVED',
   DEPOSIT_REJECTED = 'DEPOSIT_REJECTED',
+  TOKENS_MINTED = 'TOKENS_MINTED',
 }
 
 export class EmailNotificationService {
@@ -37,7 +38,7 @@ export class EmailNotificationService {
   ): Promise<void> {
     let subject: string;
     let htmlContent: string;
-
+  
     switch (type) {
       case EmailType.NEW_DEPOSIT:
         subject = 'New deposit registered';
@@ -51,10 +52,14 @@ export class EmailNotificationService {
         subject = 'Your deposit has been rejected';
         htmlContent = await render(DepositRejectedEmail(data));
         break;
+      case EmailType.TOKENS_MINTED:
+        subject = 'Your tokens have been minted';
+        htmlContent = await render(TokensMintedEmail(data));
+        break;
       default:
         throw new Error('Invalid email type');
     }
-
+  
     await this.sendEmail(to, subject, htmlContent);
   }
 }
