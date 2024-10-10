@@ -2,7 +2,7 @@
 pragma solidity ^0.8.25;
 
 import "forge-std/Script.sol";
-import "../src/CLPD.sol";
+import "../src/CLPD_BaseSepolia.sol";
 
 contract DeployACLP is Script {
     // Address to receive the tokens

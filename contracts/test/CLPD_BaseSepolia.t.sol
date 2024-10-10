@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {CLPD} from "../src/CLPD.sol";
+import {CLPD} from "../src/CLPD_BaseSepolia.sol";
 
 
 contract CLPDTest is Test {

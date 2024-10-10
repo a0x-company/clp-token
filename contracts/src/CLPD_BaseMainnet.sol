@@ -95,8 +95,8 @@ contract CLPD is ERC20, Ownable, FunctionsClient {
     // Constructor to initialize the contract and define the receiver
     constructor(address _receiver) FunctionsClient(router) ERC20(_tokenName, _tokenSymbol) Ownable(msg.sender) {
         require(_receiver != address(0), "Receiver cannot be the zero address");
-        _tokenName = "CLPDRUY";
-        _tokenSymbol = "CLPR";
+        _tokenName = "CLPD";
+        _tokenSymbol = "CLPD";
         receiver = _receiver;
     }
 
