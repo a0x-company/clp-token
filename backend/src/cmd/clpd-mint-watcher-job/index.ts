@@ -3,7 +3,7 @@ import 'module-alias/register';
 import { ethers } from 'ethers';
 import { Firestore } from '@google-cloud/firestore';
 import { Storage } from "@google-cloud/storage";
-import { DepositService } from '@internal/deposits';
+import { DepositService, DepositStatus } from '@internal/deposits';
 import { config } from '@internal';
 import { DiscordNotificationService, NotificationType } from '@internal/notifications';
 
@@ -11,8 +11,12 @@ if (!config.PROJECT_ID || !config.RPC_URL || !config.DISCORD_WEBHOOK_URL || !con
   throw new Error("❌ Required environment variables are missing");
 }
 
+
+const UNMINTED_DEPOSITS_THRESHOLD = 1;
+const NOTIFICATION_COOLDOWN_HOURS = 4;
+
 const MAX_BLOCK_RANGE = 5000;
-const TOKEN_ADDRESS = '0xe97d2Ed8261b6aeE31fD216916E2FcE7252F44ed';
+const TOKEN_ADDRESS = '0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1';
 const ABI = ['event TokensMinted(address indexed agent, address indexed user, uint256 amount)'];
 const INITIAL_BLOCK = 20856115;
 
@@ -154,11 +158,32 @@ async function fetchAndProcessEvents(): Promise<void> {
   }
 }
 
+async function checkUnmintedDeposits(): Promise<void> {
+    const deposits = await depositService.getAcceptedDeposits();
+    const unmintedDeposits = deposits.filter(d => d.status === DepositStatus.ACCEPTED_NOT_MINTED);
+  
+    if (unmintedDeposits.length >= UNMINTED_DEPOSITS_THRESHOLD) {
+      const cooldownRef = firestore.collection('notificationCooldowns').doc('unmintedDeposits');
+      const cooldownDoc = await cooldownRef.get();
+  
+      const now = new Date();
+      if (!cooldownDoc.exists || cooldownDoc.data()?.lastNotification.toDate() < new Date(now.getTime() - NOTIFICATION_COOLDOWN_HOURS * 60 * 60 * 1000)) {
+        await discordService.sendNotification(
+          `⚠️ There are ${unmintedDeposits.length} accepted deposits that have not been minted yet.`,
+          NotificationType.WARNING,
+          'Unminted Deposits'
+        );
+        await cooldownRef.set({ lastNotification: now });
+      }
+    }
+  }
+
 async function main(): Promise<void> {
   console.log("🚀 Starting token minted event processing job...");
 
   try {
     await fetchAndProcessEvents();
+    await checkUnmintedDeposits();
     console.log("🏁 Token minted event processing job completed");
   } catch (error) {
     console.error("❌ Unexpected error in the job:", error);

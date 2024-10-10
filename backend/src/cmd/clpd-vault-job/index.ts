@@ -12,10 +12,10 @@ if (!config.PROJECT_ID || !config.API_KEY) {
 }
 
 const VAULT_API_URL = 'https://development-clpd-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance';
-const DATASET_ID = 'vault_data';
+const DATASET_ID = 'clpd_vault_data';
 const TABLE_ID = 'balance_history';
 const RPC_URL = config.RPC_URL;
-const CONTRACT_ADDRESS = '0xe97d2Ed8261b6aeE31fD216916E2FcE7252F44ed'; 
+const CONTRACT_ADDRESS = '0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1'; 
 const ABI = ['function totalSupply() view returns (uint256)'];
 
 const firestore = new Firestore({projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV});

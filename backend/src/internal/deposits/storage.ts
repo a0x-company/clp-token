@@ -24,6 +24,7 @@ export interface StoredDepositData {
   createdAt: number;
   updatedAt: number;
   approvedBy?: string;
+  mintedAt?: number;
 }
 
 export interface ApprovalMember {

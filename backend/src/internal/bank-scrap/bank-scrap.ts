@@ -111,18 +111,18 @@ export class SantanderClScraper {
       });
       console.log("✅ Page loaded after login");
 
-      await page
-        .waitForSelector("button.mat-stroked-button", {
+      try {
+        await page.waitForSelector("button.mat-stroked-button", {
           visible: true,
-          timeout: 10000,
-        })
-        .catch(() => {
-          throw new Error("❌ 'Cerrar' button not found after login");
+          timeout: 5000,
         });
-      console.log("✅ 'Cerrar' button found");
+        console.log("✅ 'Cerrar' button found");
+        await page.click("button.mat-stroked-button");
+        console.log("✅ Click performed on 'Cerrar' button");
+      } catch (error) {
+        console.log("ℹ️ 'Cerrar' button not found or not clickable");
 
-      await page.click("button.mat-stroked-button");
-      console.log("✅ Click performed on 'Cerrar' button");
+      }
 
       const balanceSelector = "div.monto1 span.ng-star-inserted p.amount-pipe-4";
       await page
