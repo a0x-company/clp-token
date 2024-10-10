@@ -6,7 +6,7 @@ import { web3AuthInstance } from "@/provider/WagmiConfig";
 import { WALLET_ADAPTERS } from "@web3auth/base";
 
 // wagmi
-import { useAccount, Connector, useConnect } from "wagmi";
+import { useAccount, Connector, useConnect, useDisconnect } from "wagmi";
 
 // next
 import { usePathname, useRouter } from "next/navigation";
@@ -23,6 +23,7 @@ import crypto from "crypto";
 export const useGoogleConnect = () => {
   const { address } = useAccount();
   const { setUser } = useUserStore();
+  const { disconnect } = useDisconnect();
   const { connect, connectors } = useConnect();
   const [loadingUser, setLoadingUser] = useState(false);
   const router = useRouter();
@@ -86,6 +87,7 @@ export const useGoogleConnect = () => {
     // await web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
     //   loginProvider: "google",
     // });
+    console.log("connectors", connectors);
     const connector = connectors[0];
     try {
       connect({ connector });
@@ -96,6 +98,10 @@ export const useGoogleConnect = () => {
 
   const handleDisconnect = async () => {
     await web3AuthInstance.logout();
+    disconnect();
+    localStorage.removeItem("clpd_email");
+    await axios.post("/api/user/logout");
+    router.push("/");
   };
 
   return {

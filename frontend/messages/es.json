@@ -8,7 +8,9 @@
     "deposit": "Depositar",
     "withdraw": "Retirar",
     "invest": "Invertir",
-    "change": "Cambiar"
+    "change": "Cambiar",
+    "logout": "Cerrar sesión",
+    "backToHome": "Volver a la página"
   },
   "landing": {
     "send": "Envías",

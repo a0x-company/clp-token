@@ -8,7 +8,9 @@
     "deposit": "Deposit",
     "withdraw": "Withdraw",
     "invest": "Invest",
-    "change": "Change"
+    "change": "Change",
+    "logout": "Logout",
+    "backToHome": "Back to Home"
   },
   "landing": {
     "send": "Send",

@@ -12,8 +12,6 @@ import { selectedChain } from "@/provider/WagmiConfig";
 export const useCLPDBalance = ({ address }: { address: `0x${string}` | undefined }) => {
   const chainName = selectedChain.name.toLowerCase();
 
-  console.log("chainName", chainName);
-
   /* CLPD Balance */
   const clpdBalance = useReadContracts({
     allowFailure: false,

@@ -28,6 +28,8 @@ import { useAccount } from "wagmi";
 import CopyButton, { copyToClipboard } from "./CopyButton";
 import { useCLPDBalance } from "@/hooks/useCLPDBalance";
 import { useUSDCBalance } from "@/hooks/useUSDCBalance";
+import { formatNumber } from "@/lib/utils";
+import { useGoogleConnect } from "@/hooks/useGoogleConnect";
 
 type NavOption = "deposit" | "withdraw" | "invest" | "change";
 
@@ -64,6 +66,7 @@ const AppNavbar = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { address } = useAccount();
+  const { handleDisconnect } = useGoogleConnect();
   const { clpdBalanceFormatted } = useCLPDBalance({ address });
   const { usdcBalanceFormatted } = useUSDCBalance({ address });
 
@@ -157,7 +160,7 @@ const AppNavbar = () => {
 
             <p className="font-helvetica text-xl font-[700] text-white">Saldo:</p>
             <p className="font-helvetica text-xl font-[700] text-white">
-              {clpdBalanceFormatted} CLPD
+              {formatNumber(Number(1000000))} CLPD
             </p>
             <p className="font-helvetica text-xl font-[700] text-white">
               {usdcBalanceFormatted} USDC
@@ -173,14 +176,19 @@ const AppNavbar = () => {
             </p>
           </div>
           <DropdownMenuItem className="p-0 my-4">
-            <button className="flex items-center justify-center bg-brand-orange-pastel p-4 border-2 border-white rounded-md w-full text-start text-white gap-2 font-helvetica text-base leading-none font-[700] h-16">
+            <button
+              onClick={() => {
+                handleDisconnect();
+              }}
+              className="flex items-center justify-center bg-brand-orange-pastel p-4 border-2 border-white rounded-md w-full text-start text-white gap-2 font-helvetica text-base leading-none font-[700] h-16"
+            >
               <Image src="/images/app/logout-vector.svg" alt="logout" width={32} height={32} />
-              Cerrar sesión
+              {t("logout")}
             </button>
           </DropdownMenuItem>
           <DropdownMenuItem className="p-0">
             <button className="flex items-center justify-center bg-black p-4 border-2 border-white rounded-md w-full text-start text-white gap-2 font-helvetica text-base leading-none font-[700] h-16">
-              Volver a la página
+              {t("backToHome")}
             </button>
           </DropdownMenuItem>
         </DropdownMenuContent>
