@@ -116,5 +116,25 @@
     "amount": "Amount to Deposit",
     "amountPlaceholder": "100.000",
     "done": "Done"
+  },
+  "withdraw": {
+    "withdraw": "Withdraw CLP",
+    "amount": "Amount to Withdraw",
+    "amountPlaceholder": "100.000",
+    "createWithdrawOrder": "Create Withdraw Order",
+    "bankAccount": "Bank Account",
+    "accountHolder": "Account Holder",
+    "bankAccountPlaceholder": "Banco Estado",
+    "accountHolderPlaceholder": "Jhon Doe",
+    "withdrawStatus": "Withdraw Status",
+    "initiated": "Initiated",
+    "processing": "Processing",
+    "completed": "Completed",
+    "ownershipCheck": "Declare that I am the account holder",
+    "complianceCheck": "Compliance",
+    "createWithdraw": "Create Withdraw",
+    "receive": "Receive",
+    "redeem": "Redeem",
+    "submit": "Submit"
   }
 }

@@ -5,7 +5,7 @@ import React, { useCallback } from "react";
 
 // next
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 // components
 import { Button } from "./ui/button";
@@ -56,7 +56,6 @@ const Navbar: React.FC<NavbarProps> = () => {
   const { handleConnect, isConnected, loadingUser } = useGoogleConnect();
   const { user } = useUserStore();
   const pathname = usePathname();
-
   const currentLang = pathname.startsWith("/es") ? "es" : "en";
 
   return (
@@ -89,9 +88,12 @@ const Navbar: React.FC<NavbarProps> = () => {
             {loadingUser ? "loading..." : t("login")}
           </Button>
         ) : (
-          <Button className="bg-black text-white h-auto px-6 py-2 text-xl rounded-xl border-2 border-black font-bold shadow-brutalist">
+          <Link
+            href={`/${currentLang}/app`}
+            className="bg-black text-white h-auto px-6 py-2 text-xl rounded-xl border-2 border-black font-bold shadow-brutalist"
+          >
             {user.name}
-          </Button>
+          </Link>
         )}
       </div>
 

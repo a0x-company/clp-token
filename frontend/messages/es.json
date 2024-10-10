@@ -98,23 +98,54 @@
     "bankReserve": "Efectivo en el banco de reserva"
   },
   "deposit": {
-    "deposit": "Depositar CLP",
+    "deposit": "Crea una orden de depósito",
+    "depositSubtitle": "Deposita usando",
+    "depositStep1": "Deposita a la siguiente cuenta",
     "bankInfo": {
       "info": "Información de la cuenta bancaria",
       "bank": "Banco",
       "accountNumber": "Número de Cuenta",
       "owner": "Titular",
-      "email": "Email"
+      "email": "Email",
+      "type": "Tipo de cuenta"
     },
+    "transferBank": "Transferencia bancaria",
+    "send": "Envías",
+    "receive": "Recibes",
     "transferStatus": "Estado de la transferencia",
     "initiated": "Iniciada",
     "processing": "En Proceso",
     "completed": "Completada",
-    "createOrder": "Crear Orden",
-    "proof": "Comprobante de Transferencia",
+    "createOrder": "Ordenar Depósito",
+    "sendOrder": "Enviar",
+    "proof": "Sube el comprobante",
     "upload": "Selecciona PDF o Imagen",
     "amount": "Monto a depositar",
     "amountPlaceholder": "100.000",
-    "done": "Hecho"
+    "done": "Hecho",
+    "step3": "Tu orden está esperando revisión...",
+    "step3Description": "Esta página se actualizará automáticamente cuando esté lista, y recibirás un correo.",
+    "yourEmail": "Tu email:",
+    "back": "Volver"
+  },
+  "withdraw": {
+    "withdraw": "Retirar CLP",
+    "amount": "Monto a retirar",
+    "amountPlaceholder": "100.000",
+    "createWithdrawOrder": "Crear Orden de Retiro",
+    "bankAccount": "Cuenta bancaria",
+    "accountHolder": "Titular de la cuenta",
+    "bankAccountPlaceholder": "Banco Estado",
+    "accountHolderPlaceholder": "Jhon Doe",
+    "withdrawStatus": "Estado del Retiro",
+    "initiated": "Iniciado",
+    "processing": "En Proceso",
+    "completed": "Completado",
+    "ownershipCheck": "Declaro que soy el titular de la cuenta",
+    "complianceCheck": "Cumplimiento",
+    "createWithdraw": "Crear Retiro",
+    "submit": "Enviar",
+    "receive": "Recibes",
+    "redeem": "Sacas"
   }
 }

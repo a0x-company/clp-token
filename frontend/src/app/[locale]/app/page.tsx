@@ -8,7 +8,6 @@ export default function App({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  console.log("searchParams", searchParams);
   return (
     <main className="min-h-screen min-w-screen bg-white text-black">
       <AppNavbar />

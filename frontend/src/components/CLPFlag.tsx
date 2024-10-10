@@ -10,7 +10,7 @@ interface CLPFlagProps {
 
 const CLPFlag: React.FC<CLPFlagProps> = ({ type }) => {
   return (
-    <div className="relative self-end w-20">
+    <div className="relative self-end w-24">
       <Image
         src={`/images/landing/${type === "CLP" ? "chile-flag" : "clpa-logo-white"}.svg`}
         alt={`${type === "CLP" ? "Bandera de Chile" : "Logo CLPD"}`}
