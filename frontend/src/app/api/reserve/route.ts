@@ -11,6 +11,9 @@ import { addresses } from "@/constants/address";
 // next
 import { NextResponse } from "next/server";
 
+export const fetchCache = "force-no-store";
+export const dynamic = "auto";
+
 export async function GET(request: Request) {
   console.log("[GET][/api/reserve]");
 
