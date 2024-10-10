@@ -98,24 +98,39 @@
     "bankReserve": "Cash in the reserve bank"
   },
   "deposit": {
-    "deposit": "Deposit CLP",
+    "deposit": "Create a deposit order",
+    "depositSubtitle": "Deposit using",
+    "depositStep1": "Deposit to the following account",
     "bankInfo": {
-      "info": "Bank Account Information",
+      "info": "Bank account information",
       "bank": "Bank",
       "accountNumber": "Account Number",
-      "owner": "Owner",
-      "email": "Email"
+      "owner": "Account Holder",
+      "email": "Email",
+      "type": "Account Type"
     },
+    "transferBank": "Bank Transfer",
+    "send": "Send",
+    "receive": "Receive",
     "transferStatus": "Transfer Status",
     "initiated": "Initiated",
     "processing": "Processing",
     "completed": "Completed",
-    "createOrder": "Create Order",
-    "proof": "Proof of Transfer",
+    "createOrder": "Create Deposit Order",
+    "sendOrder": "Send",
+    "proof": "Upload Proof",
     "upload": "Select PDF or Image",
     "amount": "Amount to Deposit",
     "amountPlaceholder": "100.000",
-    "done": "Done"
+    "done": "Done",
+    "step3": "Your order is waiting review...",
+    "step3Description": "This page will update automatically when it's ready, and you will receive an email.",
+    "step3Minted": "Deposit approved!",
+    "step3MintedDescription": "Your funds have been loaded successfully.",
+    "step3MintedBalance": "Your balance",
+    "ready": "Ready",
+    "yourEmail": "Your email",
+    "back": "Back"
   },
   "withdraw": {
     "withdraw": "Withdraw CLP",

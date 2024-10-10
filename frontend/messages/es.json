@@ -125,7 +125,11 @@
     "done": "Hecho",
     "step3": "Tu orden está esperando revisión...",
     "step3Description": "Esta página se actualizará automáticamente cuando esté lista, y recibirás un correo.",
-    "yourEmail": "Tu email:",
+    "step3Minted": "¡Depósito aprobado!",
+    "step3MintedDescription": "Tus fondos han sido cargados con éxito.",
+    "step3MintedBalance": "Tu saldo",
+    "ready": "Listo",
+    "yourEmail": "Tu email",
     "back": "Volver"
   },
   "withdraw": {

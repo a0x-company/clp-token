@@ -2,11 +2,11 @@
 import { ethers } from "ethers";
 
 // viem
-import { baseSepolia } from "viem/chains";
+import { base } from "viem/chains";
 
 // constants
 import CLPD_ABI from "@/constants/CLPD-abi.json";
-import { contractAddress } from "@/constants/address";
+import { addresses } from "@/constants/address";
 
 // next
 import { NextResponse } from "next/server";
@@ -15,8 +15,8 @@ export async function GET(request: Request) {
   console.log("[GET][/api/reserve]");
 
   try {
-    const provider = new ethers.JsonRpcProvider(baseSepolia.rpcUrls.default.http[0]);
-    const contract = new ethers.Contract(contractAddress, CLPD_ABI, provider);
+    const provider = new ethers.JsonRpcProvider(base.rpcUrls.default.http[0]);
+    const contract = new ethers.Contract(addresses.base.CLPD.address, CLPD_ABI, provider);
     const supply = await contract.totalSupply();
     console.log("Supply obtenido:", supply.toString());
     const formattedSupply = ethers.formatUnits(supply, 18);

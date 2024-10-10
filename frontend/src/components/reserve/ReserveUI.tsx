@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 
 // next
 import Image from "next/image";
-import Link from "next/link";
 
 // http client
 import axios from "axios";
@@ -14,24 +13,14 @@ import ChartReserve from "./ChartReserve";
 
 // tranlations
 import { useTranslations } from "next-intl";
-
-// constants
-import { contractAddress } from "@/constants/address";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
+import { addresses } from "@/constants/address";
 
 interface ReserveData {
   balance: number;
   timestamp: number;
 }
-
-const ABI = [
-  {
-    constant: true,
-    inputs: [],
-    name: "totalSupply",
-    outputs: [{ name: "", type: "uint256" }],
-    type: "function",
-  },
-];
 
 interface ReserveUIProps {
   bankBalance: number | null;
@@ -39,7 +28,6 @@ interface ReserveUIProps {
 }
 
 const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
-  const [isMatching, setIsMatching] = useState<boolean | null>(null);
   const [reserveData, setReserveData] = useState<ReserveData[]>([]);
   const fetchedData = useRef(false);
 
@@ -66,13 +54,11 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
 
     const fetchData = async () => {
       await Promise.all([fetchReserveData()]);
-      setIsMatching(bankBalance === parseFloat(tokenSupply || "0"));
     };
 
     if (!fetchedData.current) fetchData();
   }, [reserveData, bankBalance, tokenSupply]);
 
-  const boxStyle = " rounded-xl bg-white shadow-[4px_4px_0px_0px_#000] p-2 sm:p-8";
   const processedReserveData = reserveData
     .filter((item) => item.balance > 0)
     .map((item) => ({
@@ -86,8 +72,6 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
         minute: "2-digit",
       }),
     }));
-
-  console.log(processedReserveData);
 
   const gradientStyle = { background: "linear-gradient(180deg, #06F 0%, #FFF 70%)" };
   return (
@@ -116,39 +100,60 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
 
           <div className="w-full h-0.5 my-8 dashed-border opacity-50" />
 
-          <div className={`flex items-center justify-center z-20 w-full gap-16`}>
-            <div className="flex flex-col items-center">
-              {bankBalance !== null ? (
-                <p className="text-brand-blue font-helvetica text-[36px] font-bold">
-                  $
-                  {bankBalance.toLocaleString("es-ES", {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })}
-                </p>
-              ) : (
-                <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
-              )}
+          <div className={`flex items-center justify-center z-20 w-full h-full gap-16`}>
+            <div className="flex flex-col items-center justify-between h-96">
+              <div className="flex flex-col items-center">
+                {tokenSupply !== null ? (
+                  <p className="text-brand-blue font-helvetica text-[36px] font-bold">
+                    $
+                    {parseFloat(tokenSupply).toLocaleString("es-ES", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })}
+                  </p>
+                ) : (
+                  <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
+                )}
 
-              <h2 className="text-black text-sm font-[400]">{t("inCirculation")}</h2>
-              <div className="w-20 h-96 bg-brand-blue border-2 border-black shadow-brutalist-sm rounded-xl mt-6" />
+                <h2 className="text-black text-sm font-[400]">{t("inCirculation")}</h2>
+              </div>
+              <div
+                className="w-20 bg-brand-blue border-2 border-black shadow-brutalist-sm rounded-xl mt-6 transition-all duration-300"
+                style={{
+                  height: tokenSupply
+                    ? `${
+                        (parseFloat(tokenSupply) / (parseFloat(tokenSupply) + (bankBalance || 0))) *
+                        384
+                      }px`
+                    : "0px",
+                }}
+              />
             </div>
 
-            <div className="flex flex-col items-center">
-              {tokenSupply !== null ? (
-                <p className="text-brand-blue font-helvetica text-[36px] font-bold">
-                  $
-                  {parseFloat(tokenSupply).toLocaleString("es-ES", {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })}
-                </p>
-              ) : (
-                <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
-              )}
+            <div className="flex flex-col items-center justify-between h-96">
+              <div className="flex flex-col items-center">
+                {bankBalance !== null ? (
+                  <p className="text-brand-blue font-helvetica text-[36px] font-bold">
+                    $
+                    {bankBalance.toLocaleString("es-ES", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })}
+                  </p>
+                ) : (
+                  <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
+                )}
 
-              <h2 className="text-black text-sm font-[400]">{t("inReserve")}</h2>
-              <div className="w-20 h-96 bg-brand-orange-pastel border-2 border-black shadow-brutalist-sm rounded-xl mt-6" />
+                <h2 className="text-black text-sm font-[400]">{t("inReserve")}</h2>
+              </div>
+              <div
+                className="w-20 bg-brand-orange-pastel border-2 border-black shadow-brutalist-sm rounded-xl mt-6 transition-all duration-300"
+                style={{
+                  height: bankBalance
+                    ? `${(bankBalance / (parseFloat(tokenSupply || "0") + bankBalance)) * 384}px`
+                    : "0px",
+                }}
+              />
             </div>
           </div>
 
@@ -158,6 +163,16 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-brand-blue rounded-full" />
               <p className="text-black font-helvetica text-sm">{t("CLPDCirculation")}</p>
+              <Link
+                href={`https://basescan.org/address/${addresses.base.CLPD.address}`}
+                target="_blank"
+                className="group"
+              >
+                <ExternalLink
+                  size={16}
+                  className="group-hover:text-brand-blue transition-all duration-300"
+                />
+              </Link>
             </div>
 
             <div className="flex items-center gap-2">

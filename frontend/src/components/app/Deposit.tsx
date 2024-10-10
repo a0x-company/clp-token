@@ -17,6 +17,8 @@ import { useUserStore } from "@/context/global-store";
 import { web3AuthInstance } from "@/provider/WagmiConfig";
 import axios from "axios";
 import { LoadingSpinner } from "../ui/spinner";
+import { useDepositStatus } from "@/hooks/useDepositStatus";
+import { DepositStatus } from "@/types";
 
 const currencies = {
   CLP: { name: "Peso Chileno", code: "CL" },
@@ -38,6 +40,7 @@ interface CreateStepsProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   file: File | null;
+  status: DepositStatus | null;
 }
 
 const formIds = {
@@ -59,6 +62,7 @@ const createSteps = ({
   file,
   email,
   handleSubmit,
+  status,
 }: CreateStepsProps) => [
   {
     step: 0,
@@ -124,6 +128,7 @@ const createSteps = ({
       </form>
     ),
     formId: formIds.createOrder,
+    status,
   },
   {
     step: 1,
@@ -162,20 +167,41 @@ const createSteps = ({
   },
   {
     step: 2,
-    title: t("step3"),
+    title: status === DepositStatus.ACCEPTED_MINTED ? t("step3Minted") : t("step3"),
     description: "Description 3",
     children: (
       <div className="flex flex-col items-start justify-center gap-2">
         <Image
-          src="/images/app/wired-gif.gif"
+          src={
+            status === DepositStatus.ACCEPTED_MINTED
+              ? "/images/app/success-gif.gif"
+              : "/images/app/wired-gif.gif"
+          }
           alt="done"
           width={200}
           height={200}
           className="mx-auto"
+          unoptimized
         />
-        <p className="text-xl font-helvetica font-light text-start">{t("step3Description")}</p>
-        <p className="text-sm text-white/50 font-helvetica text-start">
-          {t("yourEmail")}: {email}
+        <p
+          className={cn(
+            "text-xl font-helvetica font-light text-start text-white",
+            status === DepositStatus.ACCEPTED_MINTED && "font-bold text-black"
+          )}
+        >
+          {status === DepositStatus.ACCEPTED_MINTED
+            ? t("step3MintedDescription")
+            : t("step3Description")}
+        </p>
+        <p
+          className={cn(
+            "text-base text-white/50 font-helvetica text-start",
+            status === DepositStatus.ACCEPTED_MINTED && "font-bold text-black/50"
+          )}
+        >
+          {status === DepositStatus.ACCEPTED_MINTED
+            ? `${t("step3MintedBalance")}: ${amount} CLPD`
+            : `${t("yourEmail")}: ${email}`}
         </p>
       </div>
     ),
@@ -194,6 +220,11 @@ const Deposit: React.FC = () => {
   const [depositId, setDepositId] = useState<string>("");
 
   const { user } = useUserStore();
+  const {
+    status,
+    loading: statusLoading,
+    error,
+  } = useDepositStatus("50c7774e-8ffd-4add-a8c2-76591244d786");
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
@@ -215,6 +246,7 @@ const Deposit: React.FC = () => {
     console.log(currentStep);
     switch (currentStep) {
       case 0:
+        // setCurrentStep(1);
         if (amount === "" || !amount || Number(amount) === 0) {
           setLoading(false);
           return;
@@ -241,7 +273,13 @@ const Deposit: React.FC = () => {
         } finally {
           setLoading(false);
         }
+        break;
       case 1:
+        // setCurrentStep(2);
+        if (!file) {
+          setLoading(false);
+          return;
+        }
         try {
           console.log("Archivo:", file);
           console.log("Monto:", amount);
@@ -288,11 +326,23 @@ const Deposit: React.FC = () => {
 
   const [currentStep, setCurrentStep] = useState(0);
 
+  const handleReset = () => {
+    setCurrentStep(0);
+    setTransferStatus(null);
+    setDepositId("");
+    setFile(null);
+    setAmount("");
+  };
+
   return (
     <Card
       className={cn(
         "absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist",
-        currentStep === 2 ? "h-96 bg-brand-blue" : "h-auto"
+        currentStep === 2 && status !== DepositStatus.ACCEPTED_MINTED
+          ? "bg-brand-blue"
+          : currentStep === 2 && status === DepositStatus.ACCEPTED_MINTED
+          ? "bg-brand-green-pastel"
+          : "h-auto"
       )}
     >
       <CardContent
@@ -302,7 +352,9 @@ const Deposit: React.FC = () => {
         )}
       >
         <div className="flex flex-col rounded-xl border-none gap-3">
-          <h3 className="text-xl font-helvetica font-bold">{Object.values(titles)[currentStep]}</h3>
+          <h3 className="text-xl font-helvetica font-bold">
+            {t(Object.values(titles)[currentStep])}
+          </h3>
           <CardContent className="p-0 space-y-2">
             {
               createSteps({
@@ -313,6 +365,7 @@ const Deposit: React.FC = () => {
                 handleSubmit,
                 handleFileChange,
                 file,
+                status,
               })[currentStep].children
             }
           </CardContent>
@@ -342,12 +395,27 @@ const Deposit: React.FC = () => {
         </CardFooter>
       )}
 
+      {currentStep === 2 && status === DepositStatus.ACCEPTED_MINTED && (
+        <CardFooter>
+          <Button
+            onClick={handleReset}
+            className="w-full bg-white border-2 border-black shadow-brutalist-sm py-4 h-full text-xl hover:bg-white/90 text-black font-helvetica font-bold"
+          >
+            ¡{t("ready")}!
+          </Button>
+        </CardFooter>
+      )}
+
       <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex justify-center my-2 space-x-2 bg-white w-full max-w-3xl rounded-full">
         {Object.keys(titles).map((s) => (
           <div
             key={s}
             className={`w-full h-2 rounded-full ${
-              parseInt(s) === currentStep ? "bg-black" : "bg-black/30"
+              parseInt(s) === currentStep && status !== DepositStatus.ACCEPTED_MINTED
+                ? "bg-black"
+                : status === DepositStatus.ACCEPTED_MINTED
+                ? "bg-brand-green-pastel"
+                : "bg-black/30"
             }`}
           />
         ))}

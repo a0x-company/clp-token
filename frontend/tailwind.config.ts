@@ -35,6 +35,7 @@ const config: Config = {
           blue: "#0267FF",
           "blue-dark": "#0033A0",
           "orange-pastel": "#EF5D52",
+          "green-pastel": "#93FF89",
         },
       },
       fontFamily: {
