@@ -29,7 +29,10 @@ const fetchBankBalance = async () => {
 
 const fetchTokenSupply = async () => {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/reserve`);
+    const now = new Date();
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_URL}/api/reserve?timestamp=${now.getTime()}`
+    );
     console.log("response", response.data);
     return response.data.supply;
   } catch (error) {
