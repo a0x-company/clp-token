@@ -220,11 +220,7 @@ const Deposit: React.FC = () => {
   const [depositId, setDepositId] = useState<string>("");
 
   const { user } = useUserStore();
-  const {
-    status,
-    loading: statusLoading,
-    error,
-  } = useDepositStatus("50c7774e-8ffd-4add-a8c2-76591244d786");
+  const { status, loading: statusLoading, error } = useDepositStatus(depositId);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;

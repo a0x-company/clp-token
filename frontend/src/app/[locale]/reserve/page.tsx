@@ -13,10 +13,13 @@ import Navbar from "@/components/Navbar";
 import FAQSection from "@/components/reserve/FAQSection";
 import Footer from "@/components/Footer";
 
+export const fetchCache = "force-no-store";
+export const dynamic = "auto";
+
 const fetchBankBalance = async () => {
   try {
     const response = await axios.get(
-      "https://development-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/storage"
+      "https://development-clpd-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/storage"
     );
     return response.data.balance;
   } catch (error) {
