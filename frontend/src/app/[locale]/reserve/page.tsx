@@ -27,6 +27,7 @@ const fetchBankBalance = async () => {
 const fetchTokenSupply = async () => {
   try {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/reserve`);
+    console.log("response", response.data);
     return response.data.supply;
   } catch (error) {
     console.error("Error al obtener el total supply del token:", error);

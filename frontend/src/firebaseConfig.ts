@@ -8,7 +8,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app, "clpa");
+const db = getFirestore(app, "clpd");
 const userDataCollection = collection(db, "user-data");
+const depositsCollection = collection(db, "deposits");
 
-export { db, userDataCollection };
+export { db, userDataCollection, depositsCollection };

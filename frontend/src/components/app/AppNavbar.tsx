@@ -26,6 +26,8 @@ import {
 } from "../ui/dropdown-menu";
 import { useAccount } from "wagmi";
 import CopyButton, { copyToClipboard } from "./CopyButton";
+import { useCLPDBalance } from "@/hooks/useCLPDBalance";
+import { useUSDCBalance } from "@/hooks/useUSDCBalance";
 
 type NavOption = "deposit" | "withdraw" | "invest" | "change";
 
@@ -62,6 +64,8 @@ const AppNavbar = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { address } = useAccount();
+  const { clpdBalanceFormatted } = useCLPDBalance({ address });
+  const { usdcBalanceFormatted } = useUSDCBalance({ address });
 
   const currentLang = pathname.startsWith("/es") ? "es" : "en";
   const t = useTranslations("navbar");
@@ -152,7 +156,12 @@ const AppNavbar = () => {
             />
 
             <p className="font-helvetica text-xl font-[700] text-white">Saldo:</p>
-            <p className="font-helvetica text-xl font-[700] text-white">0 CLPD</p>
+            <p className="font-helvetica text-xl font-[700] text-white">
+              {clpdBalanceFormatted} CLPD
+            </p>
+            <p className="font-helvetica text-xl font-[700] text-white">
+              {usdcBalanceFormatted} USDC
+            </p>
             <p
               onClick={() => {
                 copyToClipboard(address, setCopied);

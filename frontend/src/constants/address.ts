@@ -1,1 +1,36 @@
-export const contractAddress = "0xbEA4c5A2515A6D9bF4A4175af336663FB8976031";
+export const addresses: {
+  [key: string]: {
+    swap: `0x${string}`;
+    CLPD: {
+      address: `0x${string}`;
+      decimals: number;
+    };
+    USDC: {
+      address: `0x${string}`;
+      decimals: number;
+    };
+  };
+} = {
+  base: {
+    swap: "0x0000000000000000000000000000000000000000",
+    CLPD: {
+      address: "0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1",
+      decimals: 18,
+    },
+    USDC: {
+      address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      decimals: 6,
+    },
+  },
+  baseSepolia: {
+    swap: "0x0000000000000000000000000000000000000000",
+    CLPD: {
+      address: "0x0000000000000000000000000000000000000000",
+      decimals: 18,
+    },
+    USDC: {
+      address: "0xcB0f68Cb1E6F4466F6970De9a3a70489Ee7D3a7A", // ERC20 Test
+      decimals: 18,
+    },
+  },
+};
