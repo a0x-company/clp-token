@@ -95,7 +95,8 @@
     "inCirculation": "En circulación",
     "inReserve": "En reserva",
     "CLPDCirculation": "CLPD en circulación",
-    "bankReserve": "Efectivo en el banco de reserva"
+    "bankReserve": "Efectivo en el banco de reserva",
+    "history": "Histórico"
   },
   "deposit": {
     "deposit": "Crea una orden de depósito",

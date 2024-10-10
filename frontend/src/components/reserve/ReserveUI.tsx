@@ -164,7 +164,7 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
               <div className="w-4 h-4 bg-brand-blue rounded-full" />
               <p className="text-black font-helvetica text-sm">{t("CLPDCirculation")}</p>
               <Link
-                href={`https://basescan.org/address/${addresses.base.CLPD.address}`}
+                href={`https://basescan.org/token/${addresses.base.CLPD.address}`}
                 target="_blank"
                 className="group"
               >

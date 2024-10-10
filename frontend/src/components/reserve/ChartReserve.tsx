@@ -7,9 +7,15 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 // date-fns
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+
+// react
 import { useEffect, useState } from "react";
 
+// translations
+import { useTranslations } from "next-intl";
+
 const ChartReserve = ({ activeData }: { activeData: any }) => {
+  const t = useTranslations("reserve");
   const [domain, setDomain] = useState<number[]>([0, 0]);
 
   useEffect(() => {
@@ -41,7 +47,9 @@ const ChartReserve = ({ activeData }: { activeData: any }) => {
 
   return (
     <div className="relative bg-white rounded-[32px] max-md:w-[90vw] max-lg:w-[860px] w-[1080px] p-8 flex flex-col gap-y-4 items-center h-full border-2 border-black shadow-brutalist mx-auto mb-[120px]">
-      <h3 className="text-black font-helvetica text-[48px] font-[700] self-start">Historico</h3>
+      <h3 className="text-black font-helvetica text-[48px] font-[700] self-start">
+        {t("history")}
+      </h3>
 
       {activeData && (
         <ChartContainer config={chartConfig} className="min-h-[370px] h-[370px] w-full flex-1">

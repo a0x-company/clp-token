@@ -95,7 +95,8 @@
     "inCirculation": "In Circulation",
     "inReserve": "In Reserve",
     "CLPDCirculation": "CLPD in circulation",
-    "bankReserve": "Cash in the reserve bank"
+    "bankReserve": "Cash in the reserve bank",
+    "history": "History"
   },
   "deposit": {
     "deposit": "Create a deposit order",
