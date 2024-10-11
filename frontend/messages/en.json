@@ -98,7 +98,21 @@
     "inReserve": "In Reserve",
     "CLPDCirculation": "CLPD in circulation",
     "bankReserve": "Cash in the reserve bank",
-    "history": "History"
+    "history": "History",
+    "faq": {
+      "title1": "How is CLPD guaranteed to be fully backed and exchangeable for traditional Chilean pesos?",
+      "content1": "CLPD is a 100% backed Chilean peso stablecoin (not converted into any other asset than traditional CLP) and is exchangeable 1:1 for Chilean pesos fiat. All Chilean pesos fiat are held in a Chilean national bank account that is monitored 24/7 by independent oracles provided by Chainlink Functions technology.",
+      "title2": "How can I get CLPD and convert it to Chilean pesos fiat?",
+      "content2": "Individuals and common users, startups and small businesses can get CLPD through the website pesodigital.mistokens.com and soon in more national and international applications and exchanges. For exchanges, institutions, banks, wallets, institutional traders, large companies and financial institutions, they can contact the A0x developer team.",
+      "title3": "In which blockchain is CLPD available?",
+      "content3": "CLPD is available on the BASE blockchain, a layer 2 solution on Ethereum, compatible with EVM (Ethereum Virtual Machine), built on the Optimism superstack, with the security, stability and scalability necessary to obtain transactions at the lowest cost for all payment and financial applications of CLPD. Soon, CLPD will be enabled on other blockchains to further facilitate its use and adoption.",
+      "title4": "How is the parity between circulating CLPD and CLP fiat reserves maintained?",
+      "content4": "When a user deposits Chilean pesos from their bank account to the stablecoin account, the equivalent CLPD are created automatically in their digital wallet. There is no other mechanism for creating CLPD. At the same time, when CLPD are wanted to be exchanged for Chilean pesos fiat in the user's bank account, these CLPD are 'burned' and removed from circulation. Through this mechanism, a parity of 1:1 is maintained at all times and automatically.",
+      "title5": "Is CLPD a cryptocurrency?",
+      "content5": "CLPD is a 100% backed stablecoin, which is a type of digital peso, or Chilean peso digital. Unlike other cryptocurrencies that fluctuate in price, CLPD is designed to maintain the market relationship with the US dollar, and have an equivalent in traditional Chilean pesos respaldado 1:1 in a fully liquid Chilean national bank account. CLPD is an equivalent to the traditional Chilean peso that benefits from the speed and security of blockchain technology.",
+      "title6": "How is CLPD different from a CBDC (digital currency issued by the central bank)?",
+      "content6": "CLPD is issued by A0x, a private Chilean company at the intersection of blockchain and fintech. In contrast, a CBDC would be issued by the government or the central bank. While the Chilean CBDC is still in the study and exploration phase, without a determination as to whether it will be created at some point or not, CLPD is already available and will be useful for payments between people, businesses, international transfers, access to yields in DeFi, savings and investment vehicles, and other applications in a safe, fast and low-cost manner. A0x has developed this technology based on open source practices and taking into account the use of stablecoins in the world."
+    }
   },
   "deposit": {
     "deposit": "Create a deposit order",

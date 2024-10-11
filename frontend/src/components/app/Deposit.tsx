@@ -220,6 +220,8 @@ const createSteps = ({
   },
 ];
 
+import { useEffect } from "react";
+
 const Deposit: React.FC = () => {
   const t = useTranslations("deposit");
 
@@ -227,9 +229,28 @@ const Deposit: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [depositId, setDepositId] = useState<string>("");
+  const [currentStep, setCurrentStep] = useState(0);
 
   const { user } = useUserStore();
-  const { status, loading: statusLoading, error } = useDepositStatus(depositId);
+  const { status, loading: statusLoading, error, refetch } = useDepositStatus(depositId);
+
+  useEffect(() => {
+    const savedDepositId = localStorage.getItem("depositId");
+    if (savedDepositId) {
+      setDepositId(savedDepositId);
+      refetch();
+    }
+  }, []); // Este efecto solo se ejecuta una vez al montar el componente
+
+  useEffect(() => {
+    if (status === DepositStatus.PENDING && currentStep !== 2) {
+      setCurrentStep(2);
+    }
+  }, [status, currentStep]);
+
+  const saveDepositIdToLocalStorage = (id: string) => {
+    localStorage.setItem("depositId", id);
+  };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
@@ -271,6 +292,7 @@ const Deposit: React.FC = () => {
           if (response.status === 201 || response.status === 200) {
             console.log("Deposito:", response.data.depositId);
             setDepositId(response.data.depositId);
+            saveDepositIdToLocalStorage(response.data.depositId);
             setCurrentStep(1);
           }
         } catch (error) {
@@ -289,9 +311,6 @@ const Deposit: React.FC = () => {
           console.log("Archivo:", file);
           console.log("Monto:", amount);
           console.log("Deposito:", depositId);
-          const userInfo = await web3AuthInstance.getUserInfo();
-          const idToken = userInfo?.idToken;
-
           const response = await axios.post(
             "/api/deposit/create-order/proof",
             { file, depositId },
@@ -328,13 +347,12 @@ const Deposit: React.FC = () => {
     }
   };
 
-  const [currentStep, setCurrentStep] = useState(0);
-
   const handleReset = () => {
     setCurrentStep(0);
     setDepositId("");
     setFile(null);
     setAmount("");
+    localStorage.removeItem("depositId");
   };
 
   const handleBack = () => {

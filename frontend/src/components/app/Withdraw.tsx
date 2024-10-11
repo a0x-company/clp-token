@@ -1,6 +1,6 @@
 "use client";
 // react
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // next
 import Image from "next/image";
@@ -343,7 +343,25 @@ const Withdraw: React.FC = () => {
   const [errorFields, setErrorFields] = useState<string[]>([]);
   const [addressDestination, setAddressDestination] = useState<`0x${string}` | null>(null);
 
-  const { status, loading: statusLoading, error } = useRedeemStatus(redeemId);
+  const { status, loading: statusLoading, error, refetch } = useRedeemStatus(redeemId);
+
+  useEffect(() => {
+    const savedRedeemId = localStorage.getItem("redeemId");
+    if (savedRedeemId) {
+      setRedeemId(savedRedeemId);
+      refetch();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (status === RedeemStatus.PENDING && currentStep !== 2) {
+      setCurrentStep(2);
+    }
+  }, [status, currentStep]);
+
+  const saveRedeemIdToLocalStorage = (id: string) => {
+    localStorage.setItem("redeemId", id);
+  };
 
   const { user } = useUserStore();
 
@@ -400,6 +418,7 @@ const Withdraw: React.FC = () => {
         //   if (response.status === 201 || response.status === 200) {
         //     console.log("Retiro:", response.data.redeemId);
         //     setRedeemId(response.data.redeemId);
+        //     saveRedeemIdToLocalStorage(response.data.redeemId);
         //     setCurrentStep(1);
         //   }
         // } catch (error) {
