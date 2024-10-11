@@ -16,6 +16,8 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { addresses } from "@/constants/address";
+import { useReadContract, useReadContracts } from "wagmi";
+import { erc20Abi } from "viem";
 
 interface ReserveData {
   balance: number;
@@ -24,12 +26,25 @@ interface ReserveData {
 
 interface ReserveUIProps {
   bankBalance: number | null;
-  tokenSupply: string | null;
+  tokenSupply: number | null | undefined;
 }
 
 const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
   const [reserveData, setReserveData] = useState<ReserveData[]>([]);
   const fetchedData = useRef(false);
+
+  // const result = useReadContracts({
+  //   allowFailure: true,
+  //   contracts: [
+  //     {
+  //       address: addresses.base.CLPD.address,
+  //       abi: erc20Abi,
+  //       functionName: "totalSupply",
+  //     },
+  //   ],
+  // });
+
+  // console.log("result", result.data);
 
   const t = useTranslations("reserve");
 
@@ -98,10 +113,12 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
                 {tokenSupply !== null ? (
                   <p className="text-brand-blue font-helvetica text-[36px] font-bold">
                     $
-                    {parseFloat(tokenSupply).toLocaleString("es-ES", {
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 0,
-                    })}
+                    {tokenSupply !== undefined
+                      ? tokenSupply.toLocaleString("es-ES", {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        })
+                      : "0"}
                   </p>
                 ) : (
                   <p className="text-2xl text-gray-500 font-helvetica">Cargando...</p>
@@ -113,10 +130,7 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
                 className="w-20 bg-brand-blue border-2 border-black shadow-brutalist-sm rounded-xl mt-6 transition-all duration-300"
                 style={{
                   height: tokenSupply
-                    ? `${
-                        (parseFloat(tokenSupply) / (parseFloat(tokenSupply) + (bankBalance || 0))) *
-                        384
-                      }px`
+                    ? `${(tokenSupply / (tokenSupply + (bankBalance || 0))) * 384}px`
                     : "0px",
                 }}
               />
@@ -141,9 +155,10 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
               <div
                 className="w-20 bg-brand-orange-pastel border-2 border-black shadow-brutalist-sm rounded-xl mt-6 transition-all duration-300"
                 style={{
-                  height: bankBalance
-                    ? `${(bankBalance / (parseFloat(tokenSupply || "0") + bankBalance)) * 384}px`
-                    : "0px",
+                  height:
+                    bankBalance && tokenSupply
+                      ? `${(bankBalance / (tokenSupply + bankBalance)) * 384}px`
+                      : "0px",
                 }}
               />
             </div>

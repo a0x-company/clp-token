@@ -11,5 +11,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app, "clpd");
 const userDataCollection = collection(db, "user-data");
 const depositsCollection = collection(db, "deposits");
+const redeemsCollection = collection(db, "redeems");
 
-export { db, userDataCollection, depositsCollection };
+export { db, userDataCollection, depositsCollection, redeemsCollection };

@@ -26,6 +26,7 @@
     "@toruslabs/eccrypto": "^5.0.4",
     "@uniswap/sdk-core": "^5.4.0",
     "@uniswap/v2-sdk": "^4.4.1",
+    "@wagmi/core": "^2.13.8",
     "@web3auth/base": "^8.12.4",
     "@web3auth/ethereum-provider": "^8.12.4",
     "@web3auth/no-modal": "^8.12.4",
@@ -50,7 +51,7 @@
     "recharts": "^2.13.0-alpha.5",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "^2.21.6",
+    "viem": "^2.21.22",
     "wagmi": "^2.12.7",
     "zod": "^3.23.8",
     "zustand": "^4.5.5"

@@ -133,13 +133,30 @@
     "step3MintedBalance": "Your balance",
     "ready": "Ready",
     "yourEmail": "Your email",
-    "back": "Back"
+    "back": "Back",
+    "willBeSent": "Will be sent"
   },
   "withdraw": {
     "withdraw": "Withdraw CLP",
     "amount": "Amount to Withdraw",
     "amountPlaceholder": "100.000",
-    "createWithdrawOrder": "Create Withdraw Order",
+    "bankInfo": {
+      "bankName": "Bank",
+      "name": "Name",
+      "accountNumber": "Account Number",
+      "accountType": "Account Type",
+      "email": "Email",
+      "bankNamePlaceholder": "Banco Santander",
+      "accountTypePlaceholder": "Checking Account",
+      "accountNumberPlaceholder": "1234567890",
+      "namePlaceholder": "Jhon Doe",
+      "emailPlaceholder": "jhon@doe.com"
+    },
+    "createWithdrawOrder": "Create a withdraw order",
+    "wallet": "Wallet",
+    "baseAddress": "Base Address",
+    "transferBank": "Bank Transfer",
+    "bankChile": "Chilean Bank",
     "bankAccount": "Bank Account",
     "accountHolder": "Account Holder",
     "bankAccountPlaceholder": "Banco Estado",
@@ -150,9 +167,29 @@
     "completed": "Completed",
     "ownershipCheck": "Declare that I am the account holder",
     "complianceCheck": "Compliance",
-    "createWithdraw": "Create Withdraw",
+    "createWithdraw": "Order Withdraw",
     "receive": "Receive",
     "redeem": "Redeem",
-    "submit": "Submit"
+    "submit": "Submit",
+    "redeemStep1": "Enter account to transfer",
+    "transferStep1": "Enter address to send",
+    "step3": "Your order is waiting review...",
+    "step3Description": "This page will update automatically when it's ready, and you will receive an email.",
+    "step3Minted": "Withdraw approved!",
+    "step3MintedDescription": "Your funds have been withdrawn successfully.",
+    "step3MintedBalance": "Your balance",
+    "ready": "Ready",
+    "yourEmail": "Your email",
+    "willBeSent": "Will be sent",
+    "networkShouldBe": "The destination wallet must support the BASE network.",
+    "baseAddressPlaceholder": "0x123...456",
+    "errorFields": {
+      "bankName": "The bank name is required",
+      "accountType": "The account type is required",
+      "accountNumber": "The account number is required",
+      "name": "The name is required",
+      "email": "The email is required",
+      "ownershipCheck": "You must declare that you are the account holder"
+    }
   }
 }

@@ -12,13 +12,14 @@ import Image from "next/image";
 import CLPFlag from "../CLPFlag";
 import { Input } from "../ui/input";
 import CreateOrder from "./CreateOrder";
-import { cn } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
 import { useUserStore } from "@/context/global-store";
 import { web3AuthInstance } from "@/provider/WagmiConfig";
 import axios from "axios";
 import { LoadingSpinner } from "../ui/spinner";
 import { useDepositStatus } from "@/hooks/useDepositStatus";
 import { DepositStatus } from "@/types";
+import { LucideArrowLeft, PencilLine } from "lucide-react";
 
 const currencies = {
   CLP: { name: "Peso Chileno", code: "CL" },
@@ -41,6 +42,7 @@ interface CreateStepsProps {
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   file: File | null;
   status: DepositStatus | null;
+  handleBack: () => void;
 }
 
 const formIds = {
@@ -62,6 +64,7 @@ const createSteps = ({
   file,
   email,
   handleSubmit,
+  handleBack,
   status,
 }: CreateStepsProps) => [
   {
@@ -161,6 +164,15 @@ const createSteps = ({
           </p>
         </div>
         <CreateOrder handleFileChange={handleFileChange} file={file} />
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-black font-helvetica">
+            {t("willBeSent")}: <span className="font-bold">{formatNumber(Number(amount))}</span>{" "}
+            CLPD
+          </p>
+          <button type="button" className="text-brand-blue" onClick={handleBack}>
+            <PencilLine className="w-4 h-4" />
+          </button>
+        </div>
       </form>
     ),
     formId: formIds.sendProof,
@@ -211,9 +223,6 @@ const createSteps = ({
 const Deposit: React.FC = () => {
   const t = useTranslations("deposit");
 
-  const [transferStatus, setTransferStatus] = useState<
-    "initiated" | "processing" | "completed" | null
-  >(null);
   const [amount, setAmount] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -249,7 +258,7 @@ const Deposit: React.FC = () => {
         }
         try {
           const response = await axios.post(
-            "/api/create-order",
+            "/api/deposit/create-order",
             { amount },
             {
               headers: {
@@ -284,7 +293,7 @@ const Deposit: React.FC = () => {
           const idToken = userInfo?.idToken;
 
           const response = await axios.post(
-            "/api/create-order/proof",
+            "/api/deposit/create-order/proof",
             { file, depositId },
             {
               headers: {
@@ -297,7 +306,6 @@ const Deposit: React.FC = () => {
           if (response.status === 201 || response.status === 200) {
             setFile(null);
             handleAmountChange({ target: { value: "" } } as React.ChangeEvent<HTMLInputElement>);
-            setTransferStatus("processing");
             setCurrentStep(2);
           }
         } catch (error) {
@@ -324,10 +332,13 @@ const Deposit: React.FC = () => {
 
   const handleReset = () => {
     setCurrentStep(0);
-    setTransferStatus(null);
     setDepositId("");
     setFile(null);
     setAmount("");
+  };
+
+  const handleBack = () => {
+    setCurrentStep(currentStep - 1);
   };
 
   return (
@@ -352,9 +363,18 @@ const Deposit: React.FC = () => {
         )}
       >
         <div className="flex flex-col rounded-xl border-none gap-3">
-          <h3 className="text-xl font-helvetica font-bold">
-            {t(Object.values(titles)[currentStep])}
-          </h3>
+          <div className="flex items-center justify-start gap-2.5">
+            {currentStep === 1 && (
+              <LucideArrowLeft
+                className="w-10 h-10 cursor-pointer border-2 border-black rounded-full p-2 bg-[#FBC858]"
+                onClick={handleBack}
+              />
+            )}
+
+            <h3 className="text-xl font-helvetica font-bold">
+              {t(Object.values(titles)[currentStep])}
+            </h3>
+          </div>
           <CardContent className="p-0 space-y-2">
             {
               createSteps({
@@ -366,6 +386,7 @@ const Deposit: React.FC = () => {
                 handleFileChange,
                 file,
                 status,
+                handleBack,
               })[currentStep].children
             }
           </CardContent>
