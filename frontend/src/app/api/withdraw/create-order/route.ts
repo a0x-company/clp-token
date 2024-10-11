@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
   try {
     const response = await axios.post(
-      `${API_URL}/deposits`,
+      `${API_URL}/redeems`,
       { amount },
       {
         headers: {
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { message: "Order created", depositId: response.data.deposit.id },
+      { message: "Order created", redeemId: response.data.redeem.id },
       { status: 200 }
     );
   } catch (error) {
