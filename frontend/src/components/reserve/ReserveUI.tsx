@@ -36,15 +36,7 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
   useEffect(() => {
     const fetchReserveData = async () => {
       try {
-        const response = await axios.get(
-          "https://development-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/history?period=week",
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "api-key": "a0xkey85vu5yu%1*",
-            },
-          }
-        );
+        const response = await axios.get("/api/reserve/historic");
         setReserveData(response.data.balanceHistory);
         fetchedData.current = true;
       } catch (error) {

@@ -105,9 +105,18 @@ const Navbar: React.FC<NavbarProps> = () => {
         </Link>
 
         <div className="flex items-center gap-2">
-          <Button className="bg-black text-white h-auto px-6 py-2 max-md:text-sm text-xl rounded-xl border-2 border-black font-bold shadow-brutalist">
-            {t("login")}
-          </Button>
+          {!isConnected ? (
+            <Button
+              onClick={handleConnect}
+              className="bg-black text-white h-auto px-6 py-2 max-md:text-sm text-xl rounded-xl border-2 border-black font-bold shadow-brutalist"
+            >
+              {loadingUser ? "loading..." : t("login")}
+            </Button>
+          ) : (
+            <Link href={`/${currentLang}/app`} className={currentPathStyle}>
+              {loadingUser ? <LoadingSpinner /> : user.name}
+            </Link>
+          )}
 
           <Sheet>
             <SheetTrigger asChild>
