@@ -5,6 +5,7 @@ const API_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
 
 export async function POST(request: Request) {
+  console.info("[POST][/api/deposit/create-order/proof]");
   const formData = await request.formData();
   const file = formData.get("file") as File;
   const depositId = formData.get("depositId") as string;
