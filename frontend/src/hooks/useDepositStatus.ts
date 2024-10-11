@@ -1,7 +1,7 @@
 // react
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 // firebase
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { depositsCollection } from "@/firebaseConfig";
 // types
 import { DepositStatus } from "@/types";
@@ -11,12 +11,39 @@ export const useDepositStatus = (depositId: string) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = async (depositRef: any) => {
     setLoading(true);
     setError(null);
+    try {
+      const docSnap = await getDoc(depositRef);
+      if (docSnap.exists()) {
+        const depositData = docSnap.data() as { status: DepositStatus };
+        setStatus(depositData.status);
+      } else {
+        setError("No se encontró el documento del depósito");
+      }
+    } catch (error) {
+      console.error("Error al obtener datos:", error);
+      setError("Error al obtener el estado del depósito");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refetch = useCallback(() => {
+    if (!depositId || depositId === "") return;
+    const depositRef = doc(depositsCollection, depositId);
+    fetchData(depositRef);
+  }, [depositId]);
+
+  useEffect(() => {
     if (!depositId || depositId === "") return;
     const depositRef = doc(depositsCollection, depositId);
 
+    // Consulta inicial
+    fetchData(depositRef);
+
+    // Suscripción en tiempo real
     const unsubscribe = onSnapshot(
       depositRef,
       (doc) => {
@@ -38,5 +65,5 @@ export const useDepositStatus = (depositId: string) => {
     return () => unsubscribe();
   }, [depositId]);
 
-  return { status, loading, error };
+  return { status, loading, error, refetch };
 };
