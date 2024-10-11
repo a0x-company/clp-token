@@ -354,7 +354,7 @@ const Withdraw: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (status === RedeemStatus.PENDING && currentStep !== 2) {
+    if (status === RedeemStatus.PENDING && currentStep === 0) {
       setCurrentStep(2);
     }
   }, [status, currentStep]);

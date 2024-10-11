@@ -5,6 +5,7 @@ const API_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
 
 export async function POST(request: Request) {
+  console.info("[POST][/api/withdraw/create-order]");
   const { amount } = await request.json();
   const idToken = request.headers.get("Authorization")?.split(" ")[1];
 
