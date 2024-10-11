@@ -243,7 +243,7 @@ const Deposit: React.FC = () => {
   }, []); // Este efecto solo se ejecuta una vez al montar el componente
 
   useEffect(() => {
-    if (status === DepositStatus.PENDING && currentStep !== 2) {
+    if (status === DepositStatus.PENDING && currentStep === 0) {
       setCurrentStep(2);
     }
   }, [status, currentStep]);
