@@ -251,68 +251,68 @@ const Deposit: React.FC = () => {
     console.log(currentStep);
     switch (currentStep) {
       case 0:
-        setCurrentStep(1);
-        // if (amount === "" || !amount || Number(amount) === 0) {
-        //   setLoading(false);
-        //   return;
-        // }
-        // try {
-        //   const response = await axios.post(
-        //     "/api/deposit/create-order",
-        //     { amount },
-        //     {
-        //       headers: {
-        //         Authorization: `Bearer ${idToken}`,
-        //         "Content-Type": "application/json",
-        //       },
-        //     }
-        //   );
-        //   console.log(response);
-        //   if (response.status === 201 || response.status === 200) {
-        //     console.log("Deposito:", response.data.depositId);
-        //     setDepositId(response.data.depositId);
-        //     setCurrentStep(1);
-        //   }
-        // } catch (error) {
-        //   console.log(error);
-        // } finally {
-        //   setLoading(false);
-        // }
+        // setCurrentStep(1);
+        if (amount === "" || !amount || Number(amount) === 0) {
+          setLoading(false);
+          return;
+        }
+        try {
+          const response = await axios.post(
+            "/api/deposit/create-order",
+            { amount },
+            {
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          console.log(response);
+          if (response.status === 201 || response.status === 200) {
+            console.log("Deposito:", response.data.depositId);
+            setDepositId(response.data.depositId);
+            setCurrentStep(1);
+          }
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false);
+        }
         break;
       case 1:
-        setCurrentStep(2);
-        // if (!file) {
-        //   setLoading(false);
-        //   return;
-        // }
-        // try {
-        //   console.log("Archivo:", file);
-        //   console.log("Monto:", amount);
-        //   console.log("Deposito:", depositId);
-        //   const userInfo = await web3AuthInstance.getUserInfo();
-        //   const idToken = userInfo?.idToken;
+        // setCurrentStep(2);
+        if (!file) {
+          setLoading(false);
+          return;
+        }
+        try {
+          console.log("Archivo:", file);
+          console.log("Monto:", amount);
+          console.log("Deposito:", depositId);
+          const userInfo = await web3AuthInstance.getUserInfo();
+          const idToken = userInfo?.idToken;
 
-        //   const response = await axios.post(
-        //     "/api/deposit/create-order/proof",
-        //     { file, depositId },
-        //     {
-        //       headers: {
-        //         Authorization: `Bearer ${idToken}`,
-        //         "Content-Type": "multipart/form-data",
-        //       },
-        //     }
-        //   );
-        //   console.log(response);
-        //   if (response.status === 201 || response.status === 200) {
-        //     setFile(null);
-        //     handleAmountChange({ target: { value: "" } } as React.ChangeEvent<HTMLInputElement>);
-        //     setCurrentStep(2);
-        //   }
-        // } catch (error) {
-        //   console.log(error);
-        // } finally {
-        //   setLoading(false);
-        // }
+          const response = await axios.post(
+            "/api/deposit/create-order/proof",
+            { file, depositId },
+            {
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          console.log(response);
+          if (response.status === 201 || response.status === 200) {
+            setFile(null);
+            handleAmountChange({ target: { value: "" } } as React.ChangeEvent<HTMLInputElement>);
+            setCurrentStep(2);
+          }
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false);
+        }
         break;
     }
   };
