@@ -8,7 +8,7 @@ import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 
 export const web3AuthNetwork =
   process.env.NODE_ENV === "development"
-    ? WEB3AUTH_NETWORK.TESTNET
+    ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET
     : WEB3AUTH_NETWORK.SAPPHIRE_MAINNET;
 export const clientId =
   process.env.NODE_ENV === "development"

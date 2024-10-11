@@ -13,6 +13,18 @@ import Navbar from "@/components/Navbar";
 import FAQSection from "@/components/reserve/FAQSection";
 import Footer from "@/components/Footer";
 
+// wagmi
+import { readContracts } from "@wagmi/core";
+
+// provider
+import { config } from "@/provider/config";
+
+// constants
+import { addresses } from "@/constants/address";
+
+// viem
+import { erc20Abi, formatUnits } from "viem";
+
 export const fetchCache = "force-no-store";
 export const dynamic = "auto";
 
@@ -29,20 +41,33 @@ const fetchBankBalance = async () => {
 
 const fetchTokenSupply = async () => {
   try {
-    const now = new Date();
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_URL}/api/reserve?timestamp=${now.getTime()}`
-    );
-    console.log("response", response.data);
-    return response.data.supply;
+    const result = await readContracts(config, {
+      allowFailure: false,
+      contracts: [
+        {
+          address: addresses.base.CLPD.address,
+          abi: erc20Abi,
+          functionName: "totalSupply",
+        },
+      ],
+    });
+
+    const totalSupply = formatUnits(result[0]!, 18);
+
+    return Number(totalSupply);
   } catch (error) {
     console.error("Error al obtener el total supply del token:", error);
   }
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  let bankBalance = await fetchBankBalance();
-  let tokenSupply = await fetchTokenSupply();
+  let bankBalance = null;
+  let tokenSupply = null;
+  try {
+    [bankBalance, tokenSupply] = await Promise.all([fetchBankBalance(), fetchTokenSupply()]);
+  } catch (error) {
+    console.error("Error al obtener los datos de reserva:", error);
+  }
   if (!bankBalance || !tokenSupply) {
     return {
       title: "Reservas | CLPD",
@@ -53,9 +78,7 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
 
-  if (typeof tokenSupply === "string") {
-    tokenSupply = formatNumber(Number(tokenSupply));
-  }
+  tokenSupply = formatNumber(tokenSupply);
   bankBalance = formatNumber(bankBalance);
 
   const imageUrl = `${process.env.NEXT_PUBLIC_URL}/api/og-reserve?bankBalance=${bankBalance}&tokenSupply=${tokenSupply}`;
@@ -69,8 +92,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Reserve() {
-  let bankBalance: number | null = null;
-  let tokenSupply: string | null = null;
+  let bankBalance = null;
+  let tokenSupply = null;
   try {
     [bankBalance, tokenSupply] = await Promise.all([fetchBankBalance(), fetchTokenSupply()]);
     console.log("bankBalance", bankBalance);

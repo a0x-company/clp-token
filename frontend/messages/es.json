@@ -133,13 +133,30 @@
     "step3MintedBalance": "Tu saldo",
     "ready": "Listo",
     "yourEmail": "Tu email",
-    "back": "Volver"
+    "back": "Volver",
+    "willBeSent": "Se enviarán"
   },
   "withdraw": {
     "withdraw": "Retirar CLP",
     "amount": "Monto a retirar",
     "amountPlaceholder": "100.000",
-    "createWithdrawOrder": "Crear Orden de Retiro",
+    "bankInfo": {
+      "bankName": "Banco",
+      "name": "Nombre",
+      "accountNumber": "Número de cuenta",
+      "accountType": "Tipo de cuenta",
+      "email": "Email",
+      "bankNamePlaceholder": "Banco Santander",
+      "accountTypePlaceholder": "Cuenta Vista",
+      "accountNumberPlaceholder": "1234567890",
+      "namePlaceholder": "Jhon Doe",
+      "emailPlaceholder": "jhon@doe.com"
+    },
+    "createWithdrawOrder": "Crear una orden de retiro",
+    "wallet": "Wallet",
+    "baseAddress": "Base Address",
+    "transferBank": "Transferencia bancaria",
+    "bankChile": "Banco Chile",
     "bankAccount": "Cuenta bancaria",
     "accountHolder": "Titular de la cuenta",
     "bankAccountPlaceholder": "Banco Estado",
@@ -150,9 +167,29 @@
     "completed": "Completado",
     "ownershipCheck": "Declaro que soy el titular de la cuenta",
     "complianceCheck": "Cumplimiento",
-    "createWithdraw": "Crear Retiro",
+    "createWithdraw": "Ordenar Retiro",
     "submit": "Enviar",
     "receive": "Recibes",
-    "redeem": "Sacas"
+    "redeem": "Retiras",
+    "redeemStep1": "Ingresa cuenta a tranferir",
+    "transferStep1": "Ingresa address a enviar",
+    "step3": "Tu orden está esperando revisión...",
+    "step3Description": "Esta página se actualizará automáticamente cuando esté lista, y recibirás un correo.",
+    "step3Minted": "¡Retiro aprobado!",
+    "step3MintedDescription": "Tus fondos han sido retirados con éxito.",
+    "step3MintedBalance": "Tu saldo",
+    "ready": "Listo",
+    "yourEmail": "Tu email",
+    "willBeSent": "Se enviarán",
+    "networkShouldBe": "La wallet de destino debe soportar la red BASE.",
+    "baseAddressPlaceholder": "0x123...456",
+    "errorFields": {
+      "bankName": "El nombre del banco es requerido",
+      "accountType": "El tipo de cuenta es requerido",
+      "accountNumber": "El número de cuenta es requerido",
+      "name": "El nombre es requerido",
+      "email": "El email es requerido",
+      "ownershipCheck": "Debes declarar que eres el titular de la cuenta"
+    }
   }
 }

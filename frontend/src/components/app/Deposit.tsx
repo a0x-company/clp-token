@@ -12,13 +12,14 @@ import Image from "next/image";
 import CLPFlag from "../CLPFlag";
 import { Input } from "../ui/input";
 import CreateOrder from "./CreateOrder";
-import { cn } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
 import { useUserStore } from "@/context/global-store";
 import { web3AuthInstance } from "@/provider/WagmiConfig";
 import axios from "axios";
 import { LoadingSpinner } from "../ui/spinner";
 import { useDepositStatus } from "@/hooks/useDepositStatus";
 import { DepositStatus } from "@/types";
+import { LucideArrowLeft, PencilLine } from "lucide-react";
 
 const currencies = {
   CLP: { name: "Peso Chileno", code: "CL" },
@@ -41,6 +42,7 @@ interface CreateStepsProps {
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   file: File | null;
   status: DepositStatus | null;
+  handleBack: () => void;
 }
 
 const formIds = {
@@ -62,6 +64,7 @@ const createSteps = ({
   file,
   email,
   handleSubmit,
+  handleBack,
   status,
 }: CreateStepsProps) => [
   {
@@ -161,6 +164,15 @@ const createSteps = ({
           </p>
         </div>
         <CreateOrder handleFileChange={handleFileChange} file={file} />
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-black font-helvetica">
+            {t("willBeSent")}: <span className="font-bold">{formatNumber(Number(amount))}</span>{" "}
+            CLPD
+          </p>
+          <button type="button" className="text-brand-blue" onClick={handleBack}>
+            <PencilLine className="w-4 h-4" />
+          </button>
+        </div>
       </form>
     ),
     formId: formIds.sendProof,
@@ -211,9 +223,6 @@ const createSteps = ({
 const Deposit: React.FC = () => {
   const t = useTranslations("deposit");
 
-  const [transferStatus, setTransferStatus] = useState<
-    "initiated" | "processing" | "completed" | null
-  >(null);
   const [amount, setAmount] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -242,69 +251,68 @@ const Deposit: React.FC = () => {
     console.log(currentStep);
     switch (currentStep) {
       case 0:
-        // setCurrentStep(1);
-        if (amount === "" || !amount || Number(amount) === 0) {
-          setLoading(false);
-          return;
-        }
-        try {
-          const response = await axios.post(
-            "/api/create-order",
-            { amount },
-            {
-              headers: {
-                Authorization: `Bearer ${idToken}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          console.log(response);
-          if (response.status === 201 || response.status === 200) {
-            console.log("Deposito:", response.data.depositId);
-            setDepositId(response.data.depositId);
-            setCurrentStep(1);
-          }
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false);
-        }
+        setCurrentStep(1);
+        // if (amount === "" || !amount || Number(amount) === 0) {
+        //   setLoading(false);
+        //   return;
+        // }
+        // try {
+        //   const response = await axios.post(
+        //     "/api/deposit/create-order",
+        //     { amount },
+        //     {
+        //       headers: {
+        //         Authorization: `Bearer ${idToken}`,
+        //         "Content-Type": "application/json",
+        //       },
+        //     }
+        //   );
+        //   console.log(response);
+        //   if (response.status === 201 || response.status === 200) {
+        //     console.log("Deposito:", response.data.depositId);
+        //     setDepositId(response.data.depositId);
+        //     setCurrentStep(1);
+        //   }
+        // } catch (error) {
+        //   console.log(error);
+        // } finally {
+        //   setLoading(false);
+        // }
         break;
       case 1:
-        // setCurrentStep(2);
-        if (!file) {
-          setLoading(false);
-          return;
-        }
-        try {
-          console.log("Archivo:", file);
-          console.log("Monto:", amount);
-          console.log("Deposito:", depositId);
-          const userInfo = await web3AuthInstance.getUserInfo();
-          const idToken = userInfo?.idToken;
+        setCurrentStep(2);
+        // if (!file) {
+        //   setLoading(false);
+        //   return;
+        // }
+        // try {
+        //   console.log("Archivo:", file);
+        //   console.log("Monto:", amount);
+        //   console.log("Deposito:", depositId);
+        //   const userInfo = await web3AuthInstance.getUserInfo();
+        //   const idToken = userInfo?.idToken;
 
-          const response = await axios.post(
-            "/api/create-order/proof",
-            { file, depositId },
-            {
-              headers: {
-                Authorization: `Bearer ${idToken}`,
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
-          console.log(response);
-          if (response.status === 201 || response.status === 200) {
-            setFile(null);
-            handleAmountChange({ target: { value: "" } } as React.ChangeEvent<HTMLInputElement>);
-            setTransferStatus("processing");
-            setCurrentStep(2);
-          }
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false);
-        }
+        //   const response = await axios.post(
+        //     "/api/deposit/create-order/proof",
+        //     { file, depositId },
+        //     {
+        //       headers: {
+        //         Authorization: `Bearer ${idToken}`,
+        //         "Content-Type": "multipart/form-data",
+        //       },
+        //     }
+        //   );
+        //   console.log(response);
+        //   if (response.status === 201 || response.status === 200) {
+        //     setFile(null);
+        //     handleAmountChange({ target: { value: "" } } as React.ChangeEvent<HTMLInputElement>);
+        //     setCurrentStep(2);
+        //   }
+        // } catch (error) {
+        //   console.log(error);
+        // } finally {
+        //   setLoading(false);
+        // }
         break;
     }
   };
@@ -324,10 +332,13 @@ const Deposit: React.FC = () => {
 
   const handleReset = () => {
     setCurrentStep(0);
-    setTransferStatus(null);
     setDepositId("");
     setFile(null);
     setAmount("");
+  };
+
+  const handleBack = () => {
+    setCurrentStep(currentStep - 1);
   };
 
   return (
@@ -352,9 +363,18 @@ const Deposit: React.FC = () => {
         )}
       >
         <div className="flex flex-col rounded-xl border-none gap-3">
-          <h3 className="text-xl font-helvetica font-bold">
-            {t(Object.values(titles)[currentStep])}
-          </h3>
+          <div className="flex items-center justify-start gap-2.5">
+            {currentStep === 1 && (
+              <LucideArrowLeft
+                className="w-10 h-10 cursor-pointer border-2 border-black rounded-full p-2 bg-[#FBC858]"
+                onClick={handleBack}
+              />
+            )}
+
+            <h3 className="text-xl font-helvetica font-bold">
+              {t(Object.values(titles)[currentStep])}
+            </h3>
+          </div>
           <CardContent className="p-0 space-y-2">
             {
               createSteps({
@@ -366,6 +386,7 @@ const Deposit: React.FC = () => {
                 handleFileChange,
                 file,
                 status,
+                handleBack,
               })[currentStep].children
             }
           </CardContent>
