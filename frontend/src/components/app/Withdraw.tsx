@@ -70,10 +70,15 @@ const formIds = {
   transfer: "transfer",
 };
 
-const titles = (type: "redeem" | "withdraw") => ({
+const titles = (type: "redeem" | "withdraw", status: RedeemStatus | null) => ({
   0: "createWithdrawOrder",
   1: type === "redeem" ? "redeemStep1" : "transferStep1",
-  2: type === "redeem" ? "step3" : "transferStep3",
+  2:
+    type === "redeem"
+      ? status === RedeemStatus.BURNED
+        ? "step3Burned"
+        : "step3"
+      : "transferStep3",
 });
 
 const createSteps = ({
@@ -681,7 +686,7 @@ const Withdraw: React.FC = () => {
   return (
     <Card
       className={cn(
-        "absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] transition-all duration-200",
+        "absolute left-1/2 -translate-x-1/2 bottom-[25%] md:top-1/2 md:-translate-y-1/2 w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] transition-all duration-200",
         currentStep === 2 && status !== RedeemStatus.BURNED
           ? "bg-brand-blue"
           : currentStep === 2 && status === RedeemStatus.BURNED
@@ -722,7 +727,7 @@ const Withdraw: React.FC = () => {
                   : "text-black"
               )}
             >
-              {t(Object.values(titles(type))[currentStep])}
+              {t(Object.values(titles(type, status))[currentStep])}
             </h3>
 
             {currentStep === 0 && (
@@ -785,7 +790,7 @@ const Withdraw: React.FC = () => {
       )}
 
       <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex justify-center my-2 space-x-2 bg-white w-full max-w-3xl rounded-full">
-        {Object.keys(titles(type)).map((s) => (
+        {Object.keys(titles(type, status)).map((s) => (
           <div
             key={s}
             className={cn(
