@@ -7,53 +7,59 @@ type RequestWithUser = Request & {
 };
 
 interface BurnRequest {
-  amount: number;
-  accountHolder: string;
-  rut: string;
-  accountNumber: string;
-  bankId: string;
-  user: NonNullable<RequestWithUser['user']>;
+    amount: number;
+    accountHolder: string;
+    rut: string;
+    accountNumber: string;
+    bankId: string;
+    email: string;
+    user: NonNullable<RequestWithUser['user']>;
 }
 
 function validateBurnRequest(req: RequestWithUser): BurnRequest | { error: string } {
-  const { amount, accountHolder, rut, accountNumber, bankId } = req.body;
-  const user = req.user;
-
-  if (!user) {
-    return { error: "User not authenticated" };
+    const { amount, accountHolder, rut, accountNumber, bankId, email } = req.body;
+    const user = req.user;
+  
+    if (!user) {
+      return { error: "Usuario no autenticado" };
+    }
+  
+    if (!amount || isNaN(amount) || amount <= 0) {
+      return { error: "Monto inválido" };
+    }
+  
+    if (!accountHolder || !rut || !accountNumber || !bankId || !email) {
+      return { error: "Faltan campos requeridos" };
+    }
+  
+    // Validación básica del email
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return { error: "Email inválido" };
+    }
+  
+    return { amount, accountHolder, rut, accountNumber, bankId, email, user };
   }
-
-  if (!amount || isNaN(amount) || amount <= 0) {
-    return { error: "Invalid amount" };
-  }
-
-  if (!accountHolder || !rut || !accountNumber || !bankId) {
-    return { error: "Missing required fields" };
-  }
-
-  return { amount, accountHolder, rut, accountNumber, bankId, user };
-}
 
 export function registerBurnRequestHandler(depositService: DepositService) {
   return async (req: RequestWithUser, res: Response) => {
     try {
-      const validationResult = validateBurnRequest(req);
+        const validationResult = validateBurnRequest(req);
 
-      if ('error' in validationResult) {
-        return res.status(400).json({ error: validationResult.error });
-      }
-
-      const { amount, accountHolder, rut, accountNumber, bankId, user } = validationResult;
-
-      const burnRequest = await depositService.requestBurn(
-        user,
-        amount,
-        accountHolder,
-        rut,
-        accountNumber,
-        bankId
-      );
-
+        if ('error' in validationResult) {
+          return res.status(400).json({ error: validationResult.error });
+        }
+  
+        const { amount, accountHolder, rut, accountNumber, bankId, email, user } = validationResult;
+  
+        const burnRequest = await depositService.requestBurn(
+          user,
+          amount,
+          accountHolder,
+          rut,
+          accountNumber,
+          bankId,
+          email
+        );
       const responseData = {
         id: burnRequest.id,
         email: burnRequest.email,

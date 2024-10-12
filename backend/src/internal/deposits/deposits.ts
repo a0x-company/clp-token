@@ -81,11 +81,13 @@ export class DepositService {
     accountHolder: string,
     rut: string,
     accountNumber: string,
-    bankId: string
+    bankId: string,
+    email: string
   ): Promise<BurnRequest> {
     const burnRequest: BurnRequest = {
       id: uuidv4(),
-      email: user.email,
+      userEmail: user.email,
+      email,
       amount,
       status: BurnStatus.RECEIVED_NOT_BURNED,
       accountHolder,
@@ -95,21 +97,68 @@ export class DepositService {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-
+  
     const result = await this.storage.addBurnRequest(burnRequest);
     console.log(`✅ New burn request registered with ID ${result.id}`);
+  
+    const redeemTransaction = {
+      "version": "1.0",
+      "chainId": "8453",
+      "createdAt": Date.now(),
+      "meta": {
+        "name": "Redeem Transaction",
+        "description": "Redeem transaction for burn request",
+        "txBuilderVersion": "1.17.0",
+        "createdFromSafeAddress": "0x5B753Da5d8c874E9313Be91fbd822979Cc7F3F88",
+        "createdFromOwnerAddress": "",
+        "checksum": ""
+      },
+      "transactions": [
+        {
+          "to": "0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1",
+          "value": "0",
+          "data": null,
+          "contractMethod": {
+            "inputs": [
+              { "internalType": "uint256", "name": "amount", "type": "uint256" },
+              { "internalType": "address", "name": "recipient", "type": "address" }
+            ],
+            "name": "redeem",
+            "payable": false
+          },
+          "contractInputsValues": {
+            "amount": amount.toString(),
+            "recipient": user.address
+          }
+        }
+      ]
+    };
+  
+    const redeemTransactionJson = JSON.stringify(redeemTransaction, null, 2);
+  
+    const fileName = `burn-requests/${result.id}/redeem-transaction.json`;
+    const file = this.bucketStorage.bucket(this.bucketName).file(fileName);
+    await file.save(redeemTransactionJson, {
+      metadata: { contentType: 'application/json' },
+    });
+  
+    const [url] = await file.getSignedUrl({
+      action: 'read',
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    });
+  
     await this.discordNotificationService.sendNotification(
-      `New burn request registered:\nAmount: ${amount}\nUser Name: ${user.name}\nEmail: ${user.email}\nBurn Request ID: ${burnRequest.id}\n`,
+      `New burn request registered:\nAmount: ${amount}\nUser Name: ${user.name}\nUser Email: ${user.email}\nBurn Request Email: ${email}\nBurn Request ID: ${burnRequest.id}\n\nRedeem Transaction JSON: [Descargar Archivo](${url})`,
       NotificationType.INFO,
       "New Burn Request"
     );
-
+  
     await this.emailNotificationService.sendNotification(
       user.email,
       EmailType.NEW_BURN_REQUEST,
-      { amount, userName: user.name, burnRequestId: burnRequest.id }
+      { amount, userName: user.name, burnRequestId: burnRequest.id, redeemTransactionUrl: url }
     );    
-
+  
     return result;
   }
   
