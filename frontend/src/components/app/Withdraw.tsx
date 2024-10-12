@@ -20,12 +20,26 @@ import { useTranslations } from "next-intl";
 // utils
 import { cn, formatNumber } from "@/lib/utils";
 import { web3AuthInstance } from "@/provider/WagmiConfig";
+
+// http client
 import axios from "axios";
+
+// types
 import { BankInfo, RedeemStatus } from "@/types/withdraw.type";
+
+// hooks
 import { useRedeemStatus } from "@/hooks/useRedeemStatus";
+
+// ui
 import { LoadingSpinner } from "../ui/spinner";
 import { Checkbox } from "../ui/checkbox";
+
+// context
 import { useUserStore } from "@/context/global-store";
+
+// crypto
+import crypto from "crypto";
+import { useAccount } from "wagmi";
 
 interface CreateStepsProps {
   t: (key: string) => string;
@@ -40,6 +54,7 @@ interface CreateStepsProps {
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   status: RedeemStatus | null;
   handleBack: () => void;
+  handleTransfer: () => void;
   errorFields: string[];
   email: string;
 }
@@ -69,6 +84,7 @@ const createSteps = ({
   handleSubmit,
   status,
   handleBack,
+  handleTransfer,
   errorFields,
   email,
 }: CreateStepsProps) => [
@@ -365,6 +381,8 @@ const Withdraw: React.FC = () => {
 
   const { user } = useUserStore();
 
+  const { address: userAddress } = useAccount();
+
   const [bankInfo, setBankInfo] = useState<BankInfo>({
     bankName: "",
     name: "",
@@ -387,6 +405,56 @@ const Withdraw: React.FC = () => {
 
   const handleBack = () => {
     setCurrentStep(currentStep - 1);
+  };
+
+  const handleTransfer = async () => {
+    setLoading(true);
+    try {
+      const userInfo = await web3AuthInstance.getUserInfo();
+      const idToken = userInfo?.idToken;
+      const privateKey = (await web3AuthInstance.provider?.request({
+        method: "private_key",
+      })) as string;
+
+      // Encriptar la clave privada antes de enviarla
+      const encryptionKey = crypto.randomBytes(32).toString("hex");
+      const iv = crypto.randomBytes(16).toString("hex");
+      const cipher = crypto.createCipheriv(
+        "aes-256-cbc",
+        Buffer.from(encryptionKey, "hex"),
+        Buffer.from(iv, "hex")
+      );
+      let encryptedPKey = cipher.update(privateKey, "utf8", "hex");
+      encryptedPKey += cipher.final("hex");
+
+      const response = await axios.post(
+        "/api/transfer",
+        {
+          userAddress,
+          address: addressDestination,
+          withdrawAmount: withdrawAmount,
+          encryptedPKey,
+          iv,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "X-Encryption-Key": encryptionKey,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        // Manejar respuesta exitosa
+        console.log("Transferencia iniciada:", response.data);
+        // Actualizar el estado o navegar a la siguiente pantalla
+      }
+    } catch (error) {
+      console.error("Error al iniciar la transferencia:", error);
+      // Manejar el error (mostrar mensaje al usuario, etc.)
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -519,6 +587,7 @@ const Withdraw: React.FC = () => {
               type,
               setType,
               handleBack,
+              handleTransfer,
               errorFields,
               email: user?.email || "",
             })[currentStep].children
@@ -567,6 +636,7 @@ const Withdraw: React.FC = () => {
             className="w-full bg-brand-blue-dark border-2 border-black shadow-brutalist-sm py-4 h-full text-xl hover:bg-brand-blue-dark/90 text-white font-helvetica font-bold"
             type="submit"
             form={Object.values(formIds)[currentStep]}
+            onClick={() => handleTransfer()}
           >
             {!loading ? (
               (() => {
