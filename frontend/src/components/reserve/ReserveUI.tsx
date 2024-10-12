@@ -113,7 +113,7 @@ const ReserveUI: React.FC<ReserveUIProps> = ({ bankBalance, tokenSupply }) => {
       <g>
         <defs>
           <filter id="dropShadow">
-            <feDropShadow dx="4" dy="4" stdDeviation="0" floodColor="#000" floodOpacity="1" />
+            <feDropShadow dx="2" dy="2" stdDeviation="0" floodColor="#000" floodOpacity="1" />
           </filter>
         </defs>
 
