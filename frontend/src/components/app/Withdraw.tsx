@@ -470,7 +470,7 @@ const Withdraw: React.FC = () => {
   }, [status, currentStep]);
 
   useEffect(() => {
-    if (status === RedeemStatus.BURNED) {
+    if (status === RedeemStatus.BURNED || status === RedeemStatus.REJECTED) {
       localStorage.removeItem("redeemId");
     }
   }, [status]);

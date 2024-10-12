@@ -15,6 +15,7 @@
   "landing": {
     "send": "Send",
     "receive": "Receive",
+    "enterApp": "Enter App",
     "redeem": "Redeem",
     "feeCLPD": "Fee in CLPD",
     "save": "Save money",
