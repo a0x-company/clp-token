@@ -13,6 +13,7 @@ const FeatureSection: React.FC = () => {
         <h2 className="text-[48px] lg:text-[64px] font-beauford font-bold text-black text-start">
           {t("features.title")}
         </h2>
+
         <p className="text-[24px] lg:text-[32px] text-start text-black">
           {t("features.description1")}
         </p>

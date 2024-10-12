@@ -55,8 +55,12 @@ const DepositSection: React.FC = () => {
       </div>
 
       <div className="flex flex-col flex-[1.5] gap-4 w-full">
-        <h2 className="text-[64px] font-beauford font-bold">{t("deposit.title")}</h2>
-        <p className="text-[32px]">{t("deposit.description")}</p>
+        <h2 className="text-[48px] lg:text-[64px] font-beauford font-bold text-black text-start">
+          {t("deposit.title")}
+        </h2>
+        <p className="text-[24px] lg:text-[32px] text-start text-black">
+          {t("deposit.description")}
+        </p>
       </div>
 
       <div className="absolute bottom-0 w-full flex justify-center">

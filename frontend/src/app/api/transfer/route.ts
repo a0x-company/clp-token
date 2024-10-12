@@ -101,6 +101,7 @@ export async function POST(request: Request) {
 
       try {
         const transactionResponse = await walletRecharge.sendTransaction(tx);
+        await transactionResponse.wait();
 
         console.log("✅ Charge ETH to user wallet completed successfully");
         console.log("🧾 Transaction hash:", transactionResponse.hash);

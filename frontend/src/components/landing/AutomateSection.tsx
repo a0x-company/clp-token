@@ -15,13 +15,24 @@ const AutomateSection: React.FC = () => {
   return (
     <section className="flex flex-col md:flex-row items-center justify-center relative px-8 lg:px-16 xl:px-32 py-[180px] gap-16">
       <div className="flex flex-col flex-[1.5] gap-4 w-full">
-        <h2 className="text-[64px] font-beauford font-bold">{t("automate.title")}</h2>
-        <p className="text-[32px]">{t("automate.description")}</p>
+        <h2 className="text-[48px] lg:text-[64px] font-beauford font-bold text-black text-start">
+          {t("automate.title")}
+        </h2>
+
+        <p className="text-[24px] lg:text-[32px] text-start text-black">
+          {t("automate.description")}
+        </p>
       </div>
 
       <div className="flex flex-col flex-1 gap-8 w-full">
         <div className="flex justify-center items-center gap-8">
-          <Image src="/images/landing/box-vector.svg" alt="Box" width={48} height={48} />
+          <Image
+            src="/images/landing/box-vector.svg"
+            alt="Box"
+            width={48}
+            height={48}
+            className="hidden md:block"
+          />
           <Image src="/images/landing/gear-vector.svg" alt="Box" width={48} height={48} />
           <Image src="/images/landing/box-vector.svg" alt="Box" width={48} height={48} />
           <Image src="/images/landing/gear-vector.svg" alt="Box" width={48} height={48} />
@@ -38,7 +49,13 @@ const AutomateSection: React.FC = () => {
         />
 
         <div className="flex justify-center items-center gap-8">
-          <Image src="/images/landing/gear-vector.svg" alt="Box" width={48} height={48} />
+          <Image
+            src="/images/landing/gear-vector.svg"
+            alt="Box"
+            width={48}
+            height={48}
+            className="hidden md:block"
+          />
           <Image src="/images/landing/box-vector.svg" alt="Box" width={48} height={48} />
           <Image src="/images/landing/gear-vector.svg" alt="Box" width={48} height={48} />
           <Image src="/images/landing/box-vector.svg" alt="Box" width={48} height={48} />
