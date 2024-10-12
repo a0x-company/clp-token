@@ -1,6 +1,13 @@
 import { Firestore, CollectionReference, Query } from "@google-cloud/firestore";
 import crypto from 'crypto';
 
+
+export enum BurnStatus {
+  RECEIVED_NOT_BURNED = "received_not_burned",
+  BURNED = "burned",
+  REJECTED = "rejected"
+}
+
 export enum DepositStatus {
   PENDING = "pending",
   ACCEPTED_NOT_MINTED = "accepted_not_minted",
@@ -8,6 +15,27 @@ export enum DepositStatus {
   REJECTED = "rejected"
 }
 
+export interface BankInfo {
+  id: string;
+  name: string;
+}
+
+export interface BurnRequest {
+  id: string;
+  userId: string;
+  email: string;
+  amount: number;
+  status: BurnStatus;
+  accountHolder: string;
+  rut: string;
+  accountNumber: string;
+  bankId: string;
+  createdAt: number;
+  updatedAt: number;
+  proofImageUrl?: string;
+  rejectionReason?: string;
+  burnTransactionHash?: string;
+}
 export interface ApprovalToken {
   depositId: string;
   expiresAt: number;
@@ -37,6 +65,8 @@ export class DepositDataStorage {
   private depositCollectionName: string = "deposits";
   private approvalTokenCollectionName: string = "approvalTokens";
   private approvalMembersCollectionName: string = "approvalMembers";
+  private burnRequestCollectionName: string = "burnRequests";
+  private banksCollectionName: string = "banks";
 
   constructor(firestore: Firestore) {
     this.firestore = firestore;
@@ -55,7 +85,13 @@ export class DepositDataStorage {
     return this.firestore.collection(this.approvalTokenCollectionName);
   }
 
+  private get burnRequestCollection(): CollectionReference {
+    return this.firestore.collection(this.burnRequestCollectionName);
+  }
 
+  private get banksCollection(): CollectionReference {
+    return this.firestore.collection(this.banksCollectionName);
+  }
   
   public async addNewDeposit(depositData: StoredDepositData): Promise<StoredDepositData> {
     try {
@@ -204,4 +240,81 @@ export class DepositDataStorage {
     
     return snapshot.docs[0].data().name;
   }
+
+  public async addBurnRequest(burnRequest: BurnRequest): Promise<BurnRequest> {
+    try {
+      await this.burnRequestCollection.doc(burnRequest.id).set(burnRequest);
+      console.log(`✅ Nueva solicitud de quema con ID ${burnRequest.id} añadida exitosamente`);
+      return burnRequest;
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        throw new Error(`❌ Error al añadir nueva solicitud de quema: ${err.message}`);
+      } else {
+        throw new Error(`❌ Error al añadir nueva solicitud de quema: Error desconocido`);
+      }
+    }
+  }
+
+  public async getBurnRequest(burnRequestId: string): Promise<BurnRequest | null> {
+    try {
+      const doc = await this.burnRequestCollection.doc(burnRequestId).get();
+      if (!doc.exists) {
+        return null;
+      }
+      return doc.data() as BurnRequest;
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        throw new Error(`Error al obtener datos de solicitud de quema: ${err.message}`);
+      } else {
+        throw new Error("Error al obtener datos de solicitud de quema: Error desconocido");
+      }
+    }
+  }
+
+  public async updateBurnRequestData(
+    burnRequestId: string,
+    updateData: Partial<BurnRequest>
+  ): Promise<void> {
+    try {
+      await this.burnRequestCollection.doc(burnRequestId).update(updateData);
+      console.log(`✅ Datos de solicitud de quema actualizados para ID ${burnRequestId}`);
+    } catch (error) {
+      console.error(`❌ Error al actualizar datos de solicitud de quema para ID ${burnRequestId}:`, error);
+      throw error;
+    }
+  }
+
+  public async getBurnRequestsByStatus(status: BurnStatus): Promise<BurnRequest[]> {
+    try {
+      const query: Query = this.burnRequestCollection.where("status", "==", status);
+      const snapshot = await query.get();
+      return snapshot.docs.map(doc => doc.data() as BurnRequest);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        throw new Error(`Error al obtener solicitudes de quema por estado: ${err.message}`);
+      } else {
+        throw new Error("Error al obtener solicitudes de quema por estado: Error desconocido");
+      }
+    }
+  }
+
+  public async addBank(bank: BankInfo): Promise<void> {
+    try {
+      await this.banksCollection.doc(bank.id).set(bank);
+      console.log(`✅ Nuevo banco añadido: ${bank.name}`);
+    } catch (error) {
+      console.error('Error al añadir banco:', error);
+      throw new Error('Error al añadir banco');
+    }
+  }
+
+  public async getBanks(): Promise<BankInfo[]> {
+    try {
+      const snapshot = await this.banksCollection.get();
+      return snapshot.docs.map(doc => doc.data() as BankInfo);
+    } catch (error) {
+      console.error('Error al obtener bancos:', error);
+      throw new Error('Error al obtener bancos');
+    }
+  }  
 }
