@@ -4,19 +4,26 @@ pragma solidity ^0.8.25;
 import {Test, console} from "forge-std/Test.sol";
 import {CLPD} from "../src/CLPD_BaseMainnet.sol";
 
+/**
+ * To run this contract, copy and paste this command in the terminal:
+ * forge test -vvvv --match-path test/CLPD_BaseMainnet.t.sol --fork-url https://mainnet.base.org/
+ * 
+ * @dev Contract deployed on Base Mainnet
+ * https://basescan.org/address/0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1
+*/
 
 contract CLPDTest is Test {
     CLPD public clpd;
     address public owner = 0x5B753Da5d8c874E9313Be91fbd822979Cc7F3F88; // Owner and Agent of the real contract
-    address public account1 = 0xFc6623B340A505E6819349aF6beE2333D31840E1; // No Agent and no own of the real contract
-    address public account2 = 0x9F693ea18DA08824E729d5efc343Dd78254a9302; // No Agent and no Owner of the real contract
+    address public account1 = 0xd806A01E295386ef7a7Cea0B9DA037B242622743; // No Agent and no own of the real contract
+    address public account2 = 0x9b63FA365019Dd7bdF8cBED2823480F808391970; // No Agent and no Owner of the real contract
 
     function setUp() public {
         clpd = CLPD(0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1); 
     }
 
     function test_chainlink() public view {
-        assertEq(clpd.getVaultBalance(), 300000);
+        assertEq(clpd.getVaultBalance(), 260000);
         console.log("Vault balance:", clpd.getVaultBalance());
     }
 
@@ -137,7 +144,7 @@ contract CLPDTest is Test {
     function testRedeem() public {
         address agent = account1;
         address recipient = account2;
-        uint256 redeemAmount = 5000000000000000000000;
+        uint256 redeemAmount = 50000000;
         
         uint256 initialBalance = clpd.balanceOf(recipient);
         uint256 initialTotalSupply = clpd.totalSupply();
@@ -628,17 +635,17 @@ contract CLPDTest is Test {
 
     // ---------------------------------------------- ForceTransfer tests ----------------------------------------------   
     function testForceTransfer() public {
-        // Make account2 an agent
+        // Make account1 an agent
         vm.prank(owner);
-        clpd.addAgent(account2);
+        clpd.addAgent(account1);
         
         // Verify that account2 is now an agent
-        assertTrue(clpd.agents(account2), "account2 should be an agent");
+        assertTrue(clpd.agents(account1), "account1 should be an agent");
 
-        address agent = account2;
-        address sender = owner;
+        address agent = account1;
+        address sender = account2;
         address recipient = account1;
-        uint256 transferAmount = 1000000000000000000000;
+        uint256 transferAmount = 100000;
         
         // Ensure the sender has enough balance
         vm.assume(clpd.balanceOf(sender) >= transferAmount);

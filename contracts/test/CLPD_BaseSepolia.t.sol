@@ -4,6 +4,13 @@ pragma solidity ^0.8.25;
 import {Test, console} from "forge-std/Test.sol";
 import {CLPD} from "../src/CLPD_BaseSepolia.sol";
 
+/**
+ * To run this contract, copy and paste this command in the terminal:
+ * forge test -vvvvv --match-path test/CLPD_BaseSepolia.t.sol --fork-url https://sepolia.base.org/
+ * 
+ * @dev Contract deployed on Base Sepolia
+ * https://sepolia.basescan.org/address/0xec4ec868b9879C222877bd42Eaa0920705eE0eE3
+*/
 
 contract CLPDTest is Test {
     CLPD public clpd;

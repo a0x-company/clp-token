@@ -7,7 +7,7 @@ import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/Fu
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
 
 /**
- * @dev Contract deployed on Base Mainnet
+ * @dev Contract deployed on Base Sepolia
  * @notice You can view the deployed contract at:
  * https://sepolia.basescan.org/address/0xec4ec868b9879C222877bd42Eaa0920705eE0eE3
  */
