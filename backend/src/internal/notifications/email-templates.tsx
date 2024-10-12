@@ -121,3 +121,72 @@ export const NewDepositEmail = ({ amount, userName, depositId }) => (
       </Body>
     </Html>
   );  
+
+  export const NewBurnRequestEmail = ({ amount, userName, burnRequestId }) => (
+    <Html>
+      <Head />
+      <Body style={baseStyles}>
+        <Container style={containerStyles}>
+          <Section style={headerStyles}>
+            <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
+          </Section>
+          <Text>Dear {userName},</Text>
+          <Text>We have received your burn request. Thank you for using our token burning service.</Text>
+          <Text>Here are the details of your burn request:</Text>
+          <Text><strong>Amount:</strong> {amount} tokens</Text>
+          <Text><strong>Burn Request ID:</strong> {burnRequestId}</Text>
+          <Text>Our team will process your burn request shortly. Once approved, we will initiate the token burning process and transfer the corresponding funds to your specified account.</Text>
+          <Text>We'll notify you as soon as the validation process is complete.</Text>
+          <Button href="https://yourcompany.com/account/burn-requests" style={buttonStyles}>
+            Track Burn Request Status
+          </Button>
+        </Container>
+      </Body>
+    </Html>
+  );
+  
+  export const BurnRequestApprovedEmail = ({ amount, burnRequestId, userName }) => (
+    <Html>
+      <Head />
+      <Body style={baseStyles}>
+        <Container style={containerStyles}>
+          <Section style={headerStyles}>
+            <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
+          </Section>
+          <Text>Dear {userName},</Text>
+          <Text>Great news! Your burn request has been approved and the tokens have been burned:</Text>
+          <Text><strong>Amount Burned:</strong> {amount} tokens</Text>
+          <Text><strong>Burn Request ID:</strong> {burnRequestId}</Text>
+          <Text>The corresponding funds will be transferred to your specified account shortly.</Text>
+          <Text>Thank you for using our token burning service.</Text>
+          <Text>If you don't recognize this transaction, please contact us immediately.</Text>
+          <Button href="https://yourcompany.com/account" style={buttonStyles}>
+            View Account
+          </Button>
+        </Container>
+      </Body>
+    </Html>
+  );
+  
+  export const BurnRequestRejectedEmail = ({ amount, burnRequestId, reason, userName }) => (
+    <Html>
+      <Head />
+      <Body style={baseStyles}>
+        <Container style={containerStyles}>
+          <Section style={headerStyles}>
+            <Img src="https://yourcompany.com/logo.png" alt="Company Logo" width="150" height="50" />
+          </Section>
+          <Text>Dear {userName},</Text>
+          <Text>We regret to inform you that your burn request has been rejected:</Text>
+          <Text><strong>Amount:</strong> {amount} tokens</Text>
+          <Text><strong>Burn Request ID:</strong> {burnRequestId}</Text>
+          <Text><strong>Reason:</strong> {reason}</Text>
+          <Text>If you have any questions or need further clarification about the token burning process, please don't hesitate to contact our support team. We're here to help you with your burn request.</Text>
+          <Text>If you haven't attempted any burn request, please inform us immediately.</Text>
+          <Button href="https://yourcompany.com/support" style={buttonStyles}>
+            Contact Support
+          </Button>
+        </Container>
+      </Body>
+    </Html>
+  );

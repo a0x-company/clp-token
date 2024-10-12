@@ -22,7 +22,6 @@ export interface BankInfo {
 
 export interface BurnRequest {
   id: string;
-  userId: string;
   email: string;
   amount: number;
   status: BurnStatus;

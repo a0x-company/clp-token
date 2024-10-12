@@ -1,7 +1,7 @@
 import { Firestore } from "@google-cloud/firestore";
 import { Storage } from "@google-cloud/storage";
 import { v4 as uuidv4 } from 'uuid';
-import { DepositDataStorage, StoredDepositData, DepositStatus } from "./storage";
+import { DepositDataStorage, StoredDepositData, DepositStatus, BurnStatus, BankInfo, BurnRequest } from "./storage";
 import { DiscordNotificationService, NotificationType, EmailNotificationService , EmailType} from "../notifications";
 import { fromBuffer } from 'pdf2pic';
 import sharp from 'sharp';
@@ -73,6 +73,138 @@ export class DepositService {
     );    
 
     return result;
+  }
+
+  public async requestBurn(
+    user: StoredUserData,
+    amount: number,
+    accountHolder: string,
+    rut: string,
+    accountNumber: string,
+    bankId: string
+  ): Promise<BurnRequest> {
+    const burnRequest: BurnRequest = {
+      id: uuidv4(),
+      email: user.email,
+      amount,
+      status: BurnStatus.RECEIVED_NOT_BURNED,
+      accountHolder,
+      rut,
+      accountNumber,
+      bankId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    const result = await this.storage.addBurnRequest(burnRequest);
+    console.log(`✅ New burn request registered with ID ${result.id}`);
+    await this.discordNotificationService.sendNotification(
+      `New burn request registered:\nAmount: ${amount}\nUser Name: ${user.name}\nEmail: ${user.email}\nBurn Request ID: ${burnRequest.id}\n`,
+      NotificationType.INFO,
+      "New Burn Request"
+    );
+
+    await this.emailNotificationService.sendNotification(
+      user.email,
+      EmailType.NEW_BURN_REQUEST,
+      { amount, userName: user.name, burnRequestId: burnRequest.id }
+    );    
+
+    return result;
+  }
+  
+  public async approveBurnRequest(burnRequestId: string, transactionHash: string): Promise<void> {
+    const burnRequest = await this.storage.getBurnRequest(burnRequestId);
+    if (!burnRequest) {
+      throw new Error(`Burn request with ID ${burnRequestId} not found`);
+    }
+  
+    await this.storage.updateBurnRequestData(burnRequestId, {
+      status: BurnStatus.BURNED,
+      burnTransactionHash: transactionHash,
+      updatedAt: Date.now(),
+    });
+    console.log(`🔥 Burn request marked as burned: ID ${burnRequestId}, Transaction Hash: ${transactionHash}`);
+  }
+
+  public async rejectBurnRequest(burnRequestId: string, reason: string): Promise<void> {
+    await this.storage.updateBurnRequestData(burnRequestId, {
+      status: BurnStatus.REJECTED,
+      rejectionReason: reason,
+      updatedAt: Date.now(),
+    });
+
+    const burnRequest = await this.storage.getBurnRequest(burnRequestId);
+    if (burnRequest) {
+      await this.discordNotificationService.sendNotification(
+        `Burn request with ID ${burnRequestId} has been rejected. Reason: ${reason}`,
+        NotificationType.ERROR,
+        "Burn Request Rejected"
+      );
+  
+      await this.emailNotificationService.sendNotification(
+        burnRequest.email,
+        EmailType.BURN_REQUEST_REJECTED,
+        { amount: burnRequest.amount, burnRequestId: burnRequest.id, reason }
+      );
+    }
+    console.log(`❌ Burn request rejected: ID ${burnRequestId}`);
+  }
+ 
+  public async uploadBurnProof(
+    burnRequestId: string,
+    proofFile: Buffer,
+    fileName: string
+  ): Promise<void> {
+    await this.ensureBucketExists();
+  
+    const bucket = this.bucketStorage.bucket(this.bucketName);
+    const fileExtension = path.extname(fileName).toLowerCase();
+    
+    let pngBuffer: Buffer;
+    if (fileExtension === '.pdf') {
+      const options = {
+        density: 100,
+        format: "png",
+        width: 1000,
+        height: 1000,
+        savePath: "/tmp",
+        type: "GraphicsMagick"
+      };
+  
+      const storeAsImage = fromBuffer(proofFile, options);
+  
+      try {
+        const result = await storeAsImage(1);
+  
+        if (!result.path) {
+          throw new Error("Failed to convert PDF to image");
+        }
+  
+        pngBuffer = await fs.readFile(result.path);
+      } catch (error) {
+        console.error("Error converting PDF to PNG:", error);
+        throw error;
+      }
+    } else {
+      pngBuffer = await sharp(proofFile).png().toBuffer();
+    }
+  
+    const pngFile = bucket.file(`burn-proofs/${burnRequestId}/proof.png`);
+    await pngFile.save(pngBuffer, {
+      metadata: {
+        contentType: 'image/png',
+      },
+    });
+  
+    const publicUrl = `https://storage.googleapis.com/${this.bucketName}/burn-proofs/${burnRequestId}/proof.png`;
+  
+    await this.storage.updateBurnRequestData(burnRequestId, {
+      proofImageUrl: publicUrl,
+      updatedAt: Date.now(),
+    });
+  
+    console.log(`📤 Proof of burn uploaded for ID ${burnRequestId}`);
   }
 
   public async uploadProofOfDeposit(
@@ -285,6 +417,22 @@ export class DepositService {
 
   public async validateApprovalMember(password: string): Promise<string | null> {
     return await this.storage.validateApprovalMember(password);
+  }
+
+  public async getBurnRequestsByStatus(status: BurnStatus): Promise<BurnRequest[]> {
+    return await this.storage.getBurnRequestsByStatus(status);
+  }
+
+  public async addBank(name: string): Promise<void> {
+    const bank: BankInfo = {
+      id: uuidv4(),
+      name
+    };
+    await this.storage.addBank(bank);
+  }
+
+  public async getBanks(): Promise<BankInfo[]> {
+    return await this.storage.getBanks();
   }
 
   public async addApprovalMember(name: string, password: string): Promise<void> {
