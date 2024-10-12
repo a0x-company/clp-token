@@ -248,6 +248,13 @@ const Deposit: React.FC = () => {
     }
   }, [status, currentStep]);
 
+  useEffect(() => {
+    if (status !== DepositStatus.PENDING) {
+      setCurrentStep(0);
+      localStorage.removeItem("depositId");
+    }
+  }, [status]);
+
   const saveDepositIdToLocalStorage = (id: string) => {
     localStorage.setItem("depositId", id);
   };
