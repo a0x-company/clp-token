@@ -24,14 +24,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+
+// wagmi
 import { useAccount } from "wagmi";
+
+// utils
 import CopyButton, { copyToClipboard } from "./CopyButton";
+
+// hooks
 import { useCLPDBalance } from "@/hooks/useCLPDBalance";
 import { useUSDCBalance } from "@/hooks/useUSDCBalance";
+
+// lib
 import { cn, formatNumber } from "@/lib/utils";
 import { useGoogleConnect } from "@/hooks/useGoogleConnect";
+
+// ui
 import { Sheet, SheetContent, SheetDescription, SheetTrigger } from "../ui/sheet";
 import { LucideMenu } from "lucide-react";
+
 import { Button } from "../ui/button";
 
 type NavOption = "deposit" | "withdraw" | "invest" | "change";
@@ -66,15 +77,19 @@ const tabs: { href: string; label: NavOption; icon: (color: string) => React.Rea
 const AppNavbar = () => {
   const [selectedOption, setSelectedOption] = useState<NavOption>("deposit");
   const [copied, setCopied] = useState(false);
+
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { address } = useAccount();
+
   const { handleDisconnect } = useGoogleConnect();
+
   const { clpdBalanceFormatted } = useCLPDBalance({ address });
   const { usdcBalanceFormatted } = useUSDCBalance({ address });
 
-  const currentLang = pathname.startsWith("/es") ? "es" : "en";
   const t = useTranslations("navbar");
+  const currentLang = pathname.startsWith("/es") ? "es" : "en";
+
   const { user } = useUserStore();
 
   const getButtonStyle = (option: NavOption) => {
