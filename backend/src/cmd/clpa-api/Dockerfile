@@ -11,6 +11,9 @@ FROM node:20-alpine
 ARG APP_NAME
 ENV APP_NAME ${APP_NAME}
 WORKDIR /app
+
+RUN apk add --no-cache graphicsmagick ghostscript
+
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/dist ./dist
 EXPOSE 8080

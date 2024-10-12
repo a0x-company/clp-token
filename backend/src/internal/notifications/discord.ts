@@ -30,23 +30,25 @@ export class DiscordNotificationService {
   public async sendNotification(
     message: string,
     type: NotificationType = NotificationType.INFO,
-    title?: string
+    title?: string,
+    imageUrl?: string
   ): Promise<void> {
     const config = this.notificationConfigs[type];
     const payload = {
       embeds: [{
         title: `${config.emoji} ${title || type}`,
         description: message,
-        color: config.color
+        color: config.color,
+        image: imageUrl ? { url: imageUrl } : undefined
       }]
     };
-
+  
     try {
       await axios.post(this.webhookUrl, payload);
-      console.log(`Discord notification sent successfully: ${type}`);
+      console.log(`Notificación de Discord enviada con éxito: ${type}`);
     } catch (error) {
-      console.error('Error sending Discord notification:', error);
-      throw new Error('Failed to send Discord notification');
+      console.error('Error al enviar notificación de Discord:', error);
+      throw new Error('No se pudo enviar la notificación de Discord');
     }
   }
 }
