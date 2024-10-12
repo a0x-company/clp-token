@@ -34,7 +34,7 @@ const items = [
 ];
 
 const FAQSection = () => {
-  const t = useTranslations("reserve.faq");
+  const t = useTranslations("reserve");
   const [openValue, setOpenValue] = useState<string | undefined>("0");
 
   return (

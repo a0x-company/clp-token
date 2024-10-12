@@ -48,6 +48,7 @@
     "react-dom": "^18",
     "react-flag-kit": "^1.1.1",
     "react-hook-form": "^7.53.0",
+    "react-responsive": "^10.0.0",
     "recharts": "^2.13.0-alpha.5",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",

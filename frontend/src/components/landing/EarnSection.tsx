@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 
 const EarnSection: React.FC = () => {
   const t = useTranslations("landing");
+
   return (
     <section className="flex flex-col-reverse md:flex-row items-center justify-center relative px-8 lg:px-16 xl:px-32 py-[180px] gap-16">
       <div className="flex flex-col flex-1 gap-4 w-full">
@@ -42,8 +43,11 @@ const EarnSection: React.FC = () => {
       </div>
 
       <div className="flex flex-col flex-[1.5] gap-4 w-full">
-        <h2 className="text-[64px] font-beauford font-bold">{t("earn.title")}</h2>
-        <p className="text-[32px]">{t("earn.description")}</p>
+        <h2 className="text-[48px] lg:text-[64px] font-beauford font-bold text-black text-start">
+          {t("earn.title")}
+        </h2>
+
+        <p className="text-[24px] lg:text-[32px] text-start text-black">{t("earn.description")}</p>
       </div>
     </section>
   );
