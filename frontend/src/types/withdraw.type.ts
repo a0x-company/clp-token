@@ -1,14 +1,14 @@
 export type BankInfo = {
-  bankName: string;
+  bankId: string;
   name: string;
   accountNumber: string;
-  accountType: string;
+  rut: string;
   email: string;
+  ownershipCheck: boolean;
 };
 
 export enum RedeemStatus {
-  PENDING = "pending",
-  ACCEPTED_NOT_BURNED = "accepted_not_burned",
-  ACCEPTED_BURNED = "accepted_burned",
+  RECEIVED_NOT_BURNED = "received_not_burned",
+  BURNED = "burned",
   REJECTED = "rejected",
 }

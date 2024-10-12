@@ -240,7 +240,7 @@ const Deposit: React.FC = () => {
       setDepositId(savedDepositId);
       refetch();
     }
-  }, []); // Este efecto solo se ejecuta una vez al montar el componente
+  }, []);
 
   useEffect(() => {
     if (status === DepositStatus.PENDING && currentStep === 0) {
@@ -362,7 +362,7 @@ const Deposit: React.FC = () => {
   return (
     <Card
       className={cn(
-        "absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%]",
+        "absolute left-1/2 -translate-x-1/2 bottom-[25%] md:top-1/2 md:-translate-y-1/2 w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%]",
         currentStep === 2 && status !== DepositStatus.ACCEPTED_MINTED
           ? "bg-brand-blue"
           : currentStep === 2 && status === DepositStatus.ACCEPTED_MINTED
@@ -452,7 +452,7 @@ const Deposit: React.FC = () => {
             className={`w-full h-2 rounded-full ${
               parseInt(s) === currentStep && status !== DepositStatus.ACCEPTED_MINTED
                 ? "bg-black"
-                : status === DepositStatus.ACCEPTED_MINTED
+                : status === DepositStatus.ACCEPTED_MINTED && currentStep === 2
                 ? "bg-brand-green-pastel"
                 : "bg-black/30"
             }`}

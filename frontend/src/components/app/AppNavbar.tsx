@@ -44,6 +44,7 @@ import { Sheet, SheetContent, SheetDescription, SheetTrigger } from "../ui/sheet
 import { LucideMenu } from "lucide-react";
 
 import { Button } from "../ui/button";
+import { LoadingSpinner } from "../ui/spinner";
 
 type NavOption = "deposit" | "withdraw" | "invest" | "change";
 
@@ -82,7 +83,7 @@ const AppNavbar = () => {
   const searchParams = useSearchParams();
   const { address } = useAccount();
 
-  const { handleDisconnect } = useGoogleConnect();
+  const { handleDisconnect, isConnected, loadingUser } = useGoogleConnect();
 
   const { clpdBalanceFormatted } = useCLPDBalance({ address });
   const { usdcBalanceFormatted } = useUSDCBalance({ address });
@@ -162,6 +163,7 @@ const AppNavbar = () => {
 
       <DropdownMenu>
         <DropdownMenuTrigger className="flex flex-row content-center items-center gap-[8px] rounded-[12px] hover:bg-brand-blue transition-all duration-300 p-2">
+          {isConnected && loadingUser && <LoadingSpinner className="text-black" />}
           <Image
             src={user?.profileImage || ""}
             alt="profile"
