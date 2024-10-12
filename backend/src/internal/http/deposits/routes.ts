@@ -18,6 +18,7 @@ import { registerBurnRequestHandler } from "./register-burn-request-handler";
 import { uploadBurnProofHandler } from "./upload-burn-proof-handler";
 import { approveRejectBurnRequestHandler } from "./approve-reject-burn-request-handler";
 import { getBurnRequestsByStatusHandler } from "./get-burn-requests-handler";
+import { renderBurnProofFormHandler } from "./render-burn-proof-form-handler";
 
 // middleware
 import { AuthMiddleware } from "@internal/http/middlewares/authentication";
@@ -43,6 +44,7 @@ export function setupDepositRoutes(
 
   depositRouter.post("/add-approval-member", addApprovalMemberHandler(depositService));
   depositRouter.post("/burn", AuthMiddleware(userService), registerBurnRequestHandler(depositService));
+  depositRouter.get("/burn/:burnRequestId/proof-form", renderBurnProofFormHandler(depositService));
   depositRouter.post("/burn/:burnRequestId/proof", AuthMiddleware(userService), upload.single('proofImage'), uploadBurnProofHandler(depositService));
   depositRouter.post("/burn/:burnRequestId/approve-reject", AuthMiddleware(userService), approveRejectBurnRequestHandler(depositService));
   depositRouter.get("/burn/status/:status", AuthMiddleware(userService), getBurnRequestsByStatusHandler(depositService));

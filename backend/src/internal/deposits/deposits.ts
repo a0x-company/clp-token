@@ -8,13 +8,14 @@ import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs/promises';
 import { StoredUserData } from "@internal/users";
+import { ethers } from 'ethers';
 
 export class DepositService {
   private storage: DepositDataStorage;
   private bucketStorage: Storage;
   private discordNotificationService: DiscordNotificationService;
   private emailNotificationService: EmailNotificationService;  
-  private bucketName: string = 'deposit-proofs';
+  public bucketName: string = 'deposit-proofs';
 
 
   constructor(
@@ -101,6 +102,8 @@ export class DepositService {
     const result = await this.storage.addBurnRequest(burnRequest);
     console.log(`✅ New burn request registered with ID ${result.id}`);
   
+    const amountWithDecimals = ethers.parseUnits(amount.toString(), 18).toString();
+  
     const redeemTransaction = {
       "version": "1.0",
       "chainId": "8453",
@@ -127,7 +130,7 @@ export class DepositService {
             "payable": false
           },
           "contractInputsValues": {
-            "amount": amount.toString(),
+            "amount": amountWithDecimals,
             "recipient": user.address
           }
         }
@@ -142,13 +145,20 @@ export class DepositService {
       metadata: { contentType: 'application/json' },
     });
   
-    const [url] = await file.getSignedUrl({
-      action: 'read',
-      expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    });
+    const jsonUrl = `https://storage.googleapis.com/${this.bucketName}/${fileName}`;
+    const burnProofFormUrl = `https://development-clpa-api-claucondor-61523929174.us-central1.run.app/deposits/burn/${result.id}/proof-form`;
+  
+    const notificationMessage = `
+  New burn request registered:
+  
+  Amount: ${amount} CLPD
+  Burn Request ID: ${burnRequest.id}
+  
+  Burn Proof Form: ${burnProofFormUrl}
+    `;
   
     await this.discordNotificationService.sendNotification(
-      `New burn request registered:\nAmount: ${amount}\nUser Name: ${user.name}\nUser Email: ${user.email}\nBurn Request Email: ${email}\nBurn Request ID: ${burnRequest.id}\n\nRedeem Transaction JSON: [Descargar Archivo](${url})`,
+      notificationMessage,
       NotificationType.INFO,
       "New Burn Request"
     );
@@ -156,12 +166,22 @@ export class DepositService {
     await this.emailNotificationService.sendNotification(
       user.email,
       EmailType.NEW_BURN_REQUEST,
-      { amount, userName: user.name, burnRequestId: burnRequest.id, redeemTransactionUrl: url }
+      { 
+        amount, 
+        userName: user.name, 
+        burnRequestId: burnRequest.id, 
+        burnProofFormUrl,
+        redeemTransactionUrl: jsonUrl,
+        accountHolder,
+        rut,
+        accountNumber,
+        bankId
+      }
     );    
   
     return result;
   }
-  
+
   public async approveBurnRequest(burnRequestId: string, transactionHash: string): Promise<void> {
     const burnRequest = await this.storage.getBurnRequest(burnRequestId);
     if (!burnRequest) {
@@ -250,11 +270,24 @@ export class DepositService {
   
     await this.storage.updateBurnRequestData(burnRequestId, {
       proofImageUrl: publicUrl,
+      status: BurnStatus.BURNED,
       updatedAt: Date.now(),
     });
   
-    console.log(`📤 Proof of burn uploaded for ID ${burnRequestId}`);
-  }
+    const burnRequest = await this.storage.getBurnRequest(burnRequestId);
+    if (burnRequest) {
+      await this.emailNotificationService.sendNotification(
+        burnRequest.email,
+        EmailType.BURN_REQUEST_COMPLETED,
+        {
+          amount: burnRequest.amount,
+          burnRequestId: burnRequest.id,
+          proofImageUrl: publicUrl
+        }
+      );
+    }
+  
+    console.log(`📤 Proof of burn uploaded, status updated to BURNED, and email sent for ID ${burnRequestId}`);}
 
   public async uploadProofOfDeposit(
     depositId: string,
@@ -497,5 +530,9 @@ export class DepositService {
       console.error('Error adding approval member:', error);
       throw new Error('Failed to add approval member');
     }
+  }
+
+  public async getBurnRequest(burnRequestId: string): Promise<BurnRequest | null> {
+    return await this.storage.getBurnRequest(burnRequestId);
   }
 }
