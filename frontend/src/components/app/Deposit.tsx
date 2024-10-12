@@ -240,7 +240,7 @@ const Deposit: React.FC = () => {
       setDepositId(savedDepositId);
       refetch();
     }
-  }, []); // Este efecto solo se ejecuta una vez al montar el componente
+  }, []);
 
   useEffect(() => {
     if (status === DepositStatus.PENDING && currentStep === 0) {
@@ -452,7 +452,7 @@ const Deposit: React.FC = () => {
             className={`w-full h-2 rounded-full ${
               parseInt(s) === currentStep && status !== DepositStatus.ACCEPTED_MINTED
                 ? "bg-black"
-                : status === DepositStatus.ACCEPTED_MINTED
+                : status === DepositStatus.ACCEPTED_MINTED && currentStep === 2
                 ? "bg-brand-green-pastel"
                 : "bg-black/30"
             }`}
