@@ -2,21 +2,21 @@
 pragma solidity ^0.8.25;
 
 import {Test, console} from "forge-std/Test.sol";
-import {CLPD} from "../src/CLPD_BaseSepolia.sol";
+import {CLPD} from "../src/CLPD_BaseMainnet.sol";
 
 
 contract CLPDTest is Test {
     CLPD public clpd;
-    address public owner = 0xd806A01E295386ef7a7Cea0B9DA037B242622743; // Owner and Agent of the real contract
-    address public account1 = 0xFc6623B340A505E6819349aF6beE2333D31840E1; // Agent of the real contract
+    address public owner = 0x5B753Da5d8c874E9313Be91fbd822979Cc7F3F88; // Owner and Agent of the real contract
+    address public account1 = 0xFc6623B340A505E6819349aF6beE2333D31840E1; // No Agent and no own of the real contract
     address public account2 = 0x9F693ea18DA08824E729d5efc343Dd78254a9302; // No Agent and no Owner of the real contract
 
     function setUp() public {
-        clpd = CLPD(0xec4ec868b9879C222877bd42Eaa0920705eE0eE3); 
+        clpd = CLPD(0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1); 
     }
 
     function test_chainlink() public view {
-        assertEq(clpd.getVaultBalance(), 201100);
+        assertEq(clpd.getVaultBalance(), 300000);
         console.log("Vault balance:", clpd.getVaultBalance());
     }
 
@@ -117,6 +117,7 @@ contract CLPDTest is Test {
         clpd.removeFromBlacklist(targetAddress2);     
     }
     
+    
     // ---------------------------------------------- Mint tests ----------------------------------------------   
     function testMintByNonAgent() public {
         address nonAgent = account2;
@@ -131,7 +132,7 @@ contract CLPDTest is Test {
         
         assertEq(clpd.balanceOf(nonAgent), initialBalance);
     }
-
+    
     // ---------------------------------------------- Redeem tests ----------------------------------------------   
     function testRedeem() public {
         address agent = account1;
