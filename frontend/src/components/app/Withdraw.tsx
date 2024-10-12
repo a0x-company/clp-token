@@ -41,6 +41,8 @@ import { useUserStore } from "@/context/global-store";
 import { useCLPDBalance } from "@/hooks/useCLPDBalance";
 import crypto from "crypto";
 import { useAccount } from "wagmi";
+import { Bank, useBankList } from "@/hooks/useBankList";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 interface CreateStepsProps {
   t: (key: string) => string;
@@ -58,6 +60,8 @@ interface CreateStepsProps {
   errorFields: string[];
   email: string;
   handleMaxAmount: () => void;
+  handleChangeField: (field: string, value: string | boolean) => void;
+  bankList: Bank[];
 }
 
 const formIds = {
@@ -88,6 +92,8 @@ const createSteps = ({
   errorFields,
   email,
   handleMaxAmount,
+  handleChangeField,
+  bankList,
 }: CreateStepsProps) => [
   {
     step: 0,
@@ -191,87 +197,137 @@ const createSteps = ({
         <form
           id={formIds.reedem}
           onSubmit={handleSubmit}
-          className="flex flex-col gap-2 rounded-md font-helvetica"
+          className="flex flex-col rounded-md font-helvetica"
         >
-          <label htmlFor="bankName" className="font-bold text-base">
-            {t("bankInfo.bankName")}
-          </label>
-          <Input
-            type="text"
-            id="bankName"
-            value={bankInfo.bankName}
-            onChange={(e) => setBankInfo({ ...bankInfo, bankName: e.target.value })}
-            placeholder={t("bankInfo.bankNamePlaceholder")}
-            className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
-          />
-          {errorFields.includes("bankName") && (
-            <p className="text-red-500 text-sm">{t("errorFields.bankName")}</p>
-          )}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="bankName" className="font-bold text-base">
+              {t("bankInfo.bankName")}
+            </label>
+            <Select
+              value={bankInfo.bankId}
+              onValueChange={(value) => handleChangeField("bankId", value)}
+            >
+              <SelectTrigger className="bg-transparent border-2 border-black shadow-brutalist-sm focus:outline-none focus:ring-0">
+                <SelectValue placeholder={t("bankInfo.bankNamePlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {bankList.map((bank) => (
+                  <SelectItem
+                    key={bank.id}
+                    value={bank.id}
+                    className="bg-white font-helvetica font-bold text-black"
+                  >
+                    {bank.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <label htmlFor="accountType" className="font-bold text-base">
-            {t("bankInfo.accountType")}
-          </label>
-          <Input
-            type="text"
-            id="accountType"
-            value={bankInfo.accountType}
-            onChange={(e) => setBankInfo({ ...bankInfo, accountType: e.target.value })}
-            placeholder={t("bankInfo.accountTypePlaceholder")}
-            className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
-          />
-          {errorFields.includes("accountType") && (
-            <p className="text-red-500 text-sm">{t("errorFields.accountType")}</p>
-          )}
+            <p
+              className={cn(
+                "text-red-500 text-sm opacity-0 transition-all duration-300",
+                errorFields.includes("bankId") && "opacity-100"
+              )}
+            >
+              {t("errorFields.bankId")}
+            </p>
+          </div>
 
-          <label htmlFor="accountNumber" className="font-bold text-base">
-            {t("bankInfo.accountNumber")}
-          </label>
-          <Input
-            type="text"
-            id="accountNumber"
-            value={bankInfo.accountNumber}
-            onChange={(e) => setBankInfo({ ...bankInfo, accountNumber: e.target.value })}
-            placeholder={t("bankInfo.accountNumberPlaceholder")}
-            className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
-          />
-          {errorFields.includes("accountNumber") && (
-            <p className="text-red-500 text-sm">{t("errorFields.accountNumber")}</p>
-          )}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="rut" className="font-bold text-base">
+              {t("bankInfo.rut")}
+            </label>
+            <Input
+              type="text"
+              id="rut"
+              value={bankInfo.rut}
+              onChange={(e) => handleChangeField("rut", e.target.value)}
+              placeholder={t("bankInfo.rutPlaceholder")}
+              className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
+            />
 
-          <label htmlFor="name" className="font-bold text-base">
-            {t("bankInfo.name")}
-          </label>
-          <Input
-            type="text"
-            id="name"
-            value={bankInfo.name}
-            onChange={(e) => setBankInfo({ ...bankInfo, name: e.target.value })}
-            placeholder={t("bankInfo.namePlaceholder")}
-            className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
-          />
-          {errorFields.includes("name") && (
-            <p className="text-red-500 text-sm">{t("errorFields.name")}</p>
-          )}
+            <p
+              className={cn(
+                "text-red-500 text-sm opacity-0 transition-all duration-300",
+                errorFields.includes("rut") && "opacity-100"
+              )}
+            >
+              {t("errorFields.rut")}
+            </p>
+          </div>
 
-          <label htmlFor="email" className="font-bold text-base">
-            {t("bankInfo.email")}
-          </label>
-          <Input
-            type="email"
-            id="email"
-            value={bankInfo.email}
-            onChange={(e) => setBankInfo({ ...bankInfo, email: e.target.value })}
-            placeholder={t("bankInfo.emailPlaceholder")}
-            className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
-          />
-          {errorFields.includes("email") && (
-            <p className="text-red-500 text-sm">{t("errorFields.email")}</p>
-          )}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="accountNumber" className="font-bold text-base">
+              {t("bankInfo.accountNumber")}
+            </label>
+            <Input
+              type="text"
+              id="accountNumber"
+              value={bankInfo.accountNumber}
+              onChange={(e) => handleChangeField("accountNumber", e.target.value)}
+              placeholder={t("bankInfo.accountNumberPlaceholder")}
+              className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
+            />
+
+            <p
+              className={cn(
+                "text-red-500 text-sm opacity-0 transition-all duration-300",
+                errorFields.includes("accountNumber") && "opacity-100"
+              )}
+            >
+              {t("errorFields.accountNumber")}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="name" className="font-bold text-base">
+              {t("bankInfo.name")}
+            </label>
+            <Input
+              type="text"
+              id="name"
+              value={bankInfo.name}
+              onChange={(e) => handleChangeField("name", e.target.value)}
+              placeholder={t("bankInfo.namePlaceholder")}
+              className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
+            />
+
+            <p
+              className={cn(
+                "text-red-500 text-sm opacity-0 transition-all duration-300",
+                errorFields.includes("name") && "opacity-100"
+              )}
+            >
+              {t("errorFields.name")}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="email" className="font-bold text-base">
+              {t("bankInfo.email")}
+            </label>
+            <Input
+              type="email"
+              id="email"
+              value={bankInfo.email}
+              onChange={(e) => handleChangeField("email", e.target.value)}
+              placeholder={t("bankInfo.emailPlaceholder")}
+              className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
+            />
+            <p
+              className={cn(
+                "text-red-500 text-sm opacity-0 transition-all duration-300",
+                errorFields.includes("email") && "opacity-100"
+              )}
+            >
+              {t("errorFields.email")}
+            </p>
+          </div>
 
           <div className="flex items-center gap-2 mt-3">
             <p className="text-sm text-black font-helvetica">
               {t("willBeSent")}: <span className="font-bold">{formatNumber(Number(amount))}</span>{" "}
-              CLPD
+              CLP
             </p>
             <button type="button" className="text-brand-blue" onClick={handleBack}>
               <PencilLine className="w-4 h-4" />
@@ -279,12 +335,13 @@ const createSteps = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <Checkbox id="ownershipCheck" />
+            <Checkbox
+              id="ownershipCheck"
+              checked={bankInfo.ownershipCheck}
+              onCheckedChange={(checked: boolean) => handleChangeField("ownershipCheck", checked)}
+            />
             <p className="text-sm text-black font-helvetica italic">{t("ownershipCheck")}</p>
           </div>
-          {errorFields.includes("ownershipCheck") && (
-            <p className="text-red-500 text-sm">{t("errorFields.ownershipCheck")}</p>
-          )}
         </form>
       ) : (
         <form id={formIds.transfer} onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -322,7 +379,7 @@ const createSteps = ({
     step: 2,
     title:
       type === "redeem"
-        ? status === RedeemStatus.ACCEPTED_BURNED
+        ? status === RedeemStatus.BURNED
           ? t("step3Burned")
           : t("step3")
         : t("step3Burned"),
@@ -331,7 +388,7 @@ const createSteps = ({
         <Image
           src={
             type === "redeem"
-              ? status === RedeemStatus.ACCEPTED_BURNED
+              ? status === RedeemStatus.BURNED
                 ? "/images/app/success-gif.gif"
                 : "/images/app/wired-gif.gif"
               : "/images/app/success-gif.gif"
@@ -346,12 +403,12 @@ const createSteps = ({
           className={cn(
             "text-xl font-helvetica font-light text-start text-white",
             type === "redeem"
-              ? status === RedeemStatus.ACCEPTED_BURNED && "font-bold text-black"
+              ? status === RedeemStatus.BURNED && "font-bold text-black"
               : "font-bold text-black"
           )}
         >
           {type === "redeem"
-            ? status === RedeemStatus.ACCEPTED_BURNED
+            ? status === RedeemStatus.BURNED
               ? t("step3BurnedDescription")
               : t("step3Description")
             : t("step3BurnedDescription")}
@@ -360,12 +417,12 @@ const createSteps = ({
           className={cn(
             "text-base text-white/50 font-helvetica text-start",
             type === "redeem"
-              ? status === RedeemStatus.ACCEPTED_BURNED && "font-bold text-black/50"
+              ? status === RedeemStatus.BURNED && "font-bold text-black/50"
               : "font-bold text-black/50"
           )}
         >
           {type === "redeem"
-            ? status === RedeemStatus.ACCEPTED_BURNED
+            ? status === RedeemStatus.BURNED
               ? `${t("step3BurnedBalance")}: ${amount} CLPD`
               : `${t("yourEmail")}: ${email}`
             : `${t("step3BurnedBalance")}: ${amount} CLPD`}
@@ -389,6 +446,8 @@ const Withdraw: React.FC = () => {
   const [errorFields, setErrorFields] = useState<string[]>([]);
   const [addressDestination, setAddressDestination] = useState<`0x${string}` | null>(null);
 
+  const { bankList } = useBankList();
+
   const { status, loading: statusLoading, error, refetch } = useRedeemStatus(redeemId);
 
   useEffect(() => {
@@ -400,7 +459,7 @@ const Withdraw: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (status === RedeemStatus.PENDING && currentStep === 0) {
+    if (status === RedeemStatus.RECEIVED_NOT_BURNED && currentStep === 0) {
       setCurrentStep(2);
     }
   }, [status, currentStep]);
@@ -417,11 +476,12 @@ const Withdraw: React.FC = () => {
   });
 
   const [bankInfo, setBankInfo] = useState<BankInfo>({
-    bankName: "",
+    bankId: "",
     name: "",
     accountNumber: "",
-    accountType: "",
+    rut: "",
     email: user?.email || "",
+    ownershipCheck: false,
   });
 
   const handleMaxAmount = () => {
@@ -447,6 +507,38 @@ const Withdraw: React.FC = () => {
 
   const handleBack = () => {
     setCurrentStep(currentStep - 1);
+  };
+
+  const handleChangeField = (field: string, value: string | boolean) => {
+    setErrorFields((prev) => prev.filter((f) => f !== field));
+    switch (field) {
+      case "bankId":
+        setBankInfo((prev) => ({ ...prev, bankId: value as string }));
+        break;
+      case "rut":
+        setBankInfo((prev) => ({ ...prev, rut: value as string }));
+        break;
+      case "accountNumber":
+        setBankInfo((prev) => ({ ...prev, accountNumber: value as string }));
+        break;
+      case "name":
+        setBankInfo((prev) => ({ ...prev, name: value as string }));
+        break;
+      case "email":
+        setBankInfo((prev) => ({ ...prev, email: value as string }));
+        break;
+      case "ownershipCheck":
+        setBankInfo((prev) => ({ ...prev, ownershipCheck: value as boolean }));
+        break;
+      case "addressDestination":
+        setAddressDestination(value as `0x${string}`);
+        break;
+      case "amount":
+        setWithdrawAmount(value as string);
+        break;
+      default:
+        break;
+    }
   };
 
   const handleTransfer = async () => {
@@ -502,76 +594,77 @@ const Withdraw: React.FC = () => {
   };
 
   const handleRedeem = async () => {
-    // try {
-    //   console.log("Monto:", withdrawAmount);
-    //   console.log("Retiro:", redeemId);
-    //   const userInfo = await web3AuthInstance.getUserInfo();
-    //   const idToken = userInfo?.idToken;
-    //   const response = await axios.post(
-    //     "/api/withdraw/redeem",
-    //     { amount: withdrawAmount, redeemId, bankInfo },
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${idToken}`,
-    //         "Content-Type": "application/json",
-    //       },
-    //     }
-    //   );
-    //   console.log(response);
-    //   if (response.status === 201 || response.status === 200) {
-    //     setWithdrawAmount("");
-    //     setBankInfo({
-    //       name: "",
-    //       accountNumber: "",
-    //       accountType: "",
-    //       email: "",
-    //     });
-    //     setCurrentStep(2);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // } finally {
-    //   setLoading(false);
-    // }
+    try {
+      let newErrorFields: string[] = [];
+
+      if (withdrawAmount === "" || !withdrawAmount || Number(withdrawAmount) === 0) {
+        newErrorFields.push("amount");
+      }
+      if (bankInfo.bankId === "") {
+        newErrorFields.push("bankId");
+      }
+      if (bankInfo.rut === "") {
+        newErrorFields.push("rut");
+      }
+      if (bankInfo.accountNumber === "") {
+        newErrorFields.push("accountNumber");
+      }
+      if (bankInfo.name === "") {
+        newErrorFields.push("name");
+      }
+      if (bankInfo.email === "") {
+        newErrorFields.push("email");
+      }
+      if (!bankInfo.ownershipCheck) {
+        newErrorFields.push("ownershipCheck");
+      }
+
+      if (newErrorFields.length > 0) {
+        setErrorFields(newErrorFields);
+        setLoading(false);
+        return;
+      }
+
+      const userInfo = await web3AuthInstance.getUserInfo();
+      const idToken = userInfo?.idToken;
+      const response = await axios.post(
+        "/api/withdraw/redeem",
+        { amount: withdrawAmount, bankInfo },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 201 || response.status === 200) {
+        setWithdrawAmount("");
+        setBankInfo({
+          bankId: "",
+          name: "",
+          accountNumber: "",
+          rut: "",
+          email: "",
+          ownershipCheck: false,
+        });
+        setCurrentStep(2);
+        setRedeemId(response.data.burnRequestId);
+        saveRedeemIdToLocalStorage(response.data.burnRequestId);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    const userInfo = await web3AuthInstance.getUserInfo();
-    const idToken = userInfo?.idToken;
-    console.log(currentStep, type);
     switch (currentStep) {
       case 0:
         setCurrentStep(1);
         setLoading(false);
-        // if (withdrawAmount === "" || !withdrawAmount || Number(withdrawAmount) === 0) {
-        //   setLoading(false);
-        //   return;
-        // }
-        // try {
-        //   const response = await axios.post(
-        //     "/api/withdraw/create-order",
-        //     { amount: withdrawAmount },
-        //     {
-        //       headers: {
-        //         Authorization: `Bearer ${idToken}`,
-        //         "Content-Type": "application/json",
-        //       },
-        //     }
-        //   );
-        //   console.log(response);
-        //   if (response.status === 201 || response.status === 200) {
-        //     console.log("Retiro:", response.data.redeemId);
-        //     setRedeemId(response.data.redeemId);
-        //     saveRedeemIdToLocalStorage(response.data.redeemId);
-        //     setCurrentStep(1);
-        //   }
-        // } catch (error) {
-        //   console.log(error);
-        // } finally {
-        //   setLoading(false);
-        // }
         break;
       case 1:
         switch (type) {
@@ -589,9 +682,9 @@ const Withdraw: React.FC = () => {
     <Card
       className={cn(
         "absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] transition-all duration-200",
-        currentStep === 2 && status !== RedeemStatus.ACCEPTED_BURNED
+        currentStep === 2 && status !== RedeemStatus.BURNED
           ? "bg-brand-blue"
-          : currentStep === 2 && status === RedeemStatus.ACCEPTED_BURNED
+          : currentStep === 2 && status === RedeemStatus.BURNED
           ? "bg-brand-green-pastel"
           : "h-auto",
         currentStep === 2 && type === "withdraw" && "bg-brand-green-pastel"
@@ -600,11 +693,7 @@ const Withdraw: React.FC = () => {
       <CardContent
         className={cn(
           "space-y-4 text-black pt-6 transition-all duration-200",
-          currentStep === 2
-            ? status === RedeemStatus.ACCEPTED_BURNED
-              ? "text-black"
-              : "text-white"
-            : ""
+          currentStep === 2 ? (status === RedeemStatus.BURNED ? "text-black" : "text-white") : ""
         )}
       >
         <div className="flex flex-col rounded-xl border-none gap-3">
@@ -626,7 +715,7 @@ const Withdraw: React.FC = () => {
                 "text-xl font-helvetica font-bold",
                 currentStep === 2
                   ? type === "redeem"
-                    ? status === RedeemStatus.ACCEPTED_BURNED
+                    ? status === RedeemStatus.BURNED
                       ? "text-black"
                       : "text-white"
                     : "text-black"
@@ -659,6 +748,8 @@ const Withdraw: React.FC = () => {
               errorFields,
               email: user?.email || "",
               handleMaxAmount,
+              bankList,
+              handleChangeField,
             })[currentStep].children
           }
         </div>
@@ -675,7 +766,7 @@ const Withdraw: React.FC = () => {
                 ? formIds.reedem
                 : formIds.transfer
             }
-            disabled={errorFields.includes("amount")}
+            disabled={errorFields.length > 0}
           >
             {!loading ? (
               (() => {
@@ -699,9 +790,9 @@ const Withdraw: React.FC = () => {
             key={s}
             className={cn(
               "w-full h-2 rounded-full",
-              parseInt(s) === currentStep && status !== RedeemStatus.ACCEPTED_BURNED
+              parseInt(s) === currentStep && status !== RedeemStatus.BURNED
                 ? "bg-black"
-                : status === RedeemStatus.ACCEPTED_BURNED
+                : status === RedeemStatus.BURNED
                 ? "bg-brand-green-pastel"
                 : "bg-black/30",
               currentStep === 2 && type === "withdraw" && "bg-brand-green-pastel"

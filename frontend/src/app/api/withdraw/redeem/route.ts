@@ -6,7 +6,7 @@ const API_KEY = process.env.API_KEY;
 
 export async function POST(request: Request) {
   console.info("[POST][/api/withdraw/redeem]");
-  const { amount, redeemId, bankInfo } = await request.json();
+  const { amount, bankInfo } = await request.json();
   const idToken = request.headers.get("Authorization")?.split(" ")[1];
 
   if (!idToken) {
@@ -15,8 +15,15 @@ export async function POST(request: Request) {
 
   try {
     const response = await axios.post(
-      `${API_URL}/redeems/${redeemId}/redeem`,
-      { amount, bankInfo },
+      `${API_URL}/deposits/burn`,
+      {
+        amount,
+        accountHolder: bankInfo.name,
+        rut: bankInfo.rut,
+        accountNumber: bankInfo.accountNumber,
+        bankId: bankInfo.bankId,
+        email: bankInfo.email,
+      },
       {
         headers: {
           "api-key": API_KEY,
@@ -33,7 +40,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { message: "Order created", redeemId: response.data.redeem.id },
+      { message: "Order created", burnRequestId: response.data.burnRequest.id },
       { status: 200 }
     );
   } catch (error) {
