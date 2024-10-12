@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 // componentes
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import CLPFlag from "../CLPFlag";
 
 // icons
-import { InfoIcon, LucideArrowLeft, PencilLine } from "lucide-react";
+import { LucideArrowLeft, PencilLine } from "lucide-react";
 
 // translations
 import { useTranslations } from "next-intl";
@@ -31,13 +31,14 @@ import { BankInfo, RedeemStatus } from "@/types/withdraw.type";
 import { useRedeemStatus } from "@/hooks/useRedeemStatus";
 
 // ui
-import { LoadingSpinner } from "../ui/spinner";
 import { Checkbox } from "../ui/checkbox";
+import { LoadingSpinner } from "../ui/spinner";
 
 // context
 import { useUserStore } from "@/context/global-store";
 
 // crypto
+import { useCLPDBalance } from "@/hooks/useCLPDBalance";
 import crypto from "crypto";
 import { useAccount } from "wagmi";
 
@@ -54,9 +55,9 @@ interface CreateStepsProps {
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   status: RedeemStatus | null;
   handleBack: () => void;
-  handleTransfer: () => void;
   errorFields: string[];
   email: string;
+  handleMaxAmount: () => void;
 }
 
 const formIds = {
@@ -68,7 +69,7 @@ const formIds = {
 const titles = (type: "redeem" | "withdraw") => ({
   0: "createWithdrawOrder",
   1: type === "redeem" ? "redeemStep1" : "transferStep1",
-  2: "step3",
+  2: type === "redeem" ? "step3" : "transferStep3",
 });
 
 const createSteps = ({
@@ -84,20 +85,32 @@ const createSteps = ({
   handleSubmit,
   status,
   handleBack,
-  handleTransfer,
   errorFields,
   email,
+  handleMaxAmount,
 }: CreateStepsProps) => [
   {
     step: 0,
     title: t("createWithdrawOrder"),
     children: (
       <form id={formIds.createOrder} onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <div className="grid w-full items-center gap-1.5 bg-gray-100 rounded-md p-3 border-2 border-black shadow-brutalist-sm">
+        <div
+          className={cn(
+            "grid w-full items-center gap-1.5 bg-gray-100 rounded-md p-3 border-2 border-black shadow-brutalist-sm relative transition-all duration-300 h-auto",
+            errorFields.includes("amount") && "bg-red-100"
+          )}
+        >
           <label htmlFor="amount" className="font-bold text-base">
             {t("redeem")}
           </label>
           <div className="flex items-center gap-4 relative">
+            <button
+              type="button"
+              onClick={handleMaxAmount}
+              className="absolute bottom-0 right-20 bg-white border-2 border-black rounded-full p-1 text-sm font-bold hover:bg-black/5 transition-colors"
+            >
+              {t("max")}
+            </button>
             <Input
               type="number"
               id="amount"
@@ -109,6 +122,9 @@ const createSteps = ({
 
             <CLPFlag type="CLPD" />
           </div>
+          {errorFields.includes("amount") && (
+            <p className="text-red-500 text-sm">{t("errorFields.amount")}</p>
+          )}
         </div>
 
         <Image
@@ -304,15 +320,21 @@ const createSteps = ({
   },
   {
     step: 2,
-    title: status === RedeemStatus.ACCEPTED_BURNED ? t("step3Minted") : t("step3"),
-    description: "Description 3",
+    title:
+      type === "redeem"
+        ? status === RedeemStatus.ACCEPTED_BURNED
+          ? t("step3Burned")
+          : t("step3")
+        : t("step3Burned"),
     children: (
       <div className="flex flex-col items-start justify-center gap-2">
         <Image
           src={
-            status === RedeemStatus.ACCEPTED_BURNED
-              ? "/images/app/success-gif.gif"
-              : "/images/app/wired-gif.gif"
+            type === "redeem"
+              ? status === RedeemStatus.ACCEPTED_BURNED
+                ? "/images/app/success-gif.gif"
+                : "/images/app/wired-gif.gif"
+              : "/images/app/success-gif.gif"
           }
           alt="done"
           width={200}
@@ -323,22 +345,30 @@ const createSteps = ({
         <p
           className={cn(
             "text-xl font-helvetica font-light text-start text-white",
-            status === RedeemStatus.ACCEPTED_BURNED && "font-bold text-black"
+            type === "redeem"
+              ? status === RedeemStatus.ACCEPTED_BURNED && "font-bold text-black"
+              : "font-bold text-black"
           )}
         >
-          {status === RedeemStatus.ACCEPTED_BURNED
-            ? t("step3MintedDescription")
-            : t("step3Description")}
+          {type === "redeem"
+            ? status === RedeemStatus.ACCEPTED_BURNED
+              ? t("step3BurnedDescription")
+              : t("step3Description")
+            : t("step3BurnedDescription")}
         </p>
         <p
           className={cn(
             "text-base text-white/50 font-helvetica text-start",
-            status === RedeemStatus.ACCEPTED_BURNED && "font-bold text-black/50"
+            type === "redeem"
+              ? status === RedeemStatus.ACCEPTED_BURNED && "font-bold text-black/50"
+              : "font-bold text-black/50"
           )}
         >
-          {status === RedeemStatus.ACCEPTED_BURNED
-            ? `${t("step3MintedBalance")}: ${amount} CLPD`
-            : `${t("yourEmail")}: ${email}`}
+          {type === "redeem"
+            ? status === RedeemStatus.ACCEPTED_BURNED
+              ? `${t("step3BurnedBalance")}: ${amount} CLPD`
+              : `${t("yourEmail")}: ${email}`
+            : `${t("step3BurnedBalance")}: ${amount} CLPD`}
         </p>
       </div>
     ),
@@ -382,6 +412,9 @@ const Withdraw: React.FC = () => {
   const { user } = useUserStore();
 
   const { address: userAddress } = useAccount();
+  const { clpdBalanceFormatted, refetch: refetchCLPDBalance } = useCLPDBalance({
+    address: userAddress,
+  });
 
   const [bankInfo, setBankInfo] = useState<BankInfo>({
     bankName: "",
@@ -390,6 +423,10 @@ const Withdraw: React.FC = () => {
     accountType: "",
     email: user?.email || "",
   });
+
+  const handleMaxAmount = () => {
+    setWithdrawAmount(clpdBalanceFormatted);
+  };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
@@ -401,6 +438,11 @@ const Withdraw: React.FC = () => {
     }
 
     setWithdrawAmount(value);
+    if (Number(value) > Number(clpdBalanceFormatted)) {
+      setErrorFields((prev) => [...prev, "amount"]);
+    } else {
+      setErrorFields((prev) => prev.filter((field) => field !== "amount"));
+    }
   };
 
   const handleBack = () => {
@@ -447,6 +489,8 @@ const Withdraw: React.FC = () => {
       if (response.status === 200) {
         // Manejar respuesta exitosa
         console.log("Transferencia iniciada:", response.data);
+        setCurrentStep(2);
+        refetchCLPDBalance();
         // Actualizar el estado o navegar a la siguiente pantalla
       }
     } catch (error) {
@@ -455,6 +499,40 @@ const Withdraw: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRedeem = async () => {
+    // try {
+    //   console.log("Monto:", withdrawAmount);
+    //   console.log("Retiro:", redeemId);
+    //   const userInfo = await web3AuthInstance.getUserInfo();
+    //   const idToken = userInfo?.idToken;
+    //   const response = await axios.post(
+    //     "/api/withdraw/redeem",
+    //     { amount: withdrawAmount, redeemId, bankInfo },
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${idToken}`,
+    //         "Content-Type": "application/json",
+    //       },
+    //     }
+    //   );
+    //   console.log(response);
+    //   if (response.status === 201 || response.status === 200) {
+    //     setWithdrawAmount("");
+    //     setBankInfo({
+    //       name: "",
+    //       accountNumber: "",
+    //       accountType: "",
+    //       email: "",
+    //     });
+    //     setCurrentStep(2);
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -496,44 +574,12 @@ const Withdraw: React.FC = () => {
         // }
         break;
       case 1:
-        setCurrentStep(2);
-        setLoading(false);
         switch (type) {
           case "redeem":
-            // try {
-            //   console.log("Monto:", withdrawAmount);
-            //   console.log("Retiro:", redeemId);
-            //   const userInfo = await web3AuthInstance.getUserInfo();
-            //   const idToken = userInfo?.idToken;
-
-            //   const response = await axios.post(
-            //     "/api/withdraw/redeem",
-            //     { amount: withdrawAmount, redeemId, bankInfo },
-            //     {
-            //       headers: {
-            //         Authorization: `Bearer ${idToken}`,
-            //         "Content-Type": "application/json",
-            //       },
-            //     }
-            //   );
-            //   console.log(response);
-            //   if (response.status === 201 || response.status === 200) {
-            //     setWithdrawAmount("");
-            //     setBankInfo({
-            //       name: "",
-            //       accountNumber: "",
-            //       accountType: "",
-            //       email: "",
-            //     });
-            //     setCurrentStep(2);
-            //   }
-            // } catch (error) {
-            //   console.log(error);
-            // } finally {
-            //   setLoading(false);
-            // }
+            handleRedeem();
             break;
           case "withdraw":
+            handleTransfer();
             break;
         }
     }
@@ -547,7 +593,8 @@ const Withdraw: React.FC = () => {
           ? "bg-brand-blue"
           : currentStep === 2 && status === RedeemStatus.ACCEPTED_BURNED
           ? "bg-brand-green-pastel"
-          : "h-auto"
+          : "h-auto",
+        currentStep === 2 && type === "withdraw" && "bg-brand-green-pastel"
       )}
     >
       <CardContent
@@ -561,7 +608,12 @@ const Withdraw: React.FC = () => {
         )}
       >
         <div className="flex flex-col rounded-xl border-none gap-3">
-          <div className="flex items-center justify-start gap-2.5">
+          <div
+            className={cn(
+              "flex items-center justify-start gap-2.5",
+              currentStep === 0 && "flex-col items-start"
+            )}
+          >
             {currentStep === 1 && (
               <LucideArrowLeft
                 className="w-10 h-10 cursor-pointer border-2 border-black rounded-full p-2 bg-[#FBC858]"
@@ -569,9 +621,26 @@ const Withdraw: React.FC = () => {
               />
             )}
 
-            <h3 className="text-xl font-helvetica font-bold">
+            <h3
+              className={cn(
+                "text-xl font-helvetica font-bold",
+                currentStep === 2
+                  ? type === "redeem"
+                    ? status === RedeemStatus.ACCEPTED_BURNED
+                      ? "text-black"
+                      : "text-white"
+                    : "text-black"
+                  : "text-black"
+              )}
+            >
               {t(Object.values(titles(type))[currentStep])}
             </h3>
+
+            {currentStep === 0 && (
+              <p className="text-sm text-black/50 font-helvetica">
+                {t("availableBalance")}: {clpdBalanceFormatted} CLPD
+              </p>
+            )}
           </div>
           {
             createSteps({
@@ -587,56 +656,26 @@ const Withdraw: React.FC = () => {
               type,
               setType,
               handleBack,
-              handleTransfer,
               errorFields,
               email: user?.email || "",
+              handleMaxAmount,
             })[currentStep].children
           }
         </div>
-        {/* <div className="flex flex-col flex-1 gap-4 w-full">
-          <div className="bg-white border-2 border-black rounded-xl p-4 flex justify-between items-center w-full">
-            <div className="w-full">
-              <div className="text-xl font-helvetica font-bold">{t("receive")}</div>
-              <Input
-                type="number"
-                value={withdrawAmount}
-                onChange={(e) => setWithdrawAmount(e.target.value)}
-                placeholder="10.000"
-                className="text-[28px] font-bold w-full bg-white border-none focus:outline-none font-helvetica"
-              />
-            </div>
-
-            <CLPFlag type="CLP" />
-          </div>
-
-          <div className="flex justify-center ">
-            <Image
-              src="/images/landing/withdraw-vector.svg"
-              alt="Withdraw"
-              width={48}
-              height={48}
-            />
-          </div>
-
-          <div className="bg-black text-white rounded-xl p-4 flex justify-between items-center w-full">
-            <div>
-              <div className="text-xl font-helvetica font-bold">{t("redeem")}</div>
-              <div className="text-[28px] font-helvetica font-bold">
-                {withdrawAmount || "0"} CLPD
-              </div>
-            </div>
-
-            <CLPFlag type="CLPD" />
-          </div>
-        </div> */}
       </CardContent>
       {currentStep !== 2 && (
         <CardFooter>
           <Button
             className="w-full bg-brand-blue-dark border-2 border-black shadow-brutalist-sm py-4 h-full text-xl hover:bg-brand-blue-dark/90 text-white font-helvetica font-bold"
             type="submit"
-            form={Object.values(formIds)[currentStep]}
-            onClick={() => handleTransfer()}
+            form={
+              currentStep === 0
+                ? formIds.createOrder
+                : type === "redeem"
+                ? formIds.reedem
+                : formIds.transfer
+            }
+            disabled={errorFields.includes("amount")}
           >
             {!loading ? (
               (() => {
@@ -658,13 +697,15 @@ const Withdraw: React.FC = () => {
         {Object.keys(titles(type)).map((s) => (
           <div
             key={s}
-            className={`w-full h-2 rounded-full ${
+            className={cn(
+              "w-full h-2 rounded-full",
               parseInt(s) === currentStep && status !== RedeemStatus.ACCEPTED_BURNED
                 ? "bg-black"
                 : status === RedeemStatus.ACCEPTED_BURNED
                 ? "bg-brand-green-pastel"
-                : "bg-black/30"
-            }`}
+                : "bg-black/30",
+              currentStep === 2 && type === "withdraw" && "bg-brand-green-pastel"
+            )}
           />
         ))}
       </div>

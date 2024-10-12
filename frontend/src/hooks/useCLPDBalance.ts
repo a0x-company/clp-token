@@ -35,5 +35,5 @@ export const useCLPDBalance = ({ address }: { address: `0x${string}` | undefined
     return Number(formatUnits(clpdBalance.data?.[0]!, 18) || 0).toFixed(2);
   }, [clpdBalance.data]);
 
-  return { clpdBalanceFormatted };
+  return { clpdBalanceFormatted, refetch: clpdBalance.refetch };
 };
