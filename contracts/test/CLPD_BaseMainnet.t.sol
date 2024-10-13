@@ -9,7 +9,7 @@ import {CLPD} from "../src/CLPD_BaseMainnet.sol";
  * forge test -vvvv --match-path test/CLPD_BaseMainnet.t.sol --fork-url https://mainnet.base.org/
  * 
  * @dev Contract deployed on Base Mainnet
- * https://basescan.org/address/0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1
+ * https://basescan.org/token/0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1
 */
 
 contract CLPDTest is Test {

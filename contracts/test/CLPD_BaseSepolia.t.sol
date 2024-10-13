@@ -9,7 +9,7 @@ import {CLPD} from "../src/CLPD_BaseSepolia.sol";
  * forge test -vvvvv --match-path test/CLPD_BaseSepolia.t.sol --fork-url https://sepolia.base.org/
  * 
  * @dev Contract deployed on Base Sepolia
- * https://sepolia.basescan.org/address/0xec4ec868b9879C222877bd42Eaa0920705eE0eE3
+ * https://sepolia.basescan.org/token/0xec4ec868b9879C222877bd42Eaa0920705eE0eE3
 */
 
 contract CLPDTest is Test {
