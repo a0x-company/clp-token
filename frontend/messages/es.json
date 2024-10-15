@@ -210,5 +210,44 @@
       "email": "El email es requerido",
       "ownershipCheck": "Debes declarar que eres el titular de la cuenta"
     }
+  },
+  "invest": {
+    "invest": "Invierte",
+    "investButton": "Invertir",
+    "investBalance": "Tu saldo",
+    "transfer": "Transfieres",
+    "amountPlaceholder": "100.000",
+    "pool": "Piscina de Liquidez",
+    "fees": "Gana fees por transacciones en la red",
+    "increase": "Haz crecer la liquidez de los CLPD para futuros usuarios.",
+    "benefits": "Otro beneficio.*",
+    "investWaitingTitle": "Transacción en curso...",
+    "investWaitingDescription": "Esta página se actualizará automáticamente cuando esté lista, y recibirás un correo.",
+    "investSuccessTitle": "¡Inversión aprobada!",
+    "investSuccessDescription": "Tus ganancias por fees se reflejarán automáticamente en tu saldo.",
+    "ready": "Listo",
+    "yourEmail": "Tu email",
+    "changeTo": "Cambiar a",
+    "max": "Max"
+  },
+  "change": {
+    "change": "Cambia entre",
+    "and": "y",
+    "from": "Desde",
+    "to": "A",
+    "send": "Enviar",
+    "receive": "Recibir",
+    "amountPlaceholder": "100.000",
+    "max": "Max",
+    "changeButton": "Cambiar",
+    "changeBalance": "Tu saldo",
+    "changeWaitingTitle": "Transacción en curso...",
+    "changeWaitingDescription": "Esta página se actualizará automáticamente cuando esté lista, y recibirás un correo.",
+    "changeSuccessTitle": "¡Cambio aprobado!",
+    "changeSuccessDescription": "Tus fondos han sido cambiados con éxito.",
+    "changeSuccessBalance": "Tu saldo",
+    "ready": "Listo",
+    "yourEmail": "Tu email",
+    "willBeSent": "Se enviarán"
   }
 }

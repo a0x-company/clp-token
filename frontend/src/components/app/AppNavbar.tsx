@@ -99,9 +99,7 @@ const AppNavbar = () => {
     const selectedStyle = "bg-black text-white";
     const unselectedStyle = "border-[2px] border-transparent hover:border-black";
 
-    return `${baseStyle} ${selectedOption === option ? selectedStyle : unselectedStyle} ${
-      (option === "invest" || option === "change") && "opacity-50"
-    }`;
+    return `${baseStyle} ${selectedOption === option ? selectedStyle : unselectedStyle}`;
   };
 
   useEffect(() => {

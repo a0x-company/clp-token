@@ -716,7 +716,7 @@ const Withdraw: React.FC = () => {
           >
             {currentStep === 1 && (
               <LucideArrowLeft
-                className="w-10 h-10 cursor-pointer border-2 border-black rounded-full p-2 bg-[#FBC858]"
+                className="w-10 h-10 cursor-pointer border-2 border-black rounded-full p-2 bg-brand-yellow-pastel"
                 onClick={handleBack}
               />
             )}
