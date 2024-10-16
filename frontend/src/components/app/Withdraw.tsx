@@ -508,6 +508,11 @@ const Withdraw: React.FC = () => {
       value = value.replace(/^0+/, "");
     }
 
+    const numValue = parseInt(value);
+    if (numValue > 10000000) {
+      value = "10000000";
+    }
+
     setWithdrawAmount(value);
     if (Number(value) > Number(clpdBalanceFormatted)) {
       setErrorFields((prev) => [...prev, "amount"]);
@@ -692,7 +697,7 @@ const Withdraw: React.FC = () => {
   return (
     <Card
       className={cn(
-        "w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] mx-auto mt-10 relative",
+        "w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] mx-auto md:mt-10 relative",
         currentStep === 2 && status !== RedeemStatus.BURNED
           ? "bg-brand-blue"
           : currentStep === 2 && status === RedeemStatus.BURNED

@@ -104,12 +104,14 @@ const createSteps = ({
           <label htmlFor="amount" className="font-bold text-base">
             {t("receive")}
           </label>
-          <div className="flex items-center gap-4 relative">
-            <p className="bg-transparent text-black text-[32px] font-helvetica w-full border-none focus:outline-none">
+          <div className="flex items-center justify-between gap-4 relative max-md:w-[270px] md:w-96">
+            <p className="bg-transparent text-black text-[32px] font-helvetica border-none focus:outline-none line-clamp-1">
               {amount || "0"}
             </p>
 
-            <CLPFlag type="CLPD" />
+            <div>
+              <CLPFlag type="CLPD" />
+            </div>
           </div>
         </div>
 
@@ -270,6 +272,11 @@ const Deposit: React.FC = () => {
 
     if (value.length > 1 && value.startsWith("0")) {
       value = value.replace(/^0+/, "");
+    }
+
+    const numValue = parseInt(value);
+    if (numValue > 10000000) {
+      value = "10000000";
     }
 
     setAmount(value);
