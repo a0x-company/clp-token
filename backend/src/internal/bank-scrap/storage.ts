@@ -1,5 +1,6 @@
 import { BigQuery } from '@google-cloud/bigquery';
 import { config } from '@internal';
+import { DiscordNotificationService, NotificationType } from '@internal/notifications';
 
 interface VaultBalanceData {
   timestamp: Date;
@@ -10,6 +11,8 @@ export class VaultBalanceStorage {
   private bigquery: BigQuery;
   private datasetId: string = 'clpd_vault_data';
   private tableId: string = 'balance_history';
+  private lastErrorNotification: number = 0;
+  private readonly ERROR_COOLDOWN = 15 * 60 * 1000; // 15 minutes in milliseconds
 
   constructor() {
     this.bigquery = new BigQuery({
@@ -35,7 +38,6 @@ export class VaultBalanceStorage {
         .insert([row]);
       console.log('✅ Balance saved to BigQuery');
     } catch (error: any) {
-      // Handle specific BigQuery errors if necessary
       console.error('❌ Error saving to BigQuery:', error);
       throw error;
     }
@@ -86,7 +88,7 @@ export class VaultBalanceStorage {
       day: 'INTERVAL 1 DAY',
       week: 'INTERVAL 7 DAY',
       month: 'INTERVAL 1 MONTH',
-      year: 'INTERVAL 365 DAY' // Cambiado de 'INTERVAL 1 YEAR' a 'INTERVAL 365 DAY'
+      year: 'INTERVAL 365 DAY'
     };
 
     const interval = periodMap[period];
@@ -110,6 +112,25 @@ export class VaultBalanceStorage {
     } catch (error: any) {
       console.error(`❌ Error fetching historical balance for ${period}:`, error);
       throw error;
+    }
+  }
+
+  public async notifyError(error: Error, discordService: DiscordNotificationService): Promise<void> {
+    const currentTime = Date.now();
+    if (currentTime - this.lastErrorNotification > this.ERROR_COOLDOWN) {
+      let errorMessage = `Error in Santander scraper: ${error.name} - ${error.message}`;
+      if (error.message.includes('Navigation after login failed')) {
+        errorMessage += ' Possible causes: slow internet, website changes, or incorrect credentials.';
+      } else if (error.message.includes('Failed to load Santander homepage')) {
+        errorMessage += ' Check internet connection or Santander website availability.';
+      }
+
+      await discordService.sendNotification(
+        errorMessage,
+        NotificationType.ERROR,
+        'Santander Scraper Error'
+      );
+      this.lastErrorNotification = currentTime;
     }
   }
 }
