@@ -1,6 +1,7 @@
 export const addresses: {
   [key: string]: {
     swap: `0x${string}`;
+    investment: `0x${string}`;
     CLPD: {
       address: `0x${string}`;
       decimals: number;
@@ -13,6 +14,7 @@ export const addresses: {
 } = {
   base: {
     swap: "0x0000000000000000000000000000000000000000",
+    investment: "0xe4c46d4a39339c8E5129E609a86e6ee88D06C34a",
     CLPD: {
       address: "0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1",
       decimals: 18,
@@ -24,6 +26,7 @@ export const addresses: {
   },
   baseSepolia: {
     swap: "0x0000000000000000000000000000000000000000",
+    investment: "0x0000000000000000000000000000000000000000",
     CLPD: {
       address: "0x0000000000000000000000000000000000000000",
       decimals: 18,

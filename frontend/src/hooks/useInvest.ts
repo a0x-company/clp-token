@@ -2,10 +2,14 @@
 import { useEffect, useRef } from "react";
 
 // abi
-// import { SwapAbi } from "@/constants/abi/SwapAbi";
+import InvestmentAbi from "@/constants/investCLPD-abi.json";
+
+// constants
+import { addresses } from "@/constants/address";
+import { CHAIN_SYMBOL } from "@/provider/WagmiConfig";
 
 // wagmi
-import { getAddress, zeroAddress } from "viem";
+import { getAddress } from "viem";
 import {
   useAccount,
   useSimulateContract,
@@ -13,21 +17,21 @@ import {
   useWriteContract,
 } from "wagmi";
 
-export const useSwap = (
-  _contractAddress: `0x${string}`,
+export const useInvest = (
   _amount: bigint,
+  _token: "CLPD" | "USDC",
   onSuccess?: () => void,
   refetch: boolean = false
 ) => {
   const { chainId } = useAccount();
 
-  const contractAddress = getAddress(_contractAddress ? _contractAddress : zeroAddress);
+  const contractAddress = getAddress(addresses[CHAIN_SYMBOL].investment);
 
   const simulate = useSimulateContract({
     address: contractAddress,
     chainId: chainId,
-    // abi: SwapAbi,
-    functionName: "buy",
+    abi: InvestmentAbi,
+    functionName: _token === "CLPD" ? " investCLPDwithoutUSDC" : "investUSDCwithoutCLPD",
     args: [_amount],
     query: {
       enabled: _amount > 0 && refetch,
