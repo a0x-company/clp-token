@@ -124,6 +124,7 @@
       "info": "Bank account information",
       "bank": "Bank",
       "accountNumber": "Account Number",
+      "rut": "RUT",
       "owner": "Account Holder",
       "email": "Email",
       "type": "Account Type"

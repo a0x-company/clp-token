@@ -30,6 +30,7 @@ const bankInfo = {
   accountType: "Cuenta Vista",
   owner: "Cristian Ignacio Valdivia Ramirez",
   accountNumber: "0-070-08-99853-6",
+  rut: "17.961.388-3",
   email: "c@mistokens.com",
 };
 
@@ -158,6 +159,9 @@ const createSteps = ({
           </p>
           <p className="flex items-center justify-between">
             <strong>{t("bankInfo.owner")}:</strong> {bankInfo.owner}
+          </p>
+          <p className="flex items-center justify-between">
+            <strong>{t("bankInfo.rut")}:</strong> {bankInfo.rut}
           </p>
           <p className="flex items-center justify-between">
             <strong>{t("bankInfo.email")}:</strong> {bankInfo.email}

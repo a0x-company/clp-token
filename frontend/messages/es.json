@@ -126,7 +126,8 @@
       "accountNumber": "Número de Cuenta",
       "owner": "Titular",
       "email": "Email",
-      "type": "Tipo de cuenta"
+      "type": "Tipo de cuenta",
+      "rut": "RUT"
     },
     "transferBank": "Transferencia bancaria",
     "send": "Envías",
