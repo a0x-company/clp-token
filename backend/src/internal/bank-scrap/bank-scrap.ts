@@ -1,45 +1,9 @@
-import { VAULT_PASSWORD, VAULT_RUT, DISCORD_WEBHOOK_URL } from "@internal/config";
-import { DiscordNotificationService, NotificationType } from "@internal/notifications";
+import { VAULT_PASSWORD, VAULT_RUT } from "@internal/config";
 import puppeteer from "puppeteer";
-import { Firestore } from '@google-cloud/firestore';
-import { config } from "@internal";
-
-const firestore = new Firestore({ projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV });
 
 export class SantanderClScraper {
   private readonly RUT = VAULT_RUT || "";
   private readonly PASS = VAULT_PASSWORD || "";
-  private discordService: DiscordNotificationService;
-  private readonly ERROR_COOLDOWN = 300000;
-
-  constructor() {
-    this.discordService = new DiscordNotificationService(DISCORD_WEBHOOK_URL || "");
-  }
-
-  private async shouldNotify(errorType: string): Promise<boolean> {
-    const errorRef = firestore.collection('scraper_errors').doc(errorType);
-    const errorDoc = await errorRef.get();
-
-    if (!errorDoc.exists) {
-      await errorRef.set({ lastNotified: Date.now() });
-      return true;
-    }
-
-    const lastNotified = errorDoc.data()?.lastNotified;
-    if (Date.now() - lastNotified > this.ERROR_COOLDOWN) {
-      await errorRef.update({ lastNotified: Date.now() });
-      return true;
-    }
-
-    return false;
-  }
-
-  private async notifyError(message: string, notificationType: NotificationType): Promise<void> {
-    const errorType = notificationType === NotificationType.ERROR ? 'scraper_error' : 'scraper_warning';
-    if (await this.shouldNotify(errorType)) {
-      await this.discordService.sendNotification(message, notificationType, "CRITICAL: Santander Scraper Alert");
-    }
-  }
 
   public async getVaultBalance(rut: string = this.RUT, pass: string = this.PASS): Promise<number> {
     console.log("✅ Starting Santander CL scraper");
@@ -64,32 +28,22 @@ export class SantanderClScraper {
 
       const page = await browser.newPage();
 
-      await page.goto("https://banco.santander.cl/personas").catch(async () => {
-        await this.notifyError(
-          "CRITICAL: Failed to load Santander homepage. Bank scraping process interrupted.",
-          NotificationType.ERROR
-        );
-        throw new Error("CRITICAL: Failed to load Santander homepage");
+      await page.goto("https://banco.santander.cl/personas").catch(() => {
+        throw new Error("Failed to load Santander homepage. Check internet connection or website availability.");
       });
       console.log("✅ Page loaded correctly");
 
-      await page
-        .waitForSelector('a.btn-ingresar[aria-label="Abrir panel de ingreso"]', {
-          visible: true,
-          timeout: 10000,
-        })
-        .catch(() => {
-          throw new Error("CRITICAL: Ingresar button not found");
-        });
+      await page.waitForSelector('a.btn-ingresar[aria-label="Abrir panel de ingreso"]', {
+        visible: true,
+        timeout: 10000,
+      });
       await page.click('a.btn-ingresar[aria-label="Abrir panel de ingreso"]');
       console.log("✅ Click performed on 'Ingresar' button");
 
       console.log("⏳ Waiting 5 seconds for iframe to load");
       await new Promise((resolve) => setTimeout(resolve, 4000));
 
-      const iframeElement = await page.$('iframe[id="login-frame"]').catch(() => {
-        throw new Error("CRITICAL: Login iframe not found");
-      });
+      const iframeElement = await page.$('iframe[id="login-frame"]');
       console.log("✅ Iframe found");
 
       const iframe = await iframeElement?.contentFrame();
@@ -98,14 +52,10 @@ export class SantanderClScraper {
       }
       console.log("✅ Successful access to iframe");
 
-      await iframe
-        .waitForSelector("#rut", {
-          visible: true,
-          timeout: 10000,
-        })
-        .catch(() => {
-          throw new Error("CRITICAL: RUT input field not found");
-        });
+      await iframe.waitForSelector("#rut", {
+        visible: true,
+        timeout: 10000,
+      });
       console.log("✅ RUT field found");
 
       await iframe.type("#rut", rut);
@@ -114,25 +64,17 @@ export class SantanderClScraper {
       await iframe.type("#pass", pass);
       console.log(`✅ Password entered in input field`);
 
-      await iframe
-        .waitForSelector('button[type="submit"]', {
-          visible: true,
-          timeout: 10000,
-        })
-        .catch(() => {
-          throw new Error("CRITICAL: 'Ingresar' submit button not found");
-        });
+      await iframe.waitForSelector('button[type="submit"]', {
+        visible: true,
+        timeout: 10000,
+      });
       console.log("✅ 'Ingresar' button found");
 
       await iframe.click('button[type="submit"]');
       console.log("✅ Click performed on 'Ingresar' button");
 
-      await page.waitForNavigation({ waitUntil: "networkidle0", timeout: 30000 }).catch(async () => {
-        await this.notifyError(
-          "CRITICAL: Navigation after login failed. Unable to access account information.",
-          NotificationType.ERROR
-        );
-        throw new Error("CRITICAL: Navigation after login failed");
+      await page.waitForNavigation({ waitUntil: "networkidle0", timeout: 30000 }).catch(() => {
+        throw new Error("Navigation after login failed. Possible reasons: slow internet, website changes, or incorrect credentials.");
       });
       console.log("✅ Page loaded after login");
 
@@ -149,14 +91,10 @@ export class SantanderClScraper {
       }
 
       const balanceSelector = "div.monto1 span.ng-star-inserted p.amount-pipe-4";
-      await page
-        .waitForSelector(balanceSelector, {
-          visible: true,
-          timeout: 10000,
-        })
-        .catch(() => {
-          throw new Error("CRITICAL: Balance information not found");
-        });
+      await page.waitForSelector(balanceSelector, {
+        visible: true,
+        timeout: 10000,
+      });
       console.log("✅ Balance visible on page");
 
       const balanceText = await page.$eval(balanceSelector, (element) => element.innerText);
@@ -164,14 +102,10 @@ export class SantanderClScraper {
       console.log(`💰 Available balance: $${balanceValue} CLP`);
 
       const cuentaSelector = "div.datos p:nth-of-type(2)";
-      await page
-        .waitForSelector(cuentaSelector, {
-          visible: true,
-          timeout: 10000,
-        })
-        .catch(() => {
-          throw new Error("CRITICAL: Account number information not found");
-        });
+      await page.waitForSelector(cuentaSelector, {
+        visible: true,
+        timeout: 10000,
+      });
 
       const cuentaNumero = await page.$eval(cuentaSelector, (el) => el.innerText.trim());
       console.log(`💳 View account number: ${cuentaNumero}`);
@@ -180,14 +114,14 @@ export class SantanderClScraper {
 
       return Number(balanceValue);
     } catch (error: unknown) {
-      console.error("❌ CRITICAL: An error occurred:");
+      console.error("❌ CRITICAL: An error occurred in Santander scraper:");
 
       if (error instanceof Error) {
-        console.error(error.message);
-        await this.notifyError(
-          `CRITICAL: Error in Santander scraper: ${error.message}`,
-          NotificationType.ERROR
-        );
+        console.error(`Error type: ${error.name}`);
+        console.error(`Error message: ${error.message}`);
+        console.error(`Stack trace: ${error.stack}`);
+      } else {
+        console.error(`Unknown error: ${error}`);
       }
 
       if (browser) {
