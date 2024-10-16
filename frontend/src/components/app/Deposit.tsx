@@ -373,7 +373,7 @@ const Deposit: React.FC = () => {
   return (
     <Card
       className={cn(
-        "absolute left-1/2 -translate-x-1/2 max-md:bottom-[25%] md:top-1/2 md:-translate-y-1/2 w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%]",
+        "w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] mx-auto mt-10 relative",
         currentStep === 2 && status !== DepositStatus.ACCEPTED_MINTED
           ? "bg-brand-blue"
           : currentStep === 2 && status === DepositStatus.ACCEPTED_MINTED

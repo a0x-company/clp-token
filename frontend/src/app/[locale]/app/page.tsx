@@ -9,7 +9,7 @@ export default function App({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   return (
-    <main className="min-h-screen min-w-screen bg-white text-black">
+    <main className="min-h-screen min-w-screen bg-white text-black flex flex-col">
       <AppNavbar />
       {(searchParams.tab === "deposit" || !searchParams.tab) && <Deposit />}
       {searchParams.tab === "withdraw" && <Withdraw />}
