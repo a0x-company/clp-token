@@ -1,88 +1,33 @@
 import 'module-alias/register';
 
-import { BigQuery } from '@google-cloud/bigquery';
-import axios from 'axios';
 import { config } from "@internal";
 import { Firestore } from '@google-cloud/firestore';
 import { DiscordNotificationService, NotificationType } from '@internal/notifications';
 import { ethers } from 'ethers';
+import { SantanderClScraper, VaultBalanceStorage } from '@internal/bank-scrap';
 
 if (!config.PROJECT_ID || !config.API_KEY) {
   throw new Error("❌ Required environment variables are missing");
 }
 
-const VAULT_API_URL = 'https://development-clpd-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance';
-const DATASET_ID = 'clpd_vault_data';
-const TABLE_ID = 'balance_history';
 const RPC_URL = config.RPC_URL;
 const CONTRACT_ADDRESS = '0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1'; 
 const ABI = ['function totalSupply() view returns (uint256)'];
 
 const firestore = new Firestore({projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV});
 const discordService = new DiscordNotificationService(config.DISCORD_WEBHOOK_URL as string);
+const vaultBalanceStorage = new VaultBalanceStorage();
+const santanderScraper = new SantanderClScraper();
 
-interface VaultBalance {
-  balance: number;
-}
-
-async function getVaultBalance(): Promise<VaultBalance> {
+async function getVaultBalance(): Promise<number> {
   try {
-    const response = await axios.get<VaultBalance>(VAULT_API_URL, {
-      headers: {
-        'api-key': config.API_KEY
-      }
-    });
-    return response.data;
+    return await santanderScraper.getVaultBalance();
   } catch (error) {
     console.error('❌ Error fetching vault balance:', error);
-    throw error;
-  }
-}
-
-async function saveBalanceToBigQuery(balance: number): Promise<void> {
-  const bigquery = new BigQuery({
-    projectId: config.PROJECT_ID,
-  });
-
-  const row = {
-    timestamp: BigQuery.timestamp(new Date()),
-    balance: balance
-  };
-
-  try {
-    await bigquery
-      .dataset(DATASET_ID)
-      .table(TABLE_ID)
-      .insert([row]);
-    console.log('✅ Balance saved to BigQuery');
-  } catch (error) {
-    console.error('❌ Error saving to BigQuery:', error);
-    throw error;
-  }
-}
-
-async function createTableIfNotExists(): Promise<void> {
-  const bigquery = new BigQuery({
-    projectId: config.PROJECT_ID,
-  });
-
-  const schema = [
-    { name: 'timestamp', type: 'TIMESTAMP' },
-    { name: 'balance', type: 'FLOAT' },
-  ];
-
-  try {
-    await bigquery
-      .dataset(DATASET_ID)
-      .createTable(TABLE_ID, { schema });
-    console.log('✅ Table created in BigQuery');
-  } catch (error: any) {
-    if (error.code === 409) {
-      console.log('ℹ️ The table already exists in BigQuery');
-    } else {
-      console.error('❌ Error creating the table in BigQuery:', error);
-      throw error;
+    if (error instanceof Error) {
+      await vaultBalanceStorage.notifyError(error, discordService);
     }
+    throw error;
   }
 }
 
@@ -122,7 +67,7 @@ async function getTotalSupply(): Promise<number> {
     const totalSupply = await contract.totalSupply();
     return Number(ethers.formatUnits(totalSupply, 18));
   } catch (error) {
-    console.error('Error al obtener el total supply:', error);
+    console.error('Error getting total supply:', error);
     throw error;
   }
 }
@@ -141,15 +86,15 @@ async function main(): Promise<void> {
   console.log("🚀 Starting vault balance update job...");
 
   try {
-    await createTableIfNotExists();
+    await vaultBalanceStorage.createTableIfNotExists();
 
-    const { balance } = await getVaultBalance();
+    const balance = await getVaultBalance();
     console.log(`📊 Current vault balance: ${balance}`);
+
+    await vaultBalanceStorage.saveBalance(balance);
 
     const totalSupply = await getTotalSupply();
     console.log(`📊 Current total supply: ${totalSupply}`);
-
-    await saveBalanceToBigQuery(balance);
 
     const threshold = 0.001; // 0.1% threshold for discrepancy
     const isDiscrepancy = Math.abs(balance - totalSupply) / totalSupply > threshold;
@@ -182,6 +127,5 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 }
-
 
 main();
