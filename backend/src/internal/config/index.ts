@@ -7,7 +7,10 @@ export const API_KEY = process.env.API_KEY;
 export const VAULT_RUT = process.env.VAULT_RUT;
 export const VAULT_PASSWORD = process.env.VAULT_PASSWORD;
 
-export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+export const DISCORD_ALERT_WEBHOOK_URL = process.env.DISCORD_ALERT_WEBHOOK_URL;
+export const DISCORD_DEPOSIT_WEBHOOK_URL = process.env.DISCORD_DEPOSIT_WEBHOOK_URL;
+export const DISCORD_WITHDRAWAL_WEBHOOK_URL = process.env.DISCORD_WITHDRAWAL_WEBHOOK_URL;
+
 
 export const RPC_URL = process.env.RPC_URL;
 export const RESEND_API_KEY = process.env.RESEND_API_KEY;
@@ -29,5 +32,7 @@ export function validateVaultApiEnvs() {
   if (!API_KEY) stopProgram("API_KEY");
   if (!VAULT_RUT) stopProgram("VAULT_RUT");
   if (!VAULT_PASSWORD) stopProgram("VAULT_PASSWORD");
-  if (!DISCORD_WEBHOOK_URL) stopProgram("DISCORD_WEBHOOK_URL");
+  if (!DISCORD_ALERT_WEBHOOK_URL) stopProgram("DISCORD_ALERT_WEBHOOK_URL");
+  if (!DISCORD_DEPOSIT_WEBHOOK_URL) stopProgram("DISCORD_DEPOSIT_WEBHOOK_URL");
+  if (!DISCORD_WITHDRAWAL_WEBHOOK_URL) stopProgram("DISCORD_WITHDRAWAL_WEBHOOK_URL");
 }
