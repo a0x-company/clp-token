@@ -120,15 +120,17 @@ export class VaultBalanceStorage {
     if (currentTime - this.lastErrorNotification > this.ERROR_COOLDOWN) {
       let errorMessage = `Error in Santander scraper: ${error.name} - ${error.message}`;
       if (error.message.includes('Navigation after login failed')) {
-        errorMessage += ' Possible causes: slow internet, website changes, or incorrect credentials.';
+        errorMessage += ' Possible causes: website changes, or incorrect credentials.';
       } else if (error.message.includes('Failed to load Santander homepage')) {
-        errorMessage += ' Check internet connection or Santander website availability.';
+        errorMessage += ' Check Santander website availability.';
       }
 
       await discordService.sendNotification(
         errorMessage,
         NotificationType.ERROR,
-        'Santander Scraper Error'
+        'Santander Scraper Error',
+        undefined,
+        'alert'
       );
       this.lastErrorNotification = currentTime;
     }
