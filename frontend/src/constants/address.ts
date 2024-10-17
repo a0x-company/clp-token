@@ -14,7 +14,7 @@ export const addresses: {
 } = {
   base: {
     swap: "0x0000000000000000000000000000000000000000",
-    investment: "0xe4c46d4a39339c8E5129E609a86e6ee88D06C34a",
+    investment: "0xCf26F8bcC82a9100279aDd043eA632A631CC10c8",
     CLPD: {
       address: "0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1",
       decimals: 18,

@@ -88,6 +88,11 @@
       }
     }
   },
+  "footer": {
+    "copyright": "A product of A0x © 2024",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use"
+  },
   "reserve": {
     "secure": "Transparency and Stability",
     "secure1": "The CLPD can always be exchanged 1:1 for Chilean pesos. Always.",
@@ -104,7 +109,7 @@
       "title1": "How is CLPD guaranteed to be fully backed and exchangeable for traditional Chilean pesos?",
       "content1": "CLPD is a 100% backed Chilean peso stablecoin (not converted into any other asset than traditional CLP) and is exchangeable 1:1 for Chilean pesos fiat. All Chilean pesos fiat are held in a Chilean national bank account that is monitored 24/7 by independent oracles provided by Chainlink Functions technology.",
       "title2": "How can I get CLPD and convert it to Chilean pesos fiat?",
-      "content2": "Individuals and common users, startups and small businesses can get CLPD through the website pesodigital.mistokens.com and soon in more national and international applications and exchanges. For exchanges, institutions, banks, wallets, institutional traders, large companies and financial institutions, they can contact the A0x developer team.",
+      "content2": "Individuals and common users, startups and small businesses can get CLPD through the website clpd.mistokens.com and soon in more national and international applications and exchanges. For exchanges, institutions, banks, wallets, institutional traders, large companies and financial institutions, they can contact the A0x developer team.",
       "title3": "In which blockchain is CLPD available?",
       "content3": "CLPD is available on the BASE blockchain, a layer 2 solution on Ethereum, compatible with EVM (Ethereum Virtual Machine), built on the Optimism superstack, with the security, stability and scalability necessary to obtain transactions at the lowest cost for all payment and financial applications of CLPD. Soon, CLPD will be enabled on other blockchains to further facilitate its use and adoption.",
       "title4": "How is the parity between circulating CLPD and CLP fiat reserves maintained?",
@@ -158,12 +163,14 @@
     "amount": "Amount to Withdraw",
     "amountPlaceholder": "100.000",
     "bankInfo": {
-      "bankId": "Bank",
+      "bankName": "Bank",
+      "accountType": "Account Type",
       "name": "Name",
       "accountNumber": "Account Number",
       "rut": "RUT",
       "email": "Email",
-      "bankIdPlaceholder": "Banco Santander",
+      "bankNamePlaceholder": "Banco Santander",
+      "accountTypePlaceholder": "Checking",
       "accountNumberPlaceholder": "1234567890",
       "rutPlaceholder": "12.345.678-9",
       "namePlaceholder": "Jhon Doe",
@@ -195,6 +202,7 @@
     "step3Burned": "Withdraw approved!",
     "step3BurnedDescription": "Your funds have been withdrawn successfully.",
     "step3BurnedBalance": "Your balance",
+    "availableBalance": "Available balance",
     "max": "Max",
     "ready": "Ready",
     "yourEmail": "Your email",
@@ -205,6 +213,7 @@
     "errorFields": {
       "amount": "The amount is greater than the available balance",
       "bankId": "The bank is required",
+      "accountType": "The account type is required",
       "rut": "The RUT is required",
       "accountNumber": "The account number is required",
       "name": "The name is required",

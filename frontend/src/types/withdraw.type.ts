@@ -1,5 +1,6 @@
 export type BankInfo = {
   bankId: string;
+  accountType: string;
   name: string;
   accountNumber: string;
   rut: string;

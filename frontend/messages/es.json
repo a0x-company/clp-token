@@ -88,6 +88,11 @@
       }
     }
   },
+  "footer": {
+    "copyright": "Un producto de A0x © 2024",
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfUse": "Términos y Condiciones"
+  },
   "reserve": {
     "secure": "Transparencia y Estabilidad",
     "secure1": "El CLPD siempre se puede intercambiar 1 a 1 por pesos chilenos. Siempre.",
@@ -104,7 +109,7 @@
       "title1": "¿Cómo se garantiza que CLPD está completamente respaldado y es intercambiable por pesos chilenos tradicionales?",
       "content1": "CLPD es un peso chileno digital respaldado 100% por dinero líquido (no está convertido en ningún tipo de activo más que CLP tradicional) y es intercambiable 1:1 por pesos chilenos fiat. Todos los pesos chilenos fiat se resguardan en una cuenta bancaria nacional que es monitoreada 24/7 por oráculos independientes proporcionados por la tecnología de Chainlink Functions.",
       "title2": "¿Cómo puedo obtener CLPD y convertirlo a pesos chilenos fiat?",
-      "content2": "Individuos y usuarios comunes, startups y pequeños negocios pueden obtener CLPD a través del sitio web pesodigital.mistokens.com y pronto en más aplicaciones y exchanges nacionales e internacionales. Para exchanges, instituciones, bancos, wallets, traders institucionales, grandes empresas e instituciones financieras, pueden ponerse en contacto con el equipo de desarrollador A0x.",
+      "content2": "Individuos y usuarios comunes, startups y pequeños negocios pueden obtener CLPD a través del sitio web clpd.mistokens.com y pronto en más aplicaciones y exchanges nacionales e internacionales. Para exchanges, instituciones, bancos, wallets, traders institucionales, grandes empresas e instituciones financieras, pueden ponerse en contacto con el equipo de desarrollador A0x.",
       "title3": "¿En qué blockchain está disponible CLPD?",
       "content3": "CLPD está disponible en la red blockchain BASE, una solución de capa 2 en Ethereum, compatible con EVM (Ethereum Virtual Machine), construida sobre el superstack de Optimism, con la seguridad, estabilidad y escalabilidad necesaria para obtener transacciones de bajísimo costo para todas las aplicaciones de pago y financieras de CLPD. Pronto se habilitará el CLPD en otras blockchains para facilitar aún más su uso y adopción.",
       "title4": "¿Cómo se mantiene la paridad entre el CLPD circulante y las reservas de CLP fiat?",
@@ -159,11 +164,13 @@
     "amountPlaceholder": "100.000",
     "bankInfo": {
       "bankName": "Banco",
+      "accountType": "Tipo de cuenta",
       "name": "Nombre",
       "accountNumber": "Número de cuenta",
       "rut": "RUT",
       "email": "Email",
       "bankNamePlaceholder": "Banco Santander",
+      "accountTypePlaceholder": "Cuenta vista",
       "accountNumberPlaceholder": "1234567890",
       "rutPlaceholder": "12.345.678-9",
       "namePlaceholder": "Jhon Doe",
@@ -188,7 +195,7 @@
     "submit": "Enviar",
     "receive": "Recibes",
     "redeem": "Retiras",
-    "redeemStep1": "Ingresa cuenta a tranferir",
+    "redeemStep1": "Ingresa la cuenta a transferir",
     "transferStep1": "Ingresa address a enviar",
     "step3": "Tu orden está esperando revisión...",
     "step3Description": "Esta página se actualizará automáticamente cuando esté lista, y recibirás un correo.",
@@ -207,6 +214,7 @@
       "amount": "El monto es mayor al saldo disponible",
       "bankId": "El banco es requerido",
       "rut": "El RUT es requerido",
+      "accountType": "El tipo de cuenta es requerido",
       "accountNumber": "El número de cuenta es requerido",
       "name": "El nombre es requerido",
       "email": "El email es requerido",

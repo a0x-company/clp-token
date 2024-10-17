@@ -120,27 +120,6 @@ const createSteps = ({
             {t("redeem")}
           </label>
 
-          {/* <div className="flex items-center gap-2 relative w-full">
-              <Input
-                type="number"
-                id="amount"
-                placeholder={tokenIn.symbol === "CLPD" ? t("amountPlaceholder") : "100"}
-                value={amount}
-                onChange={handleAmountChange}
-                className="bg-transparent text-black text-[32px] font-helvetica border-none p-0 focus:outline-none opacity-0 absolute inset-0 w-96 h-full"
-              />
-              <div className="text-black text-[32px] font-helvetica w-full">
-                {amountFormatted || amount}
-              </div>
-
-              <button
-                type="button"
-                onClick={handleMaxAmount}
-                className="bg-white border-2 border-black rounded-full p-1 text-sm font-bold hover:bg-black/5 transition-colors self-end"
-              >
-                {t("max")}
-              </button>
-            </div> */}
           <div className="flex items-center gap-4 relative">
             <Input
               type="number"
@@ -267,6 +246,29 @@ const createSteps = ({
           </div>
 
           <div className="flex flex-col gap-1">
+            <label htmlFor="accountType" className="font-bold text-base">
+              {t("bankInfo.accountType")}
+            </label>
+            <Input
+              type="text"
+              id="accountType"
+              value={bankInfo.accountType}
+              onChange={(e) => handleChangeField("accountType", e.target.value)}
+              placeholder={t("bankInfo.accountTypePlaceholder")}
+              className="font-helvetica font-bold bg-transparent border-2 border-black shadow-brutalist-sm outline-none"
+            />
+
+            <p
+              className={cn(
+                "text-red-500 text-sm opacity-0 transition-all duration-300",
+                errorFields.includes("accountType") && "opacity-100"
+              )}
+            >
+              {t("errorFields.accountType")}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-1">
             <label htmlFor="rut" className="font-bold text-base">
               {t("bankInfo.rut")}
             </label>
@@ -362,7 +364,11 @@ const createSteps = ({
               {t("willBeSent")}: <span className="font-bold">{formatNumber(Number(amount))}</span>{" "}
               CLP
             </p>
-            <button type="button" className="text-brand-blue" onClick={handleBack}>
+            <button
+              type="button"
+              className="text-brand-blue hover:bg-gray-50 p-1 rounded-full"
+              onClick={handleBack}
+            >
               <PencilLine className="w-4 h-4" />
             </button>
           </div>
@@ -518,6 +524,7 @@ const Withdraw: React.FC = () => {
     bankId: "",
     name: "",
     accountNumber: "",
+    accountType: "",
     rut: "",
     email: user?.email || "",
     ownershipCheck: false,
@@ -561,6 +568,9 @@ const Withdraw: React.FC = () => {
         break;
       case "rut":
         setBankInfo((prev) => ({ ...prev, rut: value as string }));
+        break;
+      case "accountType":
+        setBankInfo((prev) => ({ ...prev, accountType: value as string }));
         break;
       case "accountNumber":
         setBankInfo((prev) => ({ ...prev, accountNumber: value as string }));
@@ -650,6 +660,9 @@ const Withdraw: React.FC = () => {
       if (bankInfo.rut === "") {
         newErrorFields.push("rut");
       }
+      if (bankInfo.accountType === "") {
+        newErrorFields.push("accountType");
+      }
       if (bankInfo.accountNumber === "") {
         newErrorFields.push("accountNumber");
       }
@@ -687,6 +700,7 @@ const Withdraw: React.FC = () => {
           bankId: "",
           name: "",
           accountNumber: "",
+          accountType: "",
           rut: "",
           email: "",
           ownershipCheck: false,
@@ -725,7 +739,7 @@ const Withdraw: React.FC = () => {
   return (
     <Card
       className={cn(
-        "w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] mx-auto md:mt-10 relative",
+        "w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] mx-auto md:my-10 md:mb-20 relative",
         currentStep === 2 && status !== RedeemStatus.BURNED
           ? "bg-brand-blue"
           : currentStep === 2 && status === RedeemStatus.BURNED

@@ -1,10 +1,17 @@
 // react
-import Image from "next/image";
 import React from "react";
+// next
+import Image from "next/image";
+import Link from "next/link";
+// next-intl
+import { useTranslations } from "next-intl";
+
+const termsLink = "https://docs.google.com/document/d/127BPRsRSNolTrdZY4FpG3twdLQ2MStxb";
 
 const Footer: React.FC = () => {
+  const t = useTranslations("footer");
   return (
-    <footer className="bg-white w-full h-max flex flex-col items-center justify-center gap-10 pt-16 pb-8 relative">
+    <footer className="bg-white w-full h-max flex flex-col items-center justify-center pt-16 pb-8 relative">
       <Image
         src="/images/landing/stamp.svg"
         alt="Stamp Chilean"
@@ -16,7 +23,10 @@ const Footer: React.FC = () => {
         <Image src="/images/landing/clpa-logo-blue.svg" alt="CLPD logo" width={64} height={64} />
         <h2 className="text-[64px] text-brand-blue font-beauford-bold leading-none mt-2.5">CLPD</h2>
       </div>
-      <p className="text-black font-bold">Un producto de A0x © 2024</p>
+      <Link href={termsLink} target="_blank" className="hover:bg-gray-50 p-1 rounded-full mt-6">
+        {t("termsOfUse")}
+      </Link>
+      <p className="text-black font-bold">{t("copyright")}</p>
     </footer>
   );
 };
