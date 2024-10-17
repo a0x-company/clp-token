@@ -9,7 +9,7 @@ import "./oracleTokenPriceCLPD.sol";
 /**
  * @dev Contract deployed on Base Mainnet
  * @notice You can view the deployed contract at:
- * https://basescan.org/address/0xe4c46d4a39339c8E5129E609a86e6ee88D06C34a
+ * https://basescan.org/address/0xCf26F8bcC82a9100279aDd043eA632A631CC10c8
 */
 
 interface IERC721Receiver {
@@ -242,7 +242,7 @@ contract investCLPD is IERC721Receiver, Ownable {
         )
     {
         // Calculate half of the amount to swap
-        uint256 halfAmount = amountUSDC / 2;
+        uint256 halfAmount = (amountUSDC / 2) * 99 / 100;
 
         // Swap half of the USDC to CLPD
         uint256 amount0ToAdd = swapTokens(USDC, CLPD, halfAmount);
@@ -265,7 +265,7 @@ contract investCLPD is IERC721Receiver, Ownable {
         )
     {
         // Calculate half of the amount to swap
-        uint256 halfAmount = amountCLPD / 2;
+        uint256 halfAmount = (amountCLPD / 2) * 99 / 100;
 
         // Swap half of the CLPD to USDC
         uint256 amount1ToAdd = swapTokens(CLPD, USDC, halfAmount);

@@ -10,17 +10,18 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * forge test -vvvv --match-path test/swap_InvestLiquidity_CLPD.t.sol --fork-url https://mainnet.base.org
  * 
  * @dev Contract deployed on Base Mainnet
- * https://basescan.org/address/0xe4c46d4a39339c8E5129E609a86e6ee88D06C34a
+ * https://basescan.org/address/0xCf26F8bcC82a9100279aDd043eA632A631CC10c8
  */
 
 contract investCLPDTest is Test {
 
     investCLPD public investclpd;
-    address public user = 0xd806A01E295386ef7a7Cea0B9DA037B242622743;    address public USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+    address public user = 0xd806A01E295386ef7a7Cea0B9DA037B242622743;    
+    address public USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
     address public CLPD = 0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1;
 
     function setUp() public {
-        investclpd = investCLPD(0xe4c46d4a39339c8E5129E609a86e6ee88D06C34a);
+        investclpd = investCLPD(0xCf26F8bcC82a9100279aDd043eA632A631CC10c8);
     }
 
     // ---------------------------------------------- Swap tests ----------------------------------------------
