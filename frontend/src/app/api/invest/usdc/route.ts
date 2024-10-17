@@ -51,7 +51,7 @@ async function getGasPriceBaseViem(): Promise<BigInt> {
   return BigInt(gasPrice);
 }
 
-const MINIMUM_ETH_BALANCE = 0.000005 * 5;
+let MINIMUM_ETH_BALANCE = 0.000006 * 5;
 
 async function checkAndRechargeEthBalance(userAddress: string, provider: ethers.JsonRpcProvider) {
   const balanceETH = await provider.getBalance(userAddress);
@@ -86,6 +86,29 @@ async function checkAndRechargeEthBalance(userAddress: string, provider: ethers.
       console.error("❌ La transacción de recarga falló:", error);
       throw new Error("❌ La transacción de recarga falló");
     }
+  }
+}
+
+async function handleTransaction(
+  transactionFunction: () => Promise<any>,
+  userAddress: string,
+  provider: ethers.JsonRpcProvider
+) {
+  try {
+    return await transactionFunction();
+  } catch (error: any) {
+    if (
+      error.code === "INSUFFICIENT_FUNDS" &&
+      error.message.includes("insufficient funds for gas")
+    ) {
+      console.log("❌ Error de fondos insuficientes para gas. Aumentando MINIMUM_ETH_BALANCE.");
+      MINIMUM_ETH_BALANCE *= 1.2; // Aumenta en un 20%
+      console.log("Nuevo MINIMUM_ETH_BALANCE:", MINIMUM_ETH_BALANCE);
+
+      await checkAndRechargeEthBalance(userAddress, provider);
+      return await transactionFunction();
+    }
+    throw error;
   }
 }
 
@@ -152,7 +175,7 @@ export async function POST(request: Request) {
 
     console.log("💰 Invest USDC amount:", investAmount);
     console.log("💰 User USDC balance:", formatUnits(balanceUSDC, 6));
-    console.log("💰 User CLPD balance:", formatUnits(balanceCLPD, 6));
+    console.log("💰 User CLPD balance:", formatUnits(balanceCLPD, 18));
 
     if (investAmount > Number(formatUnits(balanceUSDC, 6))) {
       console.log("❌ Insufficient USDC balance");
@@ -179,11 +202,7 @@ export async function POST(request: Request) {
     );
 
     console.log("💰 Allowance:", allowance);
-    console.log(
-      "💰 Amount with decimals:",
-      amountWithDecimals,
-      Number(allowance) < amountWithDecimals
-    );
+    console.log("💰 Amount with decimals:", amountWithDecimals);
 
     if (Number(allowance) < amountWithDecimals) {
       console.log("💰 Approving USDC");
@@ -252,12 +271,18 @@ export async function POST(request: Request) {
     console.log("💰 Gas price:", gasPrice);
 
     try {
-      console.log("Iniciando inversión con USDC:", amountWithDecimals.toString());
-      const tx = await contractInvestmentWithSigner.investUSDCwithoutCLPD(amountWithDecimals, {
-        gasLimit: BigInt(15000000),
-        maxFeePerGas: gasPrice,
-        maxPriorityFeePerGas: gasPrice,
-      });
+      console.log("Iniciando inversión con USDC:", investAmount);
+      const tx = await handleTransaction(
+        async () => {
+          return await contractInvestmentWithSigner.investUSDCwithoutCLPD(amountWithDecimals, {
+            gasLimit: BigInt(15000000),
+            maxFeePerGas: gasPrice,
+            maxPriorityFeePerGas: gasPrice,
+          });
+        },
+        userAddress,
+        provider
+      );
       console.log("Transacción enviada, esperando confirmación...");
       const receipt = await tx.wait();
       console.log("✅ Inversión confirmada");
@@ -265,7 +290,6 @@ export async function POST(request: Request) {
       console.log("📊 Detalles del recibo:", receipt);
     } catch (error: any) {
       console.error("❌ La transacción falló:", error);
-      console.error("Mensaje de error:", error.message);
       if (error.transaction) {
         console.error("Detalles de la transacción:", error.transaction);
       }
@@ -277,17 +301,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    // try {
-    //   const tx = await contractWithSigner.approve(addresses.base.USDC.address, amountWithDecimals);
-    //   await tx.wait();
-
-    //   console.log("✅ Transfer confirmed");
-    //   console.log("🧾 Transaction hash:", tx.hash);
-    // } catch (error) {
-    //   console.error("❌ Transaction failed:", error);
-    //   return NextResponse.json({ error: "❌ Transaction failed" }, { status: 400 });
-    // }
 
     // TODO: guardar en la base de datos que se realizó la transferencia
 
