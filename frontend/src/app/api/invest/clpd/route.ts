@@ -20,6 +20,8 @@ import { base } from "viem/chains";
 import { erc20Abi, formatEther, parseUnits } from "viem";
 import { createPublicClient, http } from "viem";
 
+export const maxDuration = 25;
+
 const checkAllowance = async (
   userAddress: `0x${string}`,
   tokenAddress: `0x${string}`,
