@@ -32,12 +32,11 @@ export class DepositService {
   constructor(
     firestore: Firestore,
     bucketStorage: Storage,
-    discordWebhookUrl: string,
     resendApiKey: string
   ) {
     this.storage = new DepositDataStorage(firestore);
     this.bucketStorage = bucketStorage;
-    this.discordNotificationService = new DiscordNotificationService(discordWebhookUrl);
+    this.discordNotificationService = new DiscordNotificationService();
     this.emailNotificationService = new EmailNotificationService(resendApiKey);
   }
 
@@ -72,7 +71,9 @@ export class DepositService {
     await this.discordNotificationService.sendNotification(
       `New deposit registered:\nAmount: ${amount}\nUser Name: ${user.name}\nEmail: ${user.email}\nDeposit ID: ${depositData.id}\n`,
       NotificationType.INFO,
-      "New Deposit"
+      "New Deposit",
+      undefined,
+      'deposit'
     );
 
     await this.emailNotificationService.sendNotification(user.email, EmailType.NEW_DEPOSIT, {
@@ -168,7 +169,9 @@ export class DepositService {
     await this.discordNotificationService.sendNotification(
       notificationMessage,
       NotificationType.INFO,
-      "New Burn Request"
+      "New Burn Request",
+      undefined,
+      'withdrawal'
     );
 
     await this.emailNotificationService.sendNotification(user.email, EmailType.NEW_BURN_REQUEST, {
@@ -214,7 +217,9 @@ export class DepositService {
       await this.discordNotificationService.sendNotification(
         `Burn request with ID ${burnRequestId} has been rejected. Reason: ${reason}`,
         NotificationType.ERROR,
-        "Burn Request Rejected"
+        "Burn Request Rejected",
+        undefined,
+        'withdrawal'
       );
 
       await this.emailNotificationService.sendNotification(
@@ -355,7 +360,8 @@ export class DepositService {
       `A new deposit proof has been uploaded for ID: ${depositId}.\n\nProof Image:`,
       NotificationType.INFO,
       "New Deposit Proof",
-      publicUrl
+      publicUrl,
+      'deposit'
     );
 
     const approvalToken = await this.storage.generateApprovalToken(depositId);
@@ -364,7 +370,9 @@ export class DepositService {
     await this.discordNotificationService.sendNotification(
       `New deposit proof uploaded for ID: ${depositId}.\n\nProof Image: ${publicUrl}\n\nApproval Link: ${approvalLink}`,
       NotificationType.WARNING,
-      "New Deposit Proof - Action Required"
+      "New Deposit Proof - Action Required",
+      undefined,
+      'deposit'
     );
     console.log(`📤 Proof of deposit uploaded for ID ${depositId}`);
   }
@@ -431,7 +439,9 @@ export class DepositService {
       await this.discordNotificationService.sendNotification(
         `Deposit approved:\n\nID: ${deposit.id}\nAmount: ${deposit.amount} CLPD\nUser: ${deposit.email}\n\nMint Transaction JSON: ${jsonUrl}`,
         NotificationType.INFO,
-        "Deposit Approved"
+        "Deposit Approved",
+        undefined,
+        'deposit'
       );
 
       await this.emailNotificationService.sendNotification(
@@ -510,7 +520,9 @@ export class DepositService {
       await this.discordNotificationService.sendNotification(
         `Deposit with ID ${depositId} has been rejected by ${memberName}. Reason: ${reason}`,
         NotificationType.ERROR,
-        "Deposit Rejected"
+        "Deposit Rejected",
+        undefined,
+        'deposit'
       );
 
       await this.emailNotificationService.sendNotification(
@@ -576,7 +588,9 @@ export class DepositService {
       await this.discordNotificationService.sendNotification(
         `New approval member added: ${name}`,
         NotificationType.INFO,
-        "New Approval Member"
+        "New Approval Member",
+        undefined,
+        'alert'
       );
     } catch (error) {
       console.error("Error adding approval member:", error);
