@@ -119,10 +119,11 @@ export async function POST(request: Request) {
 
     try {
       const tx = await contractWithSigner.transfer(address, amountWithDecimals);
+      console.log("🧾 Transaction sent, waiting confirmation...");
+      console.log("🧾 Transaction hash:", tx.hash);
       await tx.wait();
 
       console.log("✅ Transfer confirmed");
-      console.log("🧾 Transaction hash:", tx.hash);
     } catch (error) {
       console.error("❌ Transaction failed:", error);
       return NextResponse.json({ error: "❌ Transaction failed" }, { status: 400 });
