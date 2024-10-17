@@ -7,7 +7,7 @@ import { DepositService, DepositStatus } from '@internal/deposits';
 import { config } from '@internal';
 import { DiscordNotificationService, NotificationType } from '@internal/notifications';
 
-if (!config.PROJECT_ID || !config.RPC_URL || !config.DISCORD_WEBHOOK_URL || !config.RESEND_API_KEY) {
+if (!config.PROJECT_ID || !config.RPC_URL || !config.RESEND_API_KEY) {
   throw new Error("❌ Required environment variables are missing");
 }
 
@@ -17,11 +17,11 @@ const NOTIFICATION_COOLDOWN_HOURS = 4;
 const MAX_BLOCK_RANGE = 5000;
 const TOKEN_ADDRESS = '0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1';
 const ABI = ['event TokensMinted(address indexed agent, address indexed user, uint256 amount)'];
-const INITIAL_BLOCK = 20856115;
+const INITIAL_BLOCK = 21167748;
 
 const firestore = new Firestore({ projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV });
-const discordService = new DiscordNotificationService(config.DISCORD_WEBHOOK_URL);
-const depositService = new DepositService(firestore, new Storage(), config.DISCORD_WEBHOOK_URL, config.RESEND_API_KEY);
+const discordService = new DiscordNotificationService();
+const depositService = new DepositService(firestore, new Storage(), config.RESEND_API_KEY);
 
 interface TokenMintedEvent {
   agent: string;
@@ -30,7 +30,7 @@ interface TokenMintedEvent {
 }
 
 async function getLastProcessedBlock(): Promise<number> {
-  const docRef = firestore.collection('blockTracking').doc('CLPR2TokensMinted');
+  const docRef = firestore.collection('blockTracking').doc('CLPDTokensMinted');
   const doc = await docRef.get();
   if (doc.exists) {
     const data = doc.data();
@@ -43,7 +43,7 @@ async function getLastProcessedBlock(): Promise<number> {
 }
 
 async function updateLastProcessedBlock(blockNumber: number): Promise<void> {
-  const docRef = firestore.collection('blockTracking').doc('CLPR2TokensMinted');
+  const docRef = firestore.collection('blockTracking').doc('CLPDTokensMinted');
   await docRef.set({ lastBlock: blockNumber }, { merge: true });
   console.log(`✅ Last processed block updated to: ${blockNumber}`);
 }
@@ -83,7 +83,9 @@ async function fetchAndProcessEvents(): Promise<void> {
             await discordService.sendNotification(
               `❌ Error parsing TokensMinted event`,
               NotificationType.ERROR,
-              'TokensMinted Event Parsing Error'
+              'TokensMinted Event Parsing Error',
+              undefined,
+              'alert'
             );
             continue;
           }
@@ -98,7 +100,7 @@ async function fetchAndProcessEvents(): Promise<void> {
 
           console.log(`\n🔹 Processing TokensMinted event:`);
           console.log(`  User: ${tokenEvent.user}`);
-          console.log(`  Amount: ${tokenEvent.amount} CLPR2`);
+          console.log(`  Amount: ${tokenEvent.amount} CLPD`);
 
           const deposits = await depositService.getAcceptedDeposits();
           console.log(`🔍 Found ${deposits.length} accepted deposits`);
@@ -113,16 +115,20 @@ async function fetchAndProcessEvents(): Promise<void> {
             console.log(`✅ Deposit ${matchingDeposit.id} marked as minted`);
 
             await discordService.sendNotification(
-              `✅ TokensMinted event processed and deposit updated:\n**Agent:** ${tokenEvent.agent}\n**User:** ${tokenEvent.user}\n**Amount:** ${tokenEvent.amount.toString()} CLPR2\n**TxHash:** ${event.transactionHash}\n**Block:** ${event.blockNumber.toString()}\n**Deposit ID:** ${matchingDeposit.id}`,
+              `✅ TokensMinted event processed and deposit updated:\n**Agent:** ${tokenEvent.agent}\n**User:** ${tokenEvent.user}\n**Amount:** ${tokenEvent.amount.toString()} CLPD\n**TxHash:** ${event.transactionHash}\n**Block:** ${event.blockNumber.toString()}\n**Deposit ID:** ${matchingDeposit.id}`,
               NotificationType.SUCCESS,
-              'TokensMinted Event Processed and Deposit Updated'
+              'TokensMinted Event Processed and Deposit Updated',
+              undefined,
+              'deposit'
             );
           } else {
             console.log(`❌ No matching deposit found for address ${tokenEvent.user} and amount ${tokenEvent.amount}`);
             await discordService.sendNotification(
               `❌ TokensMinted event processed but no matching deposit found:\n**Agent:** ${tokenEvent.agent}\n**User:** ${tokenEvent.user}\n**Amount:** ${tokenEvent.amount.toString()} CLPR2\n**TxHash:** ${event.transactionHash}\n**Block:** ${event.blockNumber.toString()}`,
               NotificationType.WARNING,
-              'TokensMinted Event Processed - No Matching Deposit'
+              'TokensMinted Event Processed - No Matching Deposit',
+              undefined,
+              'deposit'
             );
           }
 
@@ -131,7 +137,9 @@ async function fetchAndProcessEvents(): Promise<void> {
           await discordService.sendNotification(
             `❌ Error processing TokensMinted event: ${error}`,
             NotificationType.ERROR,
-            'TokensMinted Event Processing Error'
+            'TokensMinted Event Processing Error',
+            undefined,
+            'alert'
           );
         }
       }
@@ -147,7 +155,9 @@ async function fetchAndProcessEvents(): Promise<void> {
     await discordService.sendNotification(
       `❌ RPC error in processing minted token events: ${error.message || error}`,
       NotificationType.ERROR,
-      'RPC Error'
+      'RPC Error',
+      undefined,
+      'alert'
     );
     process.exit(1);
   }
@@ -166,7 +176,9 @@ async function checkUnmintedDeposits(): Promise<void> {
       await discordService.sendNotification(
         `⚠️ There are ${unmintedDeposits.length} accepted deposits that have not been minted yet.`,
         NotificationType.WARNING,
-        'Unminted Deposits'
+        'Unminted Deposits',
+        undefined,
+        'alert'
       );
       await cooldownRef.set({ lastNotification: now });
     }
@@ -185,7 +197,9 @@ async function main(): Promise<void> {
     await discordService.sendNotification(
       `❌ Unexpected error in minted token events processing job: ${error}`,
       NotificationType.ERROR,
-      'Error in Minted Token Events Processing Job'
+      'Error in Minted Token Events Processing Job',
+      undefined,
+      'alert'
     );
     process.exit(1);
   }
