@@ -15,7 +15,7 @@ const CONTRACT_ADDRESS = '0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1';
 const ABI = ['function totalSupply() view returns (uint256)'];
 
 const firestore = new Firestore({projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV});
-const discordService = new DiscordNotificationService(config.DISCORD_WEBHOOK_URL as string);
+const discordService = new DiscordNotificationService();
 const vaultBalanceStorage = new VaultBalanceStorage();
 const santanderScraper = new SantanderClScraper();
 
@@ -41,21 +41,27 @@ async function sendDiscrepancyAlert(balance: number, totalSupply: number, discre
     await discordService.sendNotification(
       message,
       NotificationType.INFO,
-      'Balance Discrepancy Detected'
+      'Balance Discrepancy Detected',
+      undefined,
+      'alert'
     );
   } else if (discrepancyCount === 5) {
     message += '\nThis discrepancy has persisted for 5 consecutive checks.';
     await discordService.sendNotification(
       message,
       NotificationType.WARNING,
-      'Persistent Balance Discrepancy'
+      'Persistent Balance Discrepancy',
+      undefined,
+      'alert'
     );
   } else if (discrepancyCount >= 10) {
     message += '\nThis discrepancy has persisted for 10 or more consecutive checks. Immediate attention required.';
     await discordService.sendNotification(
       message,
       NotificationType.EMERGENCY,
-      'Critical Balance Discrepancy'
+      'Critical Balance Discrepancy',
+      undefined,
+      'alert'
     );
   }
 }
@@ -68,6 +74,15 @@ async function getTotalSupply(): Promise<number> {
     return Number(ethers.formatUnits(totalSupply, 18));
   } catch (error) {
     console.error('Error getting total supply:', error);
+    if (error instanceof Error) {
+      await discordService.sendNotification(
+        `Error getting total supply: ${error}`,
+        NotificationType.ERROR,
+        'Total Supply Error',
+        undefined,
+        'alert'
+      );
+    }
     throw error;
   }
 }
@@ -96,7 +111,7 @@ async function main(): Promise<void> {
     const totalSupply = await getTotalSupply();
     console.log(`📊 Current total supply: ${totalSupply}`);
 
-    const threshold = 0.001; // 0.1% threshold for discrepancy
+    const threshold = 0.001;
     const isDiscrepancy = Math.abs(balance - totalSupply) / totalSupply > threshold;
 
     if (isDiscrepancy) {
@@ -110,7 +125,9 @@ async function main(): Promise<void> {
         await discordService.sendNotification(
           `Balance discrepancy resolved. Current balance: ${balance}`,
           NotificationType.SUCCESS,
-          'Balance Discrepancy Resolved'
+          'Balance Discrepancy Resolved',
+          undefined,
+          'alert'
         );
       }
       await updateDiscrepancyCount(0);
@@ -122,7 +139,9 @@ async function main(): Promise<void> {
     await discordService.sendNotification(
       `Error in vault balance update job: ${error}`,
       NotificationType.ERROR,
-      'Vault Balance Update Job Error'
+      'Vault Balance Update Job Error',
+      undefined,
+      'alert'
     );
     process.exit(1);
   }
