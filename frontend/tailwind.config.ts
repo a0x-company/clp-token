@@ -36,6 +36,7 @@ const config: Config = {
           "blue-dark": "#0033A0",
           "orange-pastel": "#EF5D52",
           "green-pastel": "#93FF89",
+          "yellow-pastel": "#FBC858",
         },
       },
       fontFamily: {

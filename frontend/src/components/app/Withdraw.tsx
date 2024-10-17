@@ -62,6 +62,7 @@ interface CreateStepsProps {
   handleMaxAmount: () => void;
   handleChangeField: (field: string, value: string | boolean) => void;
   bankList: Bank[];
+  clpdBalanceFormatted: string;
 }
 
 const formIds = {
@@ -99,12 +100,16 @@ const createSteps = ({
   handleMaxAmount,
   handleChangeField,
   bankList,
+  clpdBalanceFormatted,
 }: CreateStepsProps) => [
   {
     step: 0,
     title: t("createWithdrawOrder"),
     children: (
       <form id={formIds.createOrder} onSubmit={handleSubmit} className="flex flex-col gap-2">
+        <p className={cn("text-base text-black/50 font-helvetica text-start")}>
+          {t("availableBalance")}: <span className="font-bold">{clpdBalanceFormatted}</span> CLPD
+        </p>
         <div
           className={cn(
             "grid w-full items-center gap-1.5 bg-gray-100 rounded-md p-3 border-2 border-black shadow-brutalist-sm relative transition-all duration-300 h-auto",
@@ -114,14 +119,29 @@ const createSteps = ({
           <label htmlFor="amount" className="font-bold text-base">
             {t("redeem")}
           </label>
+
+          {/* <div className="flex items-center gap-2 relative w-full">
+              <Input
+                type="number"
+                id="amount"
+                placeholder={tokenIn.symbol === "CLPD" ? t("amountPlaceholder") : "100"}
+                value={amount}
+                onChange={handleAmountChange}
+                className="bg-transparent text-black text-[32px] font-helvetica border-none p-0 focus:outline-none opacity-0 absolute inset-0 w-96 h-full"
+              />
+              <div className="text-black text-[32px] font-helvetica w-full">
+                {amountFormatted || amount}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleMaxAmount}
+                className="bg-white border-2 border-black rounded-full p-1 text-sm font-bold hover:bg-black/5 transition-colors self-end"
+              >
+                {t("max")}
+              </button>
+            </div> */}
           <div className="flex items-center gap-4 relative">
-            <button
-              type="button"
-              onClick={handleMaxAmount}
-              className="absolute bottom-0 right-20 bg-white border-2 border-black rounded-full p-1 text-sm font-bold hover:bg-black/5 transition-colors"
-            >
-              {t("max")}
-            </button>
             <Input
               type="number"
               id="amount"
@@ -130,8 +150,16 @@ const createSteps = ({
               onChange={handleAmountChange}
               className="bg-transparent text-black text-[32px] font-helvetica border-none p-0 focus:outline-none"
             />
-
-            <CLPFlag type="CLPD" />
+            <div className="absolute bottom-0 right-0 flex items-end gap-2">
+              <button
+                type="button"
+                onClick={handleMaxAmount}
+                className="bg-white border-2 border-black rounded-full p-1 text-sm font-bold hover:bg-black/5 transition-colors"
+              >
+                {t("max")}
+              </button>
+              <CLPFlag type="CLPD" />
+            </div>
           </div>
           {errorFields.includes("amount") && (
             <p className="text-red-500 text-sm">{t("errorFields.amount")}</p>
@@ -721,7 +749,7 @@ const Withdraw: React.FC = () => {
           >
             {currentStep === 1 && (
               <LucideArrowLeft
-                className="w-10 h-10 cursor-pointer border-2 border-black rounded-full p-2 bg-[#FBC858]"
+                className="w-10 h-10 cursor-pointer border-2 border-black rounded-full p-2 bg-brand-yellow-pastel"
                 onClick={handleBack}
               />
             )}
@@ -740,12 +768,6 @@ const Withdraw: React.FC = () => {
             >
               {t(Object.values(titles(type, status))[currentStep])}
             </h3>
-
-            {currentStep === 0 && (
-              <p className="text-sm text-black/50 font-helvetica">
-                {t("availableBalance")}: {clpdBalanceFormatted} CLPD
-              </p>
-            )}
           </div>
           {
             createSteps({
@@ -766,6 +788,7 @@ const Withdraw: React.FC = () => {
               handleMaxAmount,
               bankList,
               handleChangeField,
+              clpdBalanceFormatted,
             })[currentStep].children
           }
         </div>

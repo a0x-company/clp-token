@@ -41,7 +41,7 @@ import { useGoogleConnect } from "@/hooks/useGoogleConnect";
 
 // ui
 import { Sheet, SheetContent, SheetDescription, SheetTrigger } from "../ui/sheet";
-import { LucideMenu } from "lucide-react";
+import { LucideMenu, RefreshCcw } from "lucide-react";
 
 import { Button } from "../ui/button";
 import { LoadingSpinner } from "../ui/spinner";
@@ -85,8 +85,8 @@ const AppNavbar = () => {
 
   const { handleDisconnect, isConnected, loadingUser } = useGoogleConnect();
 
-  const { clpdBalanceFormatted } = useCLPDBalance({ address });
-  const { usdcBalanceFormatted } = useUSDCBalance({ address });
+  const { clpdBalanceFormatted, refetch: refetchCLPDBalance } = useCLPDBalance({ address });
+  const { usdcBalanceFormatted, refetch: refetchUSDCBalance } = useUSDCBalance({ address });
 
   const t = useTranslations("navbar");
   const currentLang = pathname.startsWith("/es") ? "es" : "en";
@@ -99,9 +99,7 @@ const AppNavbar = () => {
     const selectedStyle = "bg-black text-white";
     const unselectedStyle = "border-[2px] border-transparent hover:border-black";
 
-    return `${baseStyle} ${selectedOption === option ? selectedStyle : unselectedStyle} ${
-      (option === "invest" || option === "change") && "opacity-50"
-    }`;
+    return `${baseStyle} ${selectedOption === option ? selectedStyle : unselectedStyle}`;
   };
 
   useEffect(() => {
@@ -182,7 +180,7 @@ const AppNavbar = () => {
           </p>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className="w-60 bg-brand-blue border-2 border-black shadow-brutalist p-4"
+          className="w-60 bg-brand-blue border-2 border-black shadow-brutalist p-0 overflow-hidden"
           align="end"
         >
           <div className="flex flex-col gap-2 items-start relative w-full overflow-hidden">
@@ -193,45 +191,62 @@ const AppNavbar = () => {
               height={182}
               className="absolute -rotate-[20deg] -top-12 -right-16 z-0 opacity-50"
             />
+            <div className="flex flex-col gap-2 items-start relative w-full overflow-hidden p-4">
+              <Image
+                src={user?.profileImage || ""}
+                alt="profile"
+                width={110}
+                height={110}
+                className="rounded-[12px] border-[2px] border-white z-10"
+              />
+              <p className="font-helvetica text-xl font-[700] text-white">{user?.name}</p>
+              <p className="font-helvetica text-sm font-[700] text-white line-clamp-1 break-words w-full">
+                {user?.email}
+              </p>
 
-            <Image
-              src={user?.profileImage || ""}
-              alt="profile"
-              width={110}
-              height={110}
-              className="rounded-[12px] border-[2px] border-white z-10"
-            />
-            <p className="font-helvetica text-xl font-[700] text-white">{user?.name}</p>
-            <p className="font-helvetica text-sm font-[700] text-white line-clamp-1 break-words w-full">
-              {user?.email}
-            </p>
+              <Image
+                src="/images/reserve/divider-mobile.svg"
+                alt="divider"
+                width={140}
+                height={2}
+                className="w-full my-4"
+              />
 
-            <Image
-              src="/images/reserve/divider-mobile.svg"
-              alt="divider"
-              width={140}
-              height={2}
-              className="w-full my-4"
-            />
-
-            <p className="font-helvetica text-xl font-[700] text-white">Saldo:</p>
-            <p className="font-helvetica text-xl font-[700] text-white">
-              {formatNumber(Number(clpdBalanceFormatted))} CLPD
-            </p>
-            <p className="font-helvetica text-xl font-[700] text-white">
-              {usdcBalanceFormatted === "0.00" ? "0" : usdcBalanceFormatted} USDC
-            </p>
-            <p
-              onClick={() => {
-                copyToClipboard(address, setCopied);
-              }}
-              className="font-helvetica text-xl font-[700] text-white/40 flex items-center justify-between w-full gap-2 group cursor-pointer"
-            >
-              {address?.slice(0, 6)}...{address?.slice(-4)}
-              <CopyButton text={address} setCopied={setCopied} copied={copied} />
-            </p>
+              <p className="font-helvetica text-xl font-[700] text-white">Saldo:</p>
+              <p className="font-helvetica text-xl font-[700] text-white flex items-center justify-between w-full gap-2 group cursor-pointer">
+                {formatNumber(Number(clpdBalanceFormatted))} CLPD
+                <Button
+                  onClick={() => {
+                    refetchCLPDBalance();
+                  }}
+                  className="text-white group-hover:opacity-100 opacity-0 transition-opacity duration-300 p-1 h-auto"
+                >
+                  <RefreshCcw className="w-4 h-4" />
+                </Button>
+              </p>
+              <p className="font-helvetica text-xl font-[700] text-white flex items-center justify-between w-full gap-2 group cursor-pointer">
+                {usdcBalanceFormatted === "0.00" ? "0" : usdcBalanceFormatted} USDC
+                <Button
+                  onClick={() => {
+                    refetchUSDCBalance();
+                  }}
+                  className="text-white group-hover:opacity-100 opacity-0 transition-opacity duration-300 p-1 h-auto"
+                >
+                  <RefreshCcw className="w-4 h-4" />
+                </Button>
+              </p>
+              <p
+                onClick={() => {
+                  copyToClipboard(address, setCopied);
+                }}
+                className="font-helvetica text-xl font-[700] text-white/40 flex items-center justify-between w-full gap-2 group cursor-pointer"
+              >
+                {address?.slice(0, 6)}...{address?.slice(-4)}
+                <CopyButton text={address} setCopied={setCopied} copied={copied} />
+              </p>
+            </div>
           </div>
-          <DropdownMenuItem className="p-0 my-4">
+          <DropdownMenuItem className="px-4">
             <button
               onClick={() => {
                 handleDisconnect();
@@ -242,7 +257,7 @@ const AppNavbar = () => {
               {t("logout")}
             </button>
           </DropdownMenuItem>
-          <DropdownMenuItem className="p-0">
+          <DropdownMenuItem className="px-4 pb-4">
             <button className="flex items-center justify-center bg-black p-4 border-2 border-white rounded-md w-full text-start text-white gap-2 font-helvetica text-base leading-none font-[700] h-16">
               {t("backToHome")}
             </button>

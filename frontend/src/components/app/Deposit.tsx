@@ -2,28 +2,38 @@
 // react
 import { useState } from "react";
 
+// next
+import Image from "next/image";
+
 //components
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-
-// icons
-import { useTranslations } from "next-intl";
-import Image from "next/image";
+import CreateOrder from "./CreateOrder";
 import CLPFlag from "../CLPFlag";
 import { Input } from "../ui/input";
-import CreateOrder from "./CreateOrder";
-import { cn, formatNumber } from "@/lib/utils";
-import { useUserStore } from "@/context/global-store";
-import { web3AuthInstance } from "@/provider/WagmiConfig";
-import axios from "axios";
 import { LoadingSpinner } from "../ui/spinner";
-import { useDepositStatus } from "@/hooks/useDepositStatus";
-import { DepositStatus } from "@/types";
+
+// icons
 import { LucideArrowLeft, PencilLine } from "lucide-react";
 
-const currencies = {
-  CLP: { name: "Peso Chileno", code: "CL" },
-};
+// translations
+import { useTranslations } from "next-intl";
+
+// utils
+import { cn, formatNumber } from "@/lib/utils";
+
+// context
+import { useUserStore } from "@/context/global-store";
+import { web3AuthInstance } from "@/provider/WagmiConfig";
+
+// http client
+import axios from "axios";
+
+// hooks
+import { useDepositStatus } from "@/hooks/useDepositStatus";
+
+// types
+import { DepositStatus } from "@/types";
 
 const bankInfo = {
   name: "Banco Santander",
@@ -104,7 +114,7 @@ const createSteps = ({
           <label htmlFor="amount" className="font-bold text-base">
             {t("receive")}
           </label>
-          <div className="flex items-center justify-between gap-4 relative max-md:w-[270px] md:w-96">
+          <div className="flex items-center justify-between gap-4 relative max-md:w-[270px] md:w-full">
             <p className="bg-transparent text-black text-[32px] font-helvetica border-none focus:outline-none line-clamp-1">
               {amount || "0"}
             </p>
@@ -402,7 +412,7 @@ const Deposit: React.FC = () => {
           <div className="flex items-center justify-start gap-2.5">
             {currentStep === 1 && (
               <LucideArrowLeft
-                className="w-10 h-10 cursor-pointer border-2 border-black rounded-full p-2 bg-[#FBC858]"
+                className="w-10 h-10 cursor-pointer border-2 border-black rounded-full p-2 bg-brand-yellow-pastel"
                 onClick={handleBack}
               />
             )}

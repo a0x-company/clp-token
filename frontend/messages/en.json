@@ -211,5 +211,25 @@
       "email": "The email is required",
       "ownershipCheck": "You must declare that you are the account holder"
     }
+  },
+  "invest": {
+    "invest": "Invest",
+    "investButton": "Invest",
+    "investBalance": "Your balance",
+    "invested": "Your investment",
+    "transfer": "Transfers",
+    "amountPlaceholder": "100.000",
+    "pool": "Liquidity Pool",
+    "fees": "Earn fees by transactions in the network",
+    "increase": "Grow the liquidity of CLPD for future users.",
+    "benefits": "Other benefit.*",
+    "investWaitingTitle": "Transaction in progress...",
+    "investWaitingDescription": "This page will update automatically when it's ready, and you will receive an email.",
+    "investSuccessTitle": "¡Investment approved!",
+    "investSuccessDescription": "Your gains by fees will be automatically reflected in your balance.",
+    "ready": "Ready",
+    "yourEmail": "Your email",
+    "changeTo": "Change to",
+    "max": "Max"
   }
 }

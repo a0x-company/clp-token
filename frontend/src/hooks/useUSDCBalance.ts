@@ -35,5 +35,5 @@ export const useUSDCBalance = ({ address }: { address: `0x${string}` | undefined
     return Number(formatUnits(usdcBalance.data?.[0]!, 6) || 0).toFixed(2);
   }, [usdcBalance.data]);
 
-  return { usdcBalanceFormatted };
+  return { usdcBalanceFormatted, refetch: usdcBalance.refetch };
 };
