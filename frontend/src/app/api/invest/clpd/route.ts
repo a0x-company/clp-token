@@ -143,20 +143,20 @@ export async function POST(request: Request) {
 
     const userPrivateKey = pKey;
 
-    // Check if user has enough USDC balance
+    // Check if user has enough CLPD balance
     const provider = new ethers.JsonRpcProvider(base.rpcUrls.default.http[0]);
-    const contractUSDC = new ethers.Contract(addresses.base.USDC.address, erc20Abi, provider);
     const contractCLPD = new ethers.Contract(addresses.base.CLPD.address, erc20Abi, provider);
-    const balanceUSDC = await contractUSDC.balanceOf(userAddress);
+    const contractUSDC = new ethers.Contract(addresses.base.USDC.address, erc20Abi, provider);
     const balanceCLPD = await contractCLPD.balanceOf(userAddress);
 
-    console.log("💰 Invest USDC amount:", investAmount);
-    console.log("💰 User USDC balance:", formatUnits(balanceUSDC, 6));
-    console.log("💰 User CLPD balance:", formatUnits(balanceCLPD, 6));
+    const balanceCLPDformatted = formatUnits(balanceCLPD, addresses.base.CLPD.decimals);
 
-    if (investAmount > Number(formatUnits(balanceUSDC, 6))) {
-      console.log("❌ Insufficient USDC balance");
-      return NextResponse.json({ error: "❌ Insufficient USDC balance" }, { status: 400 });
+    console.log("💰 Invest CLPD amount:", investAmount);
+    console.log("💰 User CLPD balance:", balanceCLPDformatted);
+
+    if (investAmount > Number(balanceCLPDformatted)) {
+      console.log("❌ Insufficient CLPD balance");
+      return NextResponse.json({ error: "❌ Insufficient CLPD balance" }, { status: 400 });
     }
 
     const balanceETH = await provider.getBalance(userAddress);
@@ -166,14 +166,14 @@ export async function POST(request: Request) {
 
     const wallet = new ethers.Wallet(userPrivateKey, provider);
 
-    const contractWithSignerUSDC: any = contractUSDC.connect(wallet);
+    const contractWithSignerCLPD: any = contractCLPD.connect(wallet);
 
-    const amountWithDecimals = parseUnits(investAmount.toString(), addresses.base.USDC.decimals);
-    const amountApprove = parseUnits("100000000000", addresses.base.USDC.decimals);
+    const amountWithDecimals = parseUnits(investAmount.toString(), addresses.base.CLPD.decimals);
+    const amountApproveCLPD = parseUnits("100000000000", addresses.base.CLPD.decimals);
 
     const allowance = await checkAllowance(
       userAddress,
-      addresses.base.USDC.address,
+      addresses.base.CLPD.address,
       addresses.base.investment,
       provider
     );
@@ -186,12 +186,12 @@ export async function POST(request: Request) {
     );
 
     if (Number(allowance) < amountWithDecimals) {
-      console.log("💰 Approving USDC");
+      console.log("💰 Approving CLPD");
       try {
         const tx = await approve(
           addresses.base.investment,
-          amountApprove.toString(),
-          contractWithSignerUSDC
+          amountApproveCLPD.toString(),
+          contractWithSignerCLPD
         );
         await tx.wait();
 
@@ -203,31 +203,31 @@ export async function POST(request: Request) {
       }
     }
 
-    /* Allowance CLPD */
-    const contractWithSignerCLPD: any = contractCLPD.connect(wallet);
+    /* Allowance USDC */
+    const contractWithSignerUSDC: any = contractUSDC.connect(wallet);
 
-    const amountWithDecimalsCLPD = parseUnits(
-      (investAmount * 1000).toString(), // TODO: getPrice from API, 1000 CLPD = 1 USDC
-      addresses.base.CLPD.decimals
+    const amountWithDecimalsUSDC = parseUnits(
+      (investAmount / 1000).toString(), // TODO: getPrice from API, 1000 CLPD = 1 USDC
+      addresses.base.USDC.decimals
     );
-    const amountApproveCLPD = parseUnits("100000000000", addresses.base.CLPD.decimals);
+    const amountApproveUSDC = parseUnits("100000000000", addresses.base.USDC.decimals);
 
-    const allowanceCLPD = await checkAllowance(
+    const allowanceUSDC = await checkAllowance(
       userAddress,
-      addresses.base.CLPD.address,
+      addresses.base.USDC.address,
       addresses.base.investment,
       provider
     );
-    console.log("💰 Allowance CLPD:", allowanceCLPD);
-    console.log("💰 Amount with decimals:", amountWithDecimalsCLPD);
+    console.log("💰 Allowance USDC:", allowanceUSDC);
+    console.log("💰 Amount with decimals:", amountWithDecimalsUSDC);
 
-    if (Number(allowanceCLPD) < amountWithDecimalsCLPD) {
-      console.log("💰 Approving CLPD", contractWithSignerCLPD);
+    if (Number(allowanceUSDC) < amountWithDecimalsUSDC) {
+      console.log("💰 Approving USDC", contractWithSignerUSDC);
       try {
         const tx = await approve(
           addresses.base.investment,
-          amountApproveCLPD.toString(),
-          contractWithSignerCLPD
+          amountApproveUSDC.toString(),
+          contractWithSignerUSDC
         );
         await tx.wait();
         console.log("✅ Approve confirmed");
@@ -252,9 +252,9 @@ export async function POST(request: Request) {
     console.log("💰 Gas price:", gasPrice);
 
     try {
-      console.log("Iniciando inversión con USDC:", amountWithDecimals.toString());
-      const tx = await contractInvestmentWithSigner.investUSDCwithoutCLPD(amountWithDecimals, {
-        gasLimit: BigInt(15000000),
+      console.log("Iniciando inversión con CLPD:", investAmount);
+      const tx = await contractInvestmentWithSigner.investCLPDwithoutUSDC(amountWithDecimals, {
+        gasLimit: BigInt(10000000),
         maxFeePerGas: gasPrice,
         maxPriorityFeePerGas: gasPrice,
       });
@@ -267,15 +267,33 @@ export async function POST(request: Request) {
       console.error("❌ La transacción falló:", error);
       console.error("Mensaje de error:", error.message);
       if (error.transaction) {
-        console.error("Detalles de la transacción:", error.transaction);
+        console.log("Detalles de la transacción:", error.transaction);
       }
       if (error.receipt) {
-        console.error("Detalles del recibo:", error.receipt);
+        console.log("Detalles del recibo:", error.receipt);
       }
-      return NextResponse.json(
-        { error: "❌ La transacción falló", details: error.message },
-        { status: 400 }
-      );
+
+      // Intentar recargar ETH y reintentar la transacción si falla por fondos insuficientes
+      if (error.code === "INSUFFICIENT_FUNDS") {
+        console.log("Intentando recargar ETH y reintentar la transacción...");
+        await checkAndRechargeEthBalance(userAddress, provider);
+
+        // Reintentar la transacción
+        const retryTx = await contractInvestmentWithSigner.investCLPDwithoutUSDC(
+          amountWithDecimals,
+          {
+            gasLimit: BigInt(10000000),
+            maxFeePerGas: gasPrice,
+            maxPriorityFeePerGas: gasPrice,
+          }
+        );
+        const retryReceipt = await retryTx.wait();
+        console.log("✅ Inversión confirmada después del reintento");
+        console.log("🧾 Hash de la transacción:", retryTx.hash);
+        console.log("📊 Detalles del recibo:", retryReceipt);
+      } else {
+        throw error;
+      }
     }
 
     // try {
@@ -293,7 +311,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: "✅ Transfer completed successfully" }, { status: 200 });
   } catch (error) {
-    console.error("❌ Error processing transfer:", error);
-    return NextResponse.json({ error: "❌ Internal Server Error" }, { status: 500 });
+    console.error("❌ Error al procesar la transferencia:", error);
+    return NextResponse.json({ error: "❌ Error Interno del Servidor" }, { status: 500 });
   }
 }

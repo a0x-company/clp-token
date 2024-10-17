@@ -94,8 +94,8 @@ const createSteps = ({
     step: 0,
     children: (
       <form id={formIds.change} onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="flex items-center gap-4 relative">
-          <div className="flex flex-col gap-2 border-2 border-black rounded-md p-4 w-1/2">
+        <div className="flex max-md:flex-col items-center gap-4 relative">
+          <div className="flex flex-col gap-2 border-2 border-black rounded-md p-4 w-full md:w-1/2">
             <p>{t("from")}</p>
             <div className="flex items-center gap-4 relative">
               <div
@@ -123,7 +123,7 @@ const createSteps = ({
           <button
             onClick={handleSwitchTokens}
             type="button"
-            className="flex items-center justify-center gap-4 group self-center absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 p-4 bg-brand-yellow-pastel rounded-full w-16 h-16 z-10 border-2 border-black shadow-brutalist-sm hover:bg-[#FFF8CC] transition-all duration-300 cursor-pointer"
+            className="flex items-center justify-center gap-4 group self-center absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 p-4 bg-brand-yellow-pastel rounded-full w-16 h-16 z-10 border-2 border-black shadow-brutalist-sm hover:bg-[#FFF8CC] transition-all duration-300 cursor-pointer max-md:rotate-90"
           >
             <Image
               src="/images/app/arrow-right.svg"
@@ -141,7 +141,7 @@ const createSteps = ({
             />
           </button>
 
-          <div className="flex flex-col gap-2 border-2 border-black rounded-md p-4 px-8 w-1/2">
+          <div className="flex flex-col gap-2 border-2 border-black rounded-md p-4 md:px-8 w-full md:w-1/2">
             <p>{t("to")}</p>
             <div className="flex items-center gap-4 relative">
               <div
@@ -183,7 +183,7 @@ const createSteps = ({
                 placeholder={tokenIn.symbol === "CLPD" ? t("amountPlaceholder") : "100"}
                 value={amount}
                 onChange={handleAmountChange}
-                className="bg-transparent text-black text-[32px] font-helvetica border-none p-0 focus:outline-none opacity-0 absolute inset-0 w-96 h-full"
+                className="bg-transparent text-black text-[32px] font-helvetica border-none p-0 focus:outline-none opacity-0 absolute inset-0 md:w-96 h-full"
               />
               <div className="text-black text-[32px] font-helvetica w-full">
                 {amountFormatted || amount}
@@ -405,7 +405,7 @@ const Change: React.FC = () => {
   return (
     <Card
       className={cn(
-        "absolute left-1/2 -translate-x-1/2 max-md:bottom-[25%] md:top-1/2 md:-translate-y-1/2 w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%]",
+        "w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] mx-auto mb-10 md:mt-10 relative",
         currentStep === 1 && status !== ChangeStatus.SUCCESS
           ? "bg-brand-blue"
           : currentStep === 1 && status === ChangeStatus.SUCCESS
@@ -454,6 +454,7 @@ const Change: React.FC = () => {
             className="w-full bg-brand-blue-dark border-2 border-black shadow-brutalist-sm py-4 h-full text-xl hover:bg-brand-blue-dark/90 text-white font-helvetica font-bold"
             type="submit"
             form={Object.values(formIds)[currentStep]}
+            disabled /* TODO: disabled if loading */
           >
             {!loading ? t("changeButton") : <LoadingSpinner />}
           </Button>

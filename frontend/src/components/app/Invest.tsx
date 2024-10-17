@@ -1,6 +1,6 @@
 "use client";
 // react
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // next
 import Image from "next/image";
@@ -14,14 +14,11 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card"
 import { LoadingSpinner } from "../ui/spinner";
 import USDCFlag from "../USDCFlag";
 
-// icons
-import { LucideArrowLeft } from "lucide-react";
-
 // translations
 import { useTranslations } from "next-intl";
 
 // utils
-import { cn, formatNumber } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 // context
 import { useUserStore } from "@/context/global-store";
@@ -124,7 +121,7 @@ const createSteps = ({
                 {t("max")}
               </button>
               <HoverCard>
-                <HoverCardTrigger className="cursor-pointer">
+                <HoverCardTrigger className="cursor-pointer hover:bg-black/5 rounded-full">
                   {currencyInvest === "CLPD" ? (
                     <CLPFlag type="CLPD" />
                   ) : (
@@ -223,8 +220,8 @@ const createSteps = ({
         <Image
           src={
             status === InvestStatus.SUCCESS
-              ? "/images/app/layers-gif.gif"
-              : "/images/app/layers-end-gif.gif"
+              ? "/images/app/bars-end-gif.gif"
+              : "/images/app/bars-earn-gif.gif"
           }
           alt="done"
           width={200}
@@ -249,7 +246,7 @@ const createSteps = ({
           )}
         >
           {status === InvestStatus.SUCCESS
-            ? `${t("investBalance")}: ${amount} CLPD`
+            ? `${t("invested")}: ${amount} ${currencyInvest === "CLPD" ? "CLPD" : "USDC"}`
             : `${t("yourEmail")}: ${email}`}
         </p>
       </div>
@@ -266,14 +263,14 @@ const Invest: React.FC = () => {
 
   const [currencyInvest, setCurrencyInvest] = useState<"USDC" | "CLPD">("CLPD");
 
-  const [status, setStatus] = useState<InvestStatus | null>(null);
+  const [status, setStatus] = useState<InvestStatus>(InvestStatus.PENDING);
 
   const { address: userAddress } = useAccount();
 
   const { clpdBalanceFormatted, refetch: refetchCLPDBalance } = useCLPDBalance({
     address: userAddress,
   });
-  const { usdcBalanceFormatted } = useUSDCBalance({
+  const { usdcBalanceFormatted, refetch: refetchUSDCBalance } = useUSDCBalance({
     address: userAddress,
   });
 
@@ -330,8 +327,9 @@ const Invest: React.FC = () => {
         let encryptedPKey = cipher.update(privateKey, "utf8", "hex");
         encryptedPKey += cipher.final("hex");
         try {
+          setCurrentStep(1);
           const response = await axios.post(
-            "/api/invest/usdc",
+            `/api/invest/${currencyInvest.toLowerCase()}`,
             { investAmount: amount, userAddress, encryptedPKey, iv },
             // { investAmount: 0.01, userAddress, encryptedPKey, iv },
             {
@@ -344,10 +342,16 @@ const Invest: React.FC = () => {
           );
           console.log(response);
           if (response.status === 201 || response.status === 200) {
-            setCurrentStep(1);
+            setStatus(InvestStatus.SUCCESS);
+            if (currencyInvest === "CLPD") {
+              refetchCLPDBalance();
+            } else {
+              refetchUSDCBalance();
+            }
           }
         } catch (error) {
           console.log(error);
+          setCurrentStep(0);
         } finally {
           setLoading(false);
         }
@@ -358,6 +362,7 @@ const Invest: React.FC = () => {
   const handleReset = () => {
     setCurrentStep(0);
     setAmount("");
+    setStatus(InvestStatus.PENDING);
   };
 
   const handleBack = () => {
