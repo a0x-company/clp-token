@@ -4,12 +4,13 @@ import { config } from "@internal";
 import { Firestore } from '@google-cloud/firestore';
 import { DiscordNotificationService, NotificationType } from '@internal/notifications';
 import { ethers } from 'ethers';
-import { SantanderClScraper, VaultBalanceStorage } from '@internal/bank-scrap';
+import { VaultBalanceStorage } from '@internal/bank-scrap';
+import axios from 'axios';
 
 if (!config.PROJECT_ID || !config.API_KEY) {
   throw new Error("❌ Required environment variables are missing");
 }
-
+const VAULT_API_URL = 'https://development-clpd-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance';
 const RPC_URL = config.RPC_URL;
 const CONTRACT_ADDRESS = '0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1'; 
 const ABI = ['function totalSupply() view returns (uint256)'];
@@ -17,19 +18,24 @@ const ABI = ['function totalSupply() view returns (uint256)'];
 const firestore = new Firestore({projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV});
 const discordService = new DiscordNotificationService();
 const vaultBalanceStorage = new VaultBalanceStorage();
-const santanderScraper = new SantanderClScraper();
+interface VaultBalance {
+  balance: number;
+}
 
-async function getVaultBalance(): Promise<number> {
+async function getVaultBalance(): Promise<VaultBalance> {
   try {
-    return await santanderScraper.getVaultBalance();
+    const response = await axios.get<VaultBalance>(VAULT_API_URL, {
+      headers: {
+        'api-key': config.API_KEY
+      }
+    });
+    return response.data;
   } catch (error) {
     console.error('❌ Error fetching vault balance:', error);
-    if (error instanceof Error) {
-      await vaultBalanceStorage.notifyError(error, discordService);
-    }
     throw error;
   }
 }
+
 
 async function sendDiscrepancyAlert(balance: number, totalSupply: number, discrepancyCount: number): Promise<void> {
   const difference = Math.abs(balance - totalSupply);
@@ -106,24 +112,24 @@ async function main(): Promise<void> {
     const balance = await getVaultBalance();
     console.log(`📊 Current vault balance: ${balance}`);
 
-    await vaultBalanceStorage.saveBalance(balance);
+    await vaultBalanceStorage.saveBalance(balance.balance);
 
     const totalSupply = await getTotalSupply();
     console.log(`📊 Current total supply: ${totalSupply}`);
 
     const threshold = 0.001;
-    const isDiscrepancy = Math.abs(balance - totalSupply) / totalSupply > threshold;
+    const isDiscrepancy = Math.abs(balance.balance - totalSupply) / totalSupply > threshold;
 
     if (isDiscrepancy) {
       let discrepancyCount = await getDiscrepancyCount();
       discrepancyCount++;
 
-      await sendDiscrepancyAlert(balance, totalSupply, discrepancyCount);
+      await sendDiscrepancyAlert(balance.balance, totalSupply, discrepancyCount);
       await updateDiscrepancyCount(discrepancyCount);
     } else {
       if (await getDiscrepancyCount() > 0) {
         await discordService.sendNotification(
-          `Balance discrepancy resolved. Current balance: ${balance}`,
+          `Balance discrepancy resolved. Current balance: ${balance.balance}`,
           NotificationType.SUCCESS,
           'Balance Discrepancy Resolved',
           undefined,

@@ -9,18 +9,36 @@ const discordService = new DiscordNotificationService();
 
 const LOCK_COLLECTION = "locks";
 const LOCK_DOCUMENT = "vault_lock";
+// Maximum time to wait while trying to acquire a lock (45 seconds)
+// Prevents indefinite waiting if the lock can't be acquired
 const ACQUIRE_LOCK_TIMEOUT = 45000;
+
+// Time to wait between lock acquisition attempts (1 second)
+// Allows for a short pause before retrying to acquire the lock
 const LOCK_RETRY_DELAY = 1000;
+
+// Maximum number of scraping attempts before giving up
+// Limits the number of retries to prevent infinite loops
 const MAX_RETRIES = 5;
+
+// Time to wait between scraping attempts (30 seconds)
+// Provides a delay between retries to allow for potential temporary issues to resolve
 const RETRY_DELAY = 30000;
+
+// Cooldown period for error notifications (5 minutes)
+// Prevents spamming notifications for the same error within this time frame
 const ERROR_COOLDOWN = 300000;
+
+// Time after which a lock is considered expired (5 minutes)
+// Prevents a lock from being held indefinitely if a process crashes or fails to release it
+const LOCK_EXPIRATION = 300000;
 
 async function initializeLockDocument(): Promise<void> {
   const lockRef = firestore.collection(LOCK_COLLECTION).doc(LOCK_DOCUMENT);
   const lockDoc = await lockRef.get();
 
   if (!lockDoc.exists) {
-    await lockRef.set({ locked: false });
+    await lockRef.set({ locked: false, lockedAt: null });
     console.log("🔒 Lock document initialized.");
   }
 }
@@ -33,14 +51,14 @@ async function acquireLock(): Promise<boolean> {
       const lockDoc = await transaction.get(lockRef);
 
       if (!lockDoc.exists) {
-        transaction.set(lockRef, { locked: false });
+        transaction.set(lockRef, { locked: false, lockedAt: null });
         throw new Error("Lock document initialized. Please try again.");
       }
 
       const lockData = lockDoc.data();
 
-      if (lockData && !lockData.locked) {
-        transaction.update(lockRef, { locked: true });
+      if (lockData && (!lockData.locked || Date.now() - lockData.lockedAt > LOCK_EXPIRATION)) {
+        transaction.update(lockRef, { locked: true, lockedAt: Date.now() });
       } else {
         throw new Error("Lock already acquired.");
       }
@@ -53,7 +71,7 @@ async function acquireLock(): Promise<boolean> {
       error.message === "Lock already acquired." ||
       error.message === "Lock document initialized. Please try again."
     ) {
-      console.log("🔒 Unable to acquire lock: already in use.");
+      console.log("🔒 Unable to acquire lock: already in use or just initialized.");
       return false;
     } else {
       console.error("❌ CRITICAL: Error acquiring lock:", error);
@@ -70,14 +88,8 @@ async function releaseLock(): Promise<void> {
       const lockDoc = await transaction.get(lockRef);
 
       if (lockDoc.exists) {
-        const lockData = lockDoc.data();
-
-        if (lockData && lockData.locked) {
-          transaction.update(lockRef, { locked: false });
-          console.log("🔓 Lock released successfully.");
-        } else {
-          console.log("🔓 Lock is already released.");
-        }
+        transaction.update(lockRef, { locked: false, lockedAt: null });
+        console.log("🔓 Lock released successfully.");
       } else {
         console.log("🔓 Lock document not found.");
       }
@@ -117,6 +129,9 @@ async function notifyError(message: string, notificationType: NotificationType):
       undefined,
       "alert"
     );
+    console.log(`🚨 Error notification sent: ${message}`);
+  } else {
+    console.log(`ℹ️ Error notification skipped due to cooldown: ${message}`);
   }
 }
 
@@ -127,6 +142,7 @@ export function getVaultBalanceHandler(ctx: VaultContext) {
 
     try {
       await initializeLockDocument();
+      console.log("🔧 Lock document initialized.");
 
       if (isStorageRoute) {
         balance = await ctx.storageService.getCurrentBalance();
@@ -142,15 +158,6 @@ export function getVaultBalanceHandler(ctx: VaultContext) {
       res.status(200).json({ balance });
       console.log(`📊 Balance returned: ${balance}`);
     } catch (error: unknown) {
-      if (!isStorageRoute) {
-        try {
-          await releaseLock();
-          console.log("🔓 Lock released due to error.");
-        } catch (releaseError) {
-          console.error("❌ CRITICAL: Error releasing lock after failure:", releaseError);
-        }
-      }
-
       handleError(error, res);
     }
   };
@@ -159,33 +166,23 @@ export function getVaultBalanceHandler(ctx: VaultContext) {
 async function attemptScraping(ctx: VaultContext): Promise<number | null> {
   let retries = 0;
   while (retries < MAX_RETRIES) {
+    let lockAcquired = false;
     try {
-      const startTime = Date.now();
-      let lockAcquired = false;
-
-      while (Date.now() - startTime < ACQUIRE_LOCK_TIMEOUT) {
-        lockAcquired = await acquireLock();
-        if (lockAcquired) break;
-        await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_DELAY));
-      }
-
+      console.log(`🔄 Scraping attempt ${retries + 1} of ${MAX_RETRIES}`);
+      lockAcquired = await acquireLock();
       if (!lockAcquired) {
-        console.log("🔄 Unable to acquire lock. Attempting scrape without lock.");
+        console.log("🔒 Unable to acquire lock. Waiting before next attempt.");
+        await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_DELAY));
+        continue;
       }
 
-      try {
-        console.log("🕷️ Starting scraping process.");
-        const balance = await ctx.scrapService.getVaultBalance();
-        if (balance === 0) {
-          throw new Error("❌ CRITICAL: Scraped balance is 0.");
-        }
-        console.log(`✅ Scraping successful. Balance: ${balance}`);
-        return balance;
-      } finally {
-        if (lockAcquired) {
-          await releaseLock();
-        }
+      console.log("🕷️ Starting scraping process.");
+      const balance = await ctx.scrapService.getVaultBalance();
+      if (balance === 0) {
+        throw new Error("❌ CRITICAL: Scraped balance is 0.");
       }
+      console.log(`✅ Scraping successful. Balance: ${balance}`);
+      return balance;
     } catch (error) {
       console.error(`❌ CRITICAL: Error during attempt ${retries + 1}:`, error);
       await notifyError(
@@ -193,21 +190,27 @@ async function attemptScraping(ctx: VaultContext): Promise<number | null> {
         NotificationType.ERROR
       );
       retries++;
-      if (retries < MAX_RETRIES) {
-        console.log(`Waiting ${RETRY_DELAY / 1000} seconds before next attempt...`);
-        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+    } finally {
+      if (lockAcquired) {
+        await releaseLock();
+        console.log("🔓 Lock released after scraping attempt.");
       }
+    }
+
+    if (retries < MAX_RETRIES) {
+      console.log(`⏳ Waiting ${RETRY_DELAY / 1000} seconds before next attempt...`);
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
     }
   }
 
-  console.error("❌ CRITICAL: All scraping attempts failed.");
+  console.error(`❌ CRITICAL: All ${MAX_RETRIES} scraping attempts failed.`);
   await notifyError(
     `CRITICAL: All ${MAX_RETRIES} scraping attempts failed. System may be at risk.`,
     NotificationType.ERROR
   );
   return null;
 }
-
+ 
 function handleError(error: unknown, res: Response) {
   if (error instanceof Error) {
     console.error(`❌ CRITICAL ERROR: ${error.message}`);

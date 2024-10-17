@@ -45,7 +45,7 @@ export function setupDepositRoutes(
   depositRouter.post("/add-approval-member", addApprovalMemberHandler(depositService));
   depositRouter.post("/burn", AuthMiddleware(userService), registerBurnRequestHandler(depositService));
   depositRouter.get("/burn/:burnRequestId/proof-form", renderBurnProofFormHandler(depositService));
-  depositRouter.post("/burn/:burnRequestId/proof", AuthMiddleware(userService), upload.single('proofImage'), uploadBurnProofHandler(depositService));
+  depositRouter.post("/burn/:burnRequestId/proof", upload.single('proofImage'), uploadBurnProofHandler(depositService));
   depositRouter.post("/burn/:burnRequestId/approve-reject", AuthMiddleware(userService), approveRejectBurnRequestHandler(depositService));
   depositRouter.get("/burn/status/:status", AuthMiddleware(userService), getBurnRequestsByStatusHandler(depositService));
   

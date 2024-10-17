@@ -64,7 +64,11 @@ export function renderBurnProofFormHandler(depositService: DepositService) {
                   throw new Error(data.error);
                 }
                 alert('Proof uploaded successfully');
-                window.location.href = '/'; // Redirect to main page or appropriate location
+                if (data.redirectUrl) {
+                  window.location.href = data.redirectUrl;
+                } else {
+                  window.location.reload();
+                }
               })
               .catch(error => {
                 console.error('Error:', error);

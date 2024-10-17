@@ -237,10 +237,10 @@ export class DepositService {
     fileName: string
   ): Promise<void> {
     await this.ensureBucketExists();
-
+  
     const bucket = this.bucketStorage.bucket(this.bucketName);
     const fileExtension = path.extname(fileName).toLowerCase();
-
+  
     let pngBuffer: Buffer;
     if (fileExtension === ".pdf") {
       const options = {
@@ -251,16 +251,16 @@ export class DepositService {
         savePath: "/tmp",
         type: "GraphicsMagick",
       };
-
+  
       const storeAsImage = fromBuffer(proofFile, options);
-
+  
       try {
         const result = await storeAsImage(1);
-
+  
         if (!result.path) {
           throw new Error("Failed to convert PDF to image");
         }
-
+  
         pngBuffer = await fs.readFile(result.path);
       } catch (error) {
         console.error("Error converting PDF to PNG:", error);
@@ -269,22 +269,22 @@ export class DepositService {
     } else {
       pngBuffer = await sharp(proofFile).png().toBuffer();
     }
-
+  
     const pngFile = bucket.file(`burn-proofs/${burnRequestId}/proof.png`);
     await pngFile.save(pngBuffer, {
       metadata: {
         contentType: "image/png",
       },
     });
-
+  
     const publicUrl = `https://storage.googleapis.com/${this.bucketName}/burn-proofs/${burnRequestId}/proof.png`;
-
+  
     await this.storage.updateBurnRequestData(burnRequestId, {
       proofImageUrl: publicUrl,
       status: BurnStatus.BURNED,
       updatedAt: Date.now(),
     });
-
+  
     const burnRequest = await this.storage.getBurnRequest(burnRequestId);
     if (burnRequest) {
       await this.emailNotificationService.sendNotification(
@@ -296,10 +296,17 @@ export class DepositService {
           proofImageUrl: publicUrl,
         }
       );
-    }
 
+      await this.discordNotificationService.sendNotification(
+        `Burn proof uploaded and sent to user: ${burnRequest.email}\n\nfor request ID: ${burnRequestId}\n\nProof image: ${publicUrl}`,
+        NotificationType.INFO,
+        "New burn proof",
+        publicUrl,
+        'withdrawal'
+      );
+    }
     console.log(
-      `📤 Proof of burn uploaded, status updated to BURNED, and email sent for ID ${burnRequestId}`
+      `📤 Burn proof uploaded, status updated to BURNED, email sent and Discord notification sent for ID ${burnRequestId}`
     );
   }
 
