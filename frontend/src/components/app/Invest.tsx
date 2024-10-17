@@ -87,16 +87,35 @@ const createSteps = ({
       <form id={formIds.invest} onSubmit={handleSubmit} className="flex flex-col gap-2">
         <p
           className={cn(
-            "text-base text-brand-blue font-helvetica text-start",
+            "text-base text-brand-blue font-helvetica text-start w-full flex items-center",
             status === InvestStatus.SUCCESS && "font-bold text-black/50"
           )}
         >
           {t("investBalance")}:
-          <span className="font-bold">
+          <span className="font-bold ml-1">
             {" "}
             {currencyInvest === "CLPD" ? clpdBalanceFormatted : usdcBalanceFormatted}{" "}
           </span>
           {currencyInvest === "CLPD" ? "CLPD" : "USDC"}
+          <Button
+            type="button"
+            onClick={() => {
+              if (currencyInvest === "USDC") {
+                setCurrencyInvest("CLPD");
+              } else {
+                setCurrencyInvest("USDC");
+              }
+            }}
+            className="h-auto ml-auto border rounded-full p-1 text-sm font-bold hover:bg-black/5 transition-colors"
+          >
+            <Image
+              src="/images/app/arrow-switch.svg"
+              alt="arrow-switch"
+              width={12}
+              height={12}
+              className="rotate-90"
+            />
+          </Button>
         </p>
         <div className="grid w-full items-center gap-1.5 bg-gray-100 rounded-md p-3 border-2 border-black shadow-brutalist-sm">
           <label htmlFor="amount" className="font-bold text-base">
