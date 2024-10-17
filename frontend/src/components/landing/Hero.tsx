@@ -40,14 +40,13 @@ const Hero: React.FC<HeroProps> = () => {
             width={386}
             height={422}
             className={cn("absolute", {
-              "-bottom-[2rem] md:-bottom-[2rem] lg:-bottom-[1rem] xl:-bottom-[4rem] 2xl:bottom-[0rem] -left-20 md:-left-20":
+              "-bottom-[2rem] md:-bottom-[2rem] lg:-bottom-[1rem] xl:-bottom-[0rem] 2xl:bottom-[3rem] -left-20 md:-left-20":
                 index === 0,
-              "bottom-[3rem] xl:bottom-[0rem] 2xl:bottom-[6rem] left-[40%] md:left-[20%]":
+              "bottom-[3rem] xl:bottom-[4rem] 2xl:bottom-[10rem] left-[40%] md:left-[20%]":
                 index === 1,
-              "hidden xl:block xl:-bottom-[5rem] 2xl:bottom-[4rem] right-[20%] max-md:hidden":
+              "hidden xl:block xl:bottom-[5rem] 2xl:bottom-[8rem] right-[20%] max-md:hidden":
                 index === 2,
-              "bottom-[0rem] xl:-bottom-[2rem] 2xl:-bottom-[1rem] right-0 max-md:hidden":
-                index === 3,
+              "bottom-[0rem] xl:bottom-[2rem] 2xl:bottom-[6rem] right-0 max-md:hidden": index === 3,
             })}
             key={index}
           />
