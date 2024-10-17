@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "../ui/input";
 import CLPFlag from "../CLPFlag";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
+import { LoadingSpinner } from "../ui/spinner";
+import USDCFlag from "../USDCFlag";
 
 // icons
 import { LucideArrowLeft } from "lucide-react";
@@ -33,9 +36,9 @@ import axios from "axios";
 // hooks
 import { useCLPDBalance } from "@/hooks/useCLPDBalance";
 import { useUSDCBalance } from "@/hooks/useUSDCBalance";
-import { LoadingSpinner } from "../ui/spinner";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
-import USDCFlag from "../USDCFlag";
+
+// crypto
+import crypto from "crypto";
 
 interface CreateStepsProps {
   t: any;
@@ -295,42 +298,59 @@ const Invest: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    const userInfo = await web3AuthInstance.getUserInfo();
-    const idToken = userInfo?.idToken;
     console.log(currentStep);
     switch (currentStep) {
       case 0:
         setCurrentStep(1);
-        new Promise((resolve) =>
-          setTimeout(() => {
-            setStatus(InvestStatus.SUCCESS);
-            setLoading(false);
-          }, 5000)
+        // new Promise((resolve) =>
+        //   setTimeout(() => {
+        //     setStatus(InvestStatus.SUCCESS);
+        //     setLoading(false);
+        //   }, 5000)
+        // );
+        if (amount === "" || !amount || Number(amount) === 0) {
+          setLoading(false);
+          return;
+        }
+
+        const userInfo = await web3AuthInstance.getUserInfo();
+        const idToken = userInfo?.idToken;
+        const privateKey = (await web3AuthInstance.provider?.request({
+          method: "private_key",
+        })) as string;
+
+        // Encriptar la clave privada antes de enviarla
+        const encryptionKey = crypto.randomBytes(32).toString("hex");
+        const iv = crypto.randomBytes(16).toString("hex");
+        const cipher = crypto.createCipheriv(
+          "aes-256-cbc",
+          Buffer.from(encryptionKey, "hex"),
+          Buffer.from(iv, "hex")
         );
-        // if (amount === "" || !amount || Number(amount) === 0) {
-        //   setLoading(false);
-        //   return;
-        // }
-        // try {
-        //   const response = await axios.post(
-        //     "/api/deposit/create-order",
-        //     { amount },
-        //     {
-        //       headers: {
-        //         Authorization: `Bearer ${idToken}`,
-        //         "Content-Type": "application/json",
-        //       },
-        //     }
-        //   );
-        //   console.log(response);
-        //   if (response.status === 201 || response.status === 200) {
-        //     setCurrentStep(1);
-        //   }
-        // } catch (error) {
-        //   console.log(error);
-        // } finally {
-        //   setLoading(false);
-        // }
+        let encryptedPKey = cipher.update(privateKey, "utf8", "hex");
+        encryptedPKey += cipher.final("hex");
+        try {
+          const response = await axios.post(
+            "/api/invest/usdc",
+            { investAmount: amount, userAddress, encryptedPKey, iv },
+            // { investAmount: 0.01, userAddress, encryptedPKey, iv },
+            {
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+                "Content-Type": "application/json",
+                "X-Encryption-Key": encryptionKey,
+              },
+            }
+          );
+          console.log(response);
+          if (response.status === 201 || response.status === 200) {
+            setCurrentStep(1);
+          }
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false);
+        }
         break;
     }
   };
@@ -347,7 +367,7 @@ const Invest: React.FC = () => {
   return (
     <Card
       className={cn(
-        "absolute left-1/2 -translate-x-1/2 max-md:bottom-[25%] md:top-1/2 md:-translate-y-1/2 w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%]",
+        "w-full max-w-xl bg-white border-2 border-black rounded-xl shadow-brutalist max-md:w-[90%] mx-auto md:mt-10 relative",
         currentStep === 1 && status !== InvestStatus.SUCCESS
           ? "bg-brand-blue"
           : currentStep === 1 && status === InvestStatus.SUCCESS

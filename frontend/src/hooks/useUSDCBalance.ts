@@ -32,7 +32,7 @@ export const useUSDCBalance = ({ address }: { address: `0x${string}` | undefined
 
   const usdcBalanceFormatted = useMemo(() => {
     if (!usdcBalance.data) return "0";
-    return Number(formatUnits(usdcBalance.data?.[0]!, 18) || 0).toFixed(2);
+    return Number(formatUnits(usdcBalance.data?.[0]!, 6) || 0).toFixed(2);
   }, [usdcBalance.data]);
 
   return { usdcBalanceFormatted };
