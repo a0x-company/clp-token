@@ -7,7 +7,11 @@ import "@stability/contracts/src/strategies/libs/UniswapV3MathLib.sol";
  * @dev Contract deployed on Base Mainnet
  * @notice You can view the deployed contract at:
  * https://basescan.org/address/0xFba35c65C3cfCA94d0d0d40F77F2A6eE0102EE4C
-*/
+ * 
+ * @dev Library deployed on Base Mainnet:
+ * UniswapV3MathLib.sol
+ * https://basescan.org/address/0xb98de2ea6e0aec813e3fe747d0fdbe65af71b456
+ */
 
 // Interface for interacting with Uniswap V3 Pool
 interface IUniswapV3Pool {
