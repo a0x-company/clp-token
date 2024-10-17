@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import { VaultContext } from "./routes";
-import { Firestore } from '@google-cloud/firestore';
+import { Firestore } from "@google-cloud/firestore";
 import { config } from "@internal";
 import { DiscordNotificationService, NotificationType } from "@internal/notifications";
 
 const firestore = new Firestore({ projectId: config.PROJECT_ID, databaseId: config.DATABASE_ENV });
-const discordService = new DiscordNotificationService(config.DISCORD_WEBHOOK_URL || "");
+const discordService = new DiscordNotificationService();
 
-const LOCK_COLLECTION = 'locks';
-const LOCK_DOCUMENT = 'vault_lock';
+const LOCK_COLLECTION = "locks";
+const LOCK_DOCUMENT = "vault_lock";
 const ACQUIRE_LOCK_TIMEOUT = 45000;
 const LOCK_RETRY_DELAY = 1000;
 const MAX_RETRIES = 5;
@@ -21,7 +21,7 @@ async function initializeLockDocument(): Promise<void> {
 
   if (!lockDoc.exists) {
     await lockRef.set({ locked: false });
-    console.log('🔒 Lock document initialized.');
+    console.log("🔒 Lock document initialized.");
   }
 }
 
@@ -34,7 +34,7 @@ async function acquireLock(): Promise<boolean> {
 
       if (!lockDoc.exists) {
         transaction.set(lockRef, { locked: false });
-        throw new Error('Lock document initialized. Please try again.');
+        throw new Error("Lock document initialized. Please try again.");
       }
 
       const lockData = lockDoc.data();
@@ -42,18 +42,21 @@ async function acquireLock(): Promise<boolean> {
       if (lockData && !lockData.locked) {
         transaction.update(lockRef, { locked: true });
       } else {
-        throw new Error('Lock already acquired.');
+        throw new Error("Lock already acquired.");
       }
     });
 
-    console.log('🔒 Lock acquired successfully.');
+    console.log("🔒 Lock acquired successfully.");
     return true;
   } catch (error: any) {
-    if (error.message === 'Lock already acquired.' || error.message === 'Lock document initialized. Please try again.') {
-      console.log('🔒 Unable to acquire lock: already in use.');
+    if (
+      error.message === "Lock already acquired." ||
+      error.message === "Lock document initialized. Please try again."
+    ) {
+      console.log("🔒 Unable to acquire lock: already in use.");
       return false;
     } else {
-      console.error('❌ CRITICAL: Error acquiring lock:', error);
+      console.error("❌ CRITICAL: Error acquiring lock:", error);
       throw error;
     }
   }
@@ -71,22 +74,22 @@ async function releaseLock(): Promise<void> {
 
         if (lockData && lockData.locked) {
           transaction.update(lockRef, { locked: false });
-          console.log('🔓 Lock released successfully.');
+          console.log("🔓 Lock released successfully.");
         } else {
-          console.log('🔓 Lock is already released.');
+          console.log("🔓 Lock is already released.");
         }
       } else {
-        console.log('🔓 Lock document not found.');
+        console.log("🔓 Lock document not found.");
       }
     });
   } catch (error) {
-    console.error('❌ CRITICAL: Error releasing lock:', error);
+    console.error("❌ CRITICAL: Error releasing lock:", error);
     throw error;
   }
 }
 
 async function shouldNotify(errorType: string): Promise<boolean> {
-  const errorRef = firestore.collection('scraper_errors').doc(errorType);
+  const errorRef = firestore.collection("scraper_errors").doc(errorType);
   const errorDoc = await errorRef.get();
 
   if (!errorDoc.exists) {
@@ -104,15 +107,22 @@ async function shouldNotify(errorType: string): Promise<boolean> {
 }
 
 async function notifyError(message: string, notificationType: NotificationType): Promise<void> {
-  const errorType = notificationType === NotificationType.ERROR ? 'scraper_error' : 'scraper_warning';
+  const errorType =
+    notificationType === NotificationType.ERROR ? "scraper_error" : "scraper_warning";
   if (await shouldNotify(errorType)) {
-    await discordService.sendNotification(message, notificationType, "CRITICAL: Santander Scraper Alert");
+    await discordService.sendNotification(
+      message,
+      notificationType,
+      "CRITICAL: Santander Scraper Alert",
+      undefined,
+      "alert"
+    );
   }
 }
 
 export function getVaultBalanceHandler(ctx: VaultContext) {
   return async (req: Request, res: Response) => {
-    const isStorageRoute = req.path.endsWith('/storage');
+    const isStorageRoute = req.path.endsWith("/storage");
     let balance: number | null = null;
 
     try {
@@ -120,13 +130,13 @@ export function getVaultBalanceHandler(ctx: VaultContext) {
 
       if (isStorageRoute) {
         balance = await ctx.storageService.getCurrentBalance();
-        console.log('💾 Balance retrieved from storage.');
+        console.log("💾 Balance retrieved from storage.");
       } else {
         balance = await attemptScraping(ctx);
       }
 
       if (balance === null) {
-        throw new Error('❌ CRITICAL: No balance available.');
+        throw new Error("❌ CRITICAL: No balance available.");
       }
 
       res.status(200).json({ balance });
@@ -135,9 +145,9 @@ export function getVaultBalanceHandler(ctx: VaultContext) {
       if (!isStorageRoute) {
         try {
           await releaseLock();
-          console.log('🔓 Lock released due to error.');
+          console.log("🔓 Lock released due to error.");
         } catch (releaseError) {
-          console.error('❌ CRITICAL: Error releasing lock after failure:', releaseError);
+          console.error("❌ CRITICAL: Error releasing lock after failure:", releaseError);
         }
       }
 
@@ -156,18 +166,18 @@ async function attemptScraping(ctx: VaultContext): Promise<number | null> {
       while (Date.now() - startTime < ACQUIRE_LOCK_TIMEOUT) {
         lockAcquired = await acquireLock();
         if (lockAcquired) break;
-        await new Promise(resolve => setTimeout(resolve, LOCK_RETRY_DELAY));
+        await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_DELAY));
       }
 
       if (!lockAcquired) {
-        console.log('🔄 Unable to acquire lock. Attempting scrape without lock.');
+        console.log("🔄 Unable to acquire lock. Attempting scrape without lock.");
       }
 
       try {
-        console.log('🕷️ Starting scraping process.');
+        console.log("🕷️ Starting scraping process.");
         const balance = await ctx.scrapService.getVaultBalance();
         if (balance === 0) {
-          throw new Error('❌ CRITICAL: Scraped balance is 0.');
+          throw new Error("❌ CRITICAL: Scraped balance is 0.");
         }
         console.log(`✅ Scraping successful. Balance: ${balance}`);
         return balance;
@@ -178,17 +188,23 @@ async function attemptScraping(ctx: VaultContext): Promise<number | null> {
       }
     } catch (error) {
       console.error(`❌ CRITICAL: Error during attempt ${retries + 1}:`, error);
-      await notifyError(`CRITICAL: Scraping attempt ${retries + 1} failed: ${error instanceof Error ? error.message : 'Unknown error'}`, NotificationType.ERROR);
+      await notifyError(
+        `CRITICAL: Scraping attempt ${retries + 1} failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        NotificationType.ERROR
+      );
       retries++;
       if (retries < MAX_RETRIES) {
         console.log(`Waiting ${RETRY_DELAY / 1000} seconds before next attempt...`);
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
       }
     }
   }
 
-  console.error('❌ CRITICAL: All scraping attempts failed.');
-  await notifyError(`CRITICAL: All ${MAX_RETRIES} scraping attempts failed. System may be at risk.`, NotificationType.ERROR);
+  console.error("❌ CRITICAL: All scraping attempts failed.");
+  await notifyError(
+    `CRITICAL: All ${MAX_RETRIES} scraping attempts failed. System may be at risk.`,
+    NotificationType.ERROR
+  );
   return null;
 }
 
@@ -197,8 +213,11 @@ function handleError(error: unknown, res: Response) {
     console.error(`❌ CRITICAL ERROR: ${error.message}`);
     res.status(500).json({ error: error.message });
   } else {
-    console.error('❌ CRITICAL: An unknown error occurred.');
+    console.error("❌ CRITICAL: An unknown error occurred.");
     res.status(500).json({ error: "An unknown error occurred." });
   }
-  notifyError(`CRITICAL: Vault balance retrieval failed. Error: ${error instanceof Error ? error.message : 'Unknown error'}`, NotificationType.ERROR);
+  notifyError(
+    `CRITICAL: Vault balance retrieval failed. Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+    NotificationType.ERROR
+  );
 }
