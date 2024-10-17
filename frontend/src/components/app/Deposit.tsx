@@ -40,6 +40,7 @@ const bankInfo = {
   accountType: "Cuenta Vista",
   owner: "Cristian Ignacio Valdivia Ramirez",
   accountNumber: "0-070-08-99853-6",
+  rut: "17.961.388-3",
   email: "c@mistokens.com",
 };
 
@@ -113,12 +114,14 @@ const createSteps = ({
           <label htmlFor="amount" className="font-bold text-base">
             {t("receive")}
           </label>
-          <div className="flex items-center gap-4 relative">
-            <p className="bg-transparent text-black text-[32px] font-helvetica w-96 border-none focus:outline-none line-clamp-1">
+          <div className="flex items-center justify-between gap-4 relative max-md:w-[270px] md:w-full">
+            <p className="bg-transparent text-black text-[32px] font-helvetica border-none focus:outline-none line-clamp-1">
               {amount || "0"}
             </p>
 
-            <CLPFlag type="CLPD" />
+            <div>
+              <CLPFlag type="CLPD" />
+            </div>
           </div>
         </div>
 
@@ -168,6 +171,9 @@ const createSteps = ({
           </p>
           <p className="flex items-center justify-between">
             <strong>{t("bankInfo.owner")}:</strong> {bankInfo.owner}
+          </p>
+          <p className="flex items-center justify-between">
+            <strong>{t("bankInfo.rut")}:</strong> {bankInfo.rut}
           </p>
           <p className="flex items-center justify-between">
             <strong>{t("bankInfo.email")}:</strong> {bankInfo.email}

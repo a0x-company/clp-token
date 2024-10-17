@@ -1,0 +1,24 @@
+[submodule "contracts/lib/forge-std"]
+	path = contracts/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "contracts/lib/openzeppelin-contracts"]
+	path = contracts/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "contracts/lib/chainlink"]
+	path = contracts/lib/chainlink
+	url = https://github.com/smartcontractkit/chainlink
+[submodule "lib/openzeppelin-contracts"]
+	path = lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "lib/chainlink"]
+	path = lib/chainlink
+	url = https://github.com/smartcontractkit/chainlink
+[submodule "contracts/ChainlinkCoordinator/lib/forge-std"]
+	path = contracts/ChainlinkCoordinator/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "contracts/lib/v3-periphery"]
+	path = contracts/lib/v3-periphery
+	url = https://github.com/Uniswap/v3-periphery
+[submodule "contracts/lib/v3-core"]
+	path = contracts/lib/v3-core
+	url = https://github.com/Uniswap/v3-core

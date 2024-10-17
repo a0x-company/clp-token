@@ -13,6 +13,7 @@
     "sourceMap": true,
     "lib": ["es6", "es2015", "dom"],
     "noImplicitAny": false,
+    "jsx": "react-jsx",
     "paths": {
       "@root": ["./src"],
       "@internal": ["./src/internal"],

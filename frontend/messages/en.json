@@ -99,7 +99,7 @@
     "inReserve": "In Reserve",
     "CLPDCirculation": "CLPD in circulation",
     "bankReserve": "Cash in the reserve bank",
-    "history": "History",
+    "history": "Reserve History",
     "faq": {
       "title1": "How is CLPD guaranteed to be fully backed and exchangeable for traditional Chilean pesos?",
       "content1": "CLPD is a 100% backed Chilean peso stablecoin (not converted into any other asset than traditional CLP) and is exchangeable 1:1 for Chilean pesos fiat. All Chilean pesos fiat are held in a Chilean national bank account that is monitored 24/7 by independent oracles provided by Chainlink Functions technology.",
@@ -113,7 +113,8 @@
       "content5": "CLPD is a 100% backed stablecoin, which is a type of digital peso, or Chilean peso digital. Unlike other cryptocurrencies that fluctuate in price, CLPD is designed to maintain the market relationship with the US dollar, and have an equivalent in traditional Chilean pesos respaldado 1:1 in a fully liquid Chilean national bank account. CLPD is an equivalent to the traditional Chilean peso that benefits from the speed and security of blockchain technology.",
       "title6": "How is CLPD different from a CBDC (digital currency issued by the central bank)?",
       "content6": "CLPD is issued by A0x, a private Chilean company at the intersection of blockchain and fintech. In contrast, a CBDC would be issued by the government or the central bank. While the Chilean CBDC is still in the study and exploration phase, without a determination as to whether it will be created at some point or not, CLPD is already available and will be useful for payments between people, businesses, international transfers, access to yields in DeFi, savings and investment vehicles, and other applications in a safe, fast and low-cost manner. A0x has developed this technology based on open source practices and taking into account the use of stablecoins in the world."
-    }
+    },
+    "reserve": "Money in the bank of reserve"
   },
   "deposit": {
     "deposit": "Create a deposit order",
@@ -123,6 +124,7 @@
       "info": "Bank account information",
       "bank": "Bank",
       "accountNumber": "Account Number",
+      "rut": "RUT",
       "owner": "Account Holder",
       "email": "Email",
       "type": "Account Type"

@@ -536,6 +536,11 @@ const Withdraw: React.FC = () => {
       value = value.replace(/^0+/, "");
     }
 
+    const numValue = parseInt(value);
+    if (numValue > 10000000) {
+      value = "10000000";
+    }
+
     setWithdrawAmount(value);
     if (Number(value) > Number(clpdBalanceFormatted)) {
       setErrorFields((prev) => [...prev, "amount"]);

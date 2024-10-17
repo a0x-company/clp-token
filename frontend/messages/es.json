@@ -99,7 +99,7 @@
     "inReserve": "En reserva",
     "CLPDCirculation": "CLPD en circulación",
     "bankReserve": "Efectivo en el banco de reserva",
-    "history": "Histórico",
+    "history": "Histórico de la reserva",
     "faq": {
       "title1": "¿Cómo se garantiza que CLPD está completamente respaldado y es intercambiable por pesos chilenos tradicionales?",
       "content1": "CLPD es un peso chileno digital respaldado 100% por dinero líquido (no está convertido en ningún tipo de activo más que CLP tradicional) y es intercambiable 1:1 por pesos chilenos fiat. Todos los pesos chilenos fiat se resguardan en una cuenta bancaria nacional que es monitoreada 24/7 por oráculos independientes proporcionados por la tecnología de Chainlink Functions.",
@@ -113,7 +113,8 @@
       "content5": "El CLPD es una moneda estable 100% respaldada, que es un tipo de criptomoneda, o peso chileno digital. A diferencia de otras criptomonedas que fluctúan en su precio, el CLPD está diseñado para mantener la relación de mercado con el dólar norteamericano USD, y tener un equivalente en pesos chilenos tradicionales respaldado 1:1 en una cuenta bancaria nacional 100% líquida. El CLPD es un equivalente al peso chileno tradicional que se beneficia de la velocidad y seguridad de la tecnología blockchain.",
       "title6": "¿Cómo es diferente el CLPD a una CBDC (moneda digital emitida por el banco central)?",
       "content6": "El CLPD es emitido por A0x, una empresa privada chilena en la intersección de blockchain y fintech. En cambio, una CBDC sería emitida por el gobierno o el banco central. Mientras la CBDC chilena se encuentra en etapa de estudio y exploración, sin una determinación al respecto de si se creará en algún momento o no, el CLPD ya se encuentra disponible y será útil para pagos entre personas, comercios, transferencias internacionales, acceder a rendimientos en DeFi, vehículos de ahorro e inversión, y otras aplicaciones de manera segura, rápida y de bajísimo costo. A0x ha desarrollado esta tecnología basandose en las prácticas de código abierto y tomando el conocimiento del uso de las stablecoins en el mundo."
-    }
+    },
+    "reserve": "Dinero en el banco de reserva"
   },
   "deposit": {
     "deposit": "Crea una orden de depósito",
@@ -125,7 +126,8 @@
       "accountNumber": "Número de Cuenta",
       "owner": "Titular",
       "email": "Email",
-      "type": "Tipo de cuenta"
+      "type": "Tipo de cuenta",
+      "rut": "RUT"
     },
     "transferBank": "Transferencia bancaria",
     "send": "Envías",

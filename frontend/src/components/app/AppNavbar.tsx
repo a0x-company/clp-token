@@ -112,9 +112,15 @@ const AppNavbar = () => {
   }, [searchParams]);
 
   return (
-    <div className="flex flex-row py-[32px] px-6 md:px-[48px] justify-between items-center">
+    <div className="flex flex-row py-4 md:py-[32px] px-6 md:px-[48px] justify-between items-center">
       <Link href={`/${currentLang}`} className="content-center items-center gap-[10px]">
-        <Image src="/images/clpa-logo.svg" alt="CLPD logo" width={64} height={64} />
+        <Image
+          src="/images/clpa-logo.svg"
+          alt="CLPD logo"
+          width={64}
+          height={64}
+          className="max-md:w-10 max-md:h-10"
+        />
       </Link>
 
       <Sheet>
