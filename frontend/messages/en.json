@@ -85,6 +85,10 @@
       "q4-2": {
         "title": "Integration with Coinbase Smart Wallet",
         "description": ""
+      },
+      "q4-3": {
+        "title": "Launch of liquidity pool on Aerodrome",
+        "description": ""
       }
     }
   },

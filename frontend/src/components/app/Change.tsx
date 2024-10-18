@@ -331,7 +331,6 @@ const Change: React.FC = () => {
         },
       });
       const data = await response.data;
-      console.log(data);
       setPriceCLPD_USDC(data.priceCLPDUSDC);
       setPriceUSDC_CLPD(data.priceUSDCCLPD);
     };
@@ -359,8 +358,6 @@ const Change: React.FC = () => {
     const isSufficientBalance =
       tokenOut.symbol === "CLPD" ? clpdBalanceFormatted : usdcBalanceFormatted;
     if (Number(amount) > Number(isSufficientBalance)) {
-      console.log("amount", amount);
-      console.log("isSufficientBalance", isSufficientBalance);
       setAmount((prev) => {
         return isSufficientBalance;
       });
@@ -437,7 +434,6 @@ const Change: React.FC = () => {
     setLoading(true);
     const userInfo = await web3AuthInstance.getUserInfo();
     const idToken = userInfo?.idToken;
-    console.log(currentStep);
     const privateKey = (await web3AuthInstance.provider?.request({
       method: "private_key",
     })) as string;
@@ -471,7 +467,6 @@ const Change: React.FC = () => {
               },
             }
           );
-          console.log(response);
           if (response.status === 201 || response.status === 200) {
             setStatus(ChangeStatus.SUCCESS);
             refetchCLPDBalance();
