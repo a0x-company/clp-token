@@ -1,6 +1,6 @@
 "use client";
 // react
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 // next
 import Image from "next/image";
@@ -29,6 +29,10 @@ import { web3AuthInstance } from "@/provider/WagmiConfig";
 import { useAccount } from "wagmi";
 
 // axios
+import axios from "axios";
+
+// crypto
+import crypto from "crypto";
 
 // hooks
 import { useCLPDBalance } from "@/hooks/useCLPDBalance";
@@ -39,6 +43,7 @@ const MAX_AMOUNT = 10000000;
 interface CreateStepsProps {
   t: any;
   amount: string;
+  max: boolean;
   amountFormatted: string;
   handleAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   email: string;
@@ -76,6 +81,7 @@ const titles = (status: ChangeStatus | null) => ({
 
 const createSteps = ({
   t,
+  max,
   amount,
   amountFormatted,
   handleAmountChange,
@@ -173,7 +179,7 @@ const createSteps = ({
           </label>
           <div className="flex items-center gap-4 relative">
             <div className="flex items-center gap-2">
-              <CLPFlag type="CLPD" baseIcon />
+              {tokenIn.symbol === "CLPD" ? <CLPFlag type="CLPD" baseIcon /> : <USDCFlag baseIcon />}
             </div>
 
             <div className="flex items-center gap-2 relative w-full">
@@ -192,7 +198,10 @@ const createSteps = ({
               <button
                 type="button"
                 onClick={handleMaxAmount}
-                className="bg-white border-2 border-black rounded-full p-1 text-sm font-bold hover:bg-black/5 transition-colors self-end"
+                className={cn(
+                  "bg-white border-2 border-black rounded-full p-1 text-sm font-bold hover:bg-black/5 transition-colors self-end",
+                  max && "bg-brand-blue/50"
+                )}
               >
                 {t("max")}
               </button>
@@ -206,7 +215,11 @@ const createSteps = ({
           </label>
           <div className="flex items-center gap-4 relative w-full">
             <div className="">
-              <USDCFlag baseIcon />
+              {tokenOut.symbol === "USDC" ? (
+                <USDCFlag baseIcon />
+              ) : (
+                <CLPFlag type="CLPD" baseIcon />
+              )}
             </div>
 
             <div className="flex items-center gap-2 w-full justify-between">
@@ -266,10 +279,14 @@ const createSteps = ({
             status === ChangeStatus.SUCCESS && "font-bold text-black/50"
           )}
         >
-          {status === ChangeStatus.SUCCESS
-            ? `${t("changeBalance")}: ${amount} CLPD`
-            : `${t("yourEmail")}: ${email}`}
+          {status === ChangeStatus.SUCCESS ? `${t("yourBalance")}:` : `${t("yourEmail")}: ${email}`}
         </p>
+        {status === ChangeStatus.SUCCESS && (
+          <div className="flex flex-col items-start gap-2">
+            <span className="font-bold text-black/50">{clpdBalanceFormatted} CLPD</span>
+            <span className="font-bold text-black/50">{usdcBalanceFormatted} USDC</span>
+          </div>
+        )}
       </div>
     ),
   },
@@ -286,7 +303,8 @@ const Change: React.FC = () => {
 
   const [tokenIn, setTokenIn] = useState<Token>({ symbol: "CLPD", address: "" });
   const [tokenOut, setTokenOut] = useState<Token>({ symbol: "USDC", address: "" });
-  const [status, setStatus] = useState<ChangeStatus | null>(null);
+  const [status, setStatus] = useState<ChangeStatus>(ChangeStatus.PENDING);
+  const [max, setMax] = useState<boolean>(false);
   const [errorFields, setErrorFields] = useState<string[]>([]);
 
   const { address: userAddress } = useAccount();
@@ -294,15 +312,39 @@ const Change: React.FC = () => {
   const { clpdBalanceFormatted, refetch: refetchCLPDBalance } = useCLPDBalance({
     address: userAddress,
   });
-  const { usdcBalanceFormatted } = useUSDCBalance({
+  const { usdcBalanceFormatted, refetch: refetchUSDCBalance } = useUSDCBalance({
     address: userAddress,
   });
 
+  const [priceCLPD_USDC, setPriceCLPD_USDC] = useState<number>(0);
+  const [priceUSDC_CLPD, setPriceUSDC_CLPD] = useState<number>(0);
+
+  const fetchedPrice = useRef(false);
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+      const userInfo = await web3AuthInstance.getUserInfo();
+      const idToken = userInfo?.idToken;
+      const response = await axios.get("/api/swap/price", {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+      const data = await response.data;
+      setPriceCLPD_USDC(data.priceCLPDUSDC);
+      setPriceUSDC_CLPD(data.priceUSDCCLPD);
+    };
+    if (!fetchedPrice.current) {
+      fetchPrice();
+      fetchedPrice.current = true;
+    }
+  }, []);
+
   const handleConvertAmount = useMemo(() => {
     if (tokenIn.symbol === "CLPD") {
-      return (Number(amount) / 1000).toString();
+      return (Number(amount) * priceCLPD_USDC).toString();
     } else {
-      return (Number(amount) * 1000).toString();
+      return (Number(amount) * priceUSDC_CLPD).toString();
     }
   }, [tokenIn, amount]);
 
@@ -313,32 +355,69 @@ const Change: React.FC = () => {
   const { user } = useUserStore();
 
   const handleSwitchTokens = () => {
+    const isSufficientBalance =
+      tokenOut.symbol === "CLPD" ? clpdBalanceFormatted : usdcBalanceFormatted;
+    if (Number(amount) > Number(isSufficientBalance)) {
+      setAmount((prev) => {
+        return isSufficientBalance;
+      });
+      setAmountFormatted((prev) => {
+        return isSufficientBalance;
+      });
+      setMax(true);
+    } else {
+      setMax(false);
+    }
+
     setTokenIn(tokenOut);
     setTokenOut(tokenIn);
+    if (tokenIn.symbol === "CLPD") {
+      setAmountReceive(handleConvertAmount);
+    } else {
+      setAmountReceive(handleConvertAmount);
+    }
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
 
-    value = value.replace(/[^0-9]/g, "");
-
-    if (value.length > 1 && value.startsWith("0")) {
-      value = value.replace(/^0+/, "");
+    if (value === "") {
+      setAmount("");
+      setAmountFormatted("0");
+      setErrorFields([]);
+      return;
     }
 
-    const numericValue = Number(value);
-    const availableAmount =
+    value = value.replace(/[^0-9.]/g, "");
+
+    const parts = value.split(".");
+    if (parts.length > 2) {
+      value = parts[0] + "." + parts.slice(1).join("");
+    }
+
+    // Limitar a dos decimales
+    if (parts.length === 2 && parts[1].length > 2) {
+      value = parts[0] + "." + parts[1].slice(0, 2);
+    }
+
+    const numericValue = parseFloat(value);
+    const availableAmount = parseFloat(
       tokenIn.symbol === "CLPD"
-        ? Number(clpdBalanceFormatted.replace(/,/g, ""))
-        : Number(usdcBalanceFormatted.replace(/,/g, ""));
+        ? clpdBalanceFormatted.replace(/,/g, "")
+        : usdcBalanceFormatted.replace(/,/g, "")
+    );
 
     if (numericValue > availableAmount) {
-      value = availableAmount.toString();
-    } else if (numericValue === 0) {
+      value = availableAmount.toFixed(2);
+      setMax(true);
+    } else if (isNaN(numericValue) || numericValue === 0) {
       value = "0";
       setErrorFields(["insufficientBalance"]);
     } else if (numericValue > MAX_AMOUNT) {
-      value = MAX_AMOUNT.toString();
+      value = MAX_AMOUNT.toFixed(2);
+      setMax(true);
+    } else if (Number(amount) !== availableAmount && max) {
+      setMax(false);
     }
 
     setAmount(value);
@@ -355,47 +434,61 @@ const Change: React.FC = () => {
     setLoading(true);
     const userInfo = await web3AuthInstance.getUserInfo();
     const idToken = userInfo?.idToken;
-    console.log(currentStep);
+    const privateKey = (await web3AuthInstance.provider?.request({
+      method: "private_key",
+    })) as string;
+
+    // Encriptar la clave privada antes de enviarla
+    const encryptionKey = crypto.randomBytes(32).toString("hex");
+    const iv = crypto.randomBytes(16).toString("hex");
+    const cipher = crypto.createCipheriv(
+      "aes-256-cbc",
+      Buffer.from(encryptionKey, "hex"),
+      Buffer.from(iv, "hex")
+    );
+    let encryptedPKey = cipher.update(privateKey, "utf8", "hex");
+    encryptedPKey += cipher.final("hex");
     switch (currentStep) {
       case 0:
+        if (amount === "" || !amount || Number(amount) === 0) {
+          setLoading(false);
+          return;
+        }
         setCurrentStep(1);
-        new Promise((resolve) =>
-          setTimeout(() => {
+        try {
+          const response = await axios.post(
+            "/api/swap",
+            { amountIn: amount, userAddress, encryptedPKey, iv, tokenIn: tokenIn.symbol },
+            {
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+                "Content-Type": "application/json",
+                "X-Encryption-Key": encryptionKey,
+              },
+            }
+          );
+          if (response.status === 201 || response.status === 200) {
             setStatus(ChangeStatus.SUCCESS);
-            setLoading(false);
-          }, 5000)
-        );
-        // if (amount === "" || !amount || Number(amount) === 0) {
-        //   setLoading(false);
-        //   return;
-        // }
-        // try {
-        //   const response = await axios.post(
-        //     "/api/deposit/create-order",
-        //     { amount },
-        //     {
-        //       headers: {
-        //         Authorization: `Bearer ${idToken}`,
-        //         "Content-Type": "application/json",
-        //       },
-        //     }
-        //   );
-        //   console.log(response);
-        //   if (response.status === 201 || response.status === 200) {
-        //     setCurrentStep(1);
-        //   }
-        // } catch (error) {
-        //   console.log(error);
-        // } finally {
-        //   setLoading(false);
-        // }
+            refetchCLPDBalance();
+            refetchUSDCBalance();
+            setCurrentStep(1);
+          }
+        } catch (error) {
+          console.log(error);
+          setCurrentStep(0);
+        } finally {
+          setLoading(false);
+        }
         break;
     }
   };
 
   const handleReset = () => {
     setCurrentStep(0);
-    setAmount("");
+    setStatus(ChangeStatus.PENDING);
+    setAmount("0");
+    setAmountFormatted("0");
+    setAmountReceive("0");
   };
 
   const handleBack = () => {
@@ -428,6 +521,7 @@ const Change: React.FC = () => {
             {
               createSteps({
                 t,
+                max,
                 amount,
                 amountFormatted,
                 handleAmountChange,
@@ -454,7 +548,7 @@ const Change: React.FC = () => {
             className="w-full bg-brand-blue-dark border-2 border-black shadow-brutalist-sm py-4 h-full text-xl hover:bg-brand-blue-dark/90 text-white font-helvetica font-bold"
             type="submit"
             form={Object.values(formIds)[currentStep]}
-            disabled /* TODO: disabled if loading */
+            disabled={loading}
           >
             {!loading ? t("changeButton") : <LoadingSpinner />}
           </Button>
