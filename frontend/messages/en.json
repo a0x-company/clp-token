@@ -240,5 +240,26 @@
     "yourEmail": "Your email",
     "changeTo": "Change to",
     "max": "Max"
+  },
+  "change": {
+    "change": "Change between",
+    "and": "and",
+    "from": "From",
+    "to": "To",
+    "send": "Send",
+    "receive": "Receive",
+    "amountPlaceholder": "100.000",
+    "max": "Max",
+    "changeButton": "Change",
+    "changeBalance": "Your balance",
+    "changeWaitingTitle": "Transaction in progress...",
+    "changeWaitingDescription": "This page will update automatically when it's ready, and you will receive an email.",
+    "changeSuccessTitle": "¡Change approved!",
+    "changeSuccessDescription": "Your funds have been changed successfully.",
+    "changeSuccessBalance": "Your balance",
+    "yourBalance": "Your balance",
+    "ready": "Ready",
+    "yourEmail": "Your email",
+    "willBeSent": "Will be sent"
   }
 }
