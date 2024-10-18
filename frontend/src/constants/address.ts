@@ -10,11 +10,13 @@ export const addresses: {
       address: `0x${string}`;
       decimals: number;
     };
+    poolUsdcClpdAddress: `0x${string}`;
   };
 } = {
   base: {
     swap: "0x0000000000000000000000000000000000000000",
     investment: "0xCf26F8bcC82a9100279aDd043eA632A631CC10c8",
+    poolUsdcClpdAddress: "0x778b848d35cdd7d20845237832a8dc47d6c28b65",
     CLPD: {
       address: "0x24460D2b3d96ee5Ce87EE401b1cf2FD01545d9b1",
       decimals: 18,
@@ -27,6 +29,7 @@ export const addresses: {
   baseSepolia: {
     swap: "0x0000000000000000000000000000000000000000",
     investment: "0x0000000000000000000000000000000000000000",
+    poolUsdcClpdAddress: "0x0000000000000000000000000000000000000000",
     CLPD: {
       address: "0x0000000000000000000000000000000000000000",
       decimals: 18,

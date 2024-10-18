@@ -1,6 +1,6 @@
 "use client";
 // react
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 // next
 import Image from "next/image";
@@ -316,11 +316,36 @@ const Change: React.FC = () => {
     address: userAddress,
   });
 
+  const [priceCLPD_USDC, setPriceCLPD_USDC] = useState<number>(0);
+  const [priceUSDC_CLPD, setPriceUSDC_CLPD] = useState<number>(0);
+
+  const fetchedPrice = useRef(false);
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+      const userInfo = await web3AuthInstance.getUserInfo();
+      const idToken = userInfo?.idToken;
+      const response = await axios.get("/api/swap/price", {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+      const data = await response.data;
+      console.log(data);
+      setPriceCLPD_USDC(data.priceCLPDUSDC);
+      setPriceUSDC_CLPD(data.priceUSDCCLPD);
+    };
+    if (!fetchedPrice.current) {
+      fetchPrice();
+      fetchedPrice.current = true;
+    }
+  }, []);
+
   const handleConvertAmount = useMemo(() => {
     if (tokenIn.symbol === "CLPD") {
-      return (Number(amount) / 1000).toString();
+      return (Number(amount) * priceCLPD_USDC).toString();
     } else {
-      return (Number(amount) * 1000).toString();
+      return (Number(amount) * priceUSDC_CLPD).toString();
     }
   }, [tokenIn, amount]);
 
@@ -331,8 +356,29 @@ const Change: React.FC = () => {
   const { user } = useUserStore();
 
   const handleSwitchTokens = () => {
+    const isSufficientBalance =
+      tokenOut.symbol === "CLPD" ? clpdBalanceFormatted : usdcBalanceFormatted;
+    if (Number(amount) > Number(isSufficientBalance)) {
+      console.log("amount", amount);
+      console.log("isSufficientBalance", isSufficientBalance);
+      setAmount((prev) => {
+        return isSufficientBalance;
+      });
+      setAmountFormatted((prev) => {
+        return isSufficientBalance;
+      });
+      setMax(true);
+    } else {
+      setMax(false);
+    }
+
     setTokenIn(tokenOut);
     setTokenOut(tokenIn);
+    if (tokenIn.symbol === "CLPD") {
+      setAmountReceive(handleConvertAmount);
+    } else {
+      setAmountReceive(handleConvertAmount);
+    }
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -408,11 +454,11 @@ const Change: React.FC = () => {
     encryptedPKey += cipher.final("hex");
     switch (currentStep) {
       case 0:
-        setCurrentStep(1);
         if (amount === "" || !amount || Number(amount) === 0) {
           setLoading(false);
           return;
         }
+        setCurrentStep(1);
         try {
           const response = await axios.post(
             "/api/swap",
@@ -445,7 +491,9 @@ const Change: React.FC = () => {
   const handleReset = () => {
     setCurrentStep(0);
     setStatus(ChangeStatus.PENDING);
-    setAmount("");
+    setAmount("0");
+    setAmountFormatted("0");
+    setAmountReceive("0");
   };
 
   const handleBack = () => {

@@ -77,6 +77,9 @@ const Roadmap: React.FC = () => {
             <li>
               <span className="font-bold">{t("q4-2.title")}</span>
             </li>
+            <li>
+              <span className="font-bold">{t("q4-3.title")}</span>
+            </li>
           </Quarter>
         )}
 
@@ -135,6 +138,9 @@ const Roadmap: React.FC = () => {
           </li>
           <li>
             <span className="font-bold">{t("q4-2.title")}</span>
+          </li>
+          <li>
+            <span className="font-bold">{t("q4-3.title")}</span>
           </li>
         </Quarter>
 
