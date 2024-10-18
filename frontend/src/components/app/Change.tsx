@@ -331,8 +331,8 @@ const Change: React.FC = () => {
         },
       });
       const data = await response.data;
-      setPriceCLPD_USDC(data.priceCLPDUSDC);
-      setPriceUSDC_CLPD(data.priceUSDCCLPD);
+      setPriceCLPD_USDC(data.data.priceCLPDUSDC);
+      setPriceUSDC_CLPD(data.data.priceUSDCCLPD);
     };
     if (!fetchedPrice.current) {
       fetchPrice();

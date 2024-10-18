@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     const { priceCLPDUSDC, priceUSDCCLPD } = await getPrice();
 
     return NextResponse.json(
-      { message: "✅ Price fetched successfully", priceCLPDUSDC, priceUSDCCLPD },
+      { message: "✅ Price fetched successfully", data: { priceCLPDUSDC, priceUSDCCLPD } },
       { status: 200 }
     );
   } catch (error) {
