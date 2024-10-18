@@ -47,6 +47,26 @@ Advanced contract for CLPD-related DeFi operations:
 - ISwapRouter02: Uniswap V3 interface used in swap_InvestLiquidity_CLPD.sol for exchange operations.
 - INonfungiblePositionManager: Uniswap V3 interface used in swap_InvestLiquidity_CLPD.sol to manage liquidity positions.
 
+### Contract Compilation
+
+To compile the contracts, follow these steps:
+
+1. Make sure you have Foundry installed on your system.
+2. Open a terminal and navigate to the project directory.
+3. Enter the contracts directory:
+
+   ```
+   cd contracts
+   ```
+
+4. Run the Forge compilation command:
+
+   ```
+   forge build
+   ```
+
+   This command compiles all the smart contracts in the project using Forge, a Foundry tool. When executed, Forge will analyze and compile all Solidity files (.sol) in the project directory and its subdirectories, generating the necessary compilation artifacts for deployment and testing.
+
 ## Tests
 
 The `test` folder contains test files for the contracts. These tests are designed to verify the correct functioning of the contracts and their functions.
@@ -83,26 +103,6 @@ To run these tests, use the following commands in the terminal:
    ```
 
 These commands will run the specific tests for each contract, using Forge to simulate the corresponding network conditions. The `-vvvv` option provides a detailed output level to assist in debugging if necessary.
-
-### Contract Compilation
-
-To compile the contracts, follow these steps:
-
-1. Make sure you have Foundry installed on your system.
-2. Open a terminal and navigate to the project directory.
-3. Enter the contracts directory:
-
-   ```
-   cd contracts
-   ```
-
-4. Run the Forge compilation command:
-
-   ```
-   forge build
-   ```
-
-   This command compiles all the smart contracts in the project using Forge, a Foundry tool. When executed, Forge will analyze and compile all Solidity files (.sol) in the project directory and its subdirectories, generating the necessary compilation artifacts for deployment and testing.
 
 ## Deployment and Interaction Scripts
 
