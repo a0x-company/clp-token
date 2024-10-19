@@ -16,3 +16,23 @@ export const formatNumber = (num: number): string => {
     return num.toLocaleString();
   }
 };
+
+export function calculateFees(
+  feeGrowthGlobal: bigint,
+  feeGrowthOutsideLower: bigint,
+  feeGrowthOutsideUpper: bigint,
+  feeGrowthInsideLast: bigint,
+  liquidity: bigint
+): bigint {
+  const Q128 = BigInt("340282366920938463463374607431768211455");
+
+  // Calculate feeGrowthInside
+  const feeGrowthBelow = feeGrowthOutsideLower;
+  const feeGrowthAbove = feeGrowthOutsideUpper;
+  const feeGrowthInside = feeGrowthGlobal - feeGrowthBelow - feeGrowthAbove;
+
+  // Calculate fees
+  const fees = (liquidity * (feeGrowthInside - feeGrowthInsideLast)) / Q128;
+
+  return fees;
+}

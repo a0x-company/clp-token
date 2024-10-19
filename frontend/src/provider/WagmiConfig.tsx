@@ -7,7 +7,7 @@ import Web3AuthConnectorInstance from "./_Web3AuthConnectorInstance";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 export const selectedChain = !isDevelopment ? base : base;
-export const CHAIN_SYMBOL = !isDevelopment ? "base" : "eth";
+export const CHAIN_SYMBOL = !isDevelopment ? "base" : "base";
 
 export const { web3AuthConnector, web3AuthInstance } = Web3AuthConnectorInstance([selectedChain]);
 
