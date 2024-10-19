@@ -104,7 +104,7 @@ async function handleTransaction(
       error.message.includes("insufficient funds for gas")
     ) {
       console.log("❌ Error de fondos insuficientes para gas. Aumentando MINIMUM_ETH_BALANCE.");
-      MINIMUM_ETH_BALANCE *= 1.2; // Aumenta en un 20%
+      MINIMUM_ETH_BALANCE *= 1.4; // Aumenta en un 40%
       console.log("Nuevo MINIMUM_ETH_BALANCE:", MINIMUM_ETH_BALANCE);
 
       await checkAndRechargeEthBalance(userAddress, provider);

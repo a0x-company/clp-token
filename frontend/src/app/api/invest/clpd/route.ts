@@ -53,7 +53,7 @@ async function getGasPriceBaseViem(): Promise<BigInt> {
   return BigInt(gasPrice);
 }
 
-const MINIMUM_ETH_BALANCE = 0.000005 * 5;
+let MINIMUM_ETH_BALANCE = 0.000006 * 5;
 
 async function checkAndRechargeEthBalance(userAddress: string, provider: ethers.JsonRpcProvider) {
   const balanceETH = await provider.getBalance(userAddress);
@@ -88,6 +88,29 @@ async function checkAndRechargeEthBalance(userAddress: string, provider: ethers.
       console.error("❌ La transacción de recarga falló:", error);
       throw new Error("❌ La transacción de recarga falló");
     }
+  }
+}
+
+async function handleTransaction(
+  transactionFunction: () => Promise<any>,
+  userAddress: string,
+  provider: ethers.JsonRpcProvider
+) {
+  try {
+    return await transactionFunction();
+  } catch (error: any) {
+    if (
+      error.code === "INSUFFICIENT_FUNDS" &&
+      error.message.includes("insufficient funds for gas")
+    ) {
+      console.log("❌ Error de fondos insuficientes para gas. Aumentando MINIMUM_ETH_BALANCE.");
+      MINIMUM_ETH_BALANCE *= 1.4; // Aumenta en un 20%
+      console.log("Nuevo MINIMUM_ETH_BALANCE:", MINIMUM_ETH_BALANCE);
+
+      await checkAndRechargeEthBalance(userAddress, provider);
+      return await transactionFunction();
+    }
+    throw error;
   }
 }
 
@@ -255,11 +278,17 @@ export async function POST(request: Request) {
 
     try {
       console.log("Iniciando inversión con CLPD:", investAmount);
-      const tx = await contractInvestmentWithSigner.investCLPDwithoutUSDC(amountWithDecimals, {
-        gasLimit: BigInt(10000000),
-        maxFeePerGas: gasPrice,
-        maxPriorityFeePerGas: gasPrice,
-      });
+      const tx = await handleTransaction(
+        async () => {
+          return await contractInvestmentWithSigner.investCLPDwithoutUSDC(amountWithDecimals, {
+            gasLimit: BigInt(15000000),
+            maxFeePerGas: gasPrice,
+            maxPriorityFeePerGas: gasPrice,
+          });
+        },
+        userAddress,
+        provider
+      );
       console.log("Transacción enviada, esperando confirmación...");
       const receipt = await tx.wait();
       console.log("✅ Inversión confirmada");
