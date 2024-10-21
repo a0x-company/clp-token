@@ -26,24 +26,17 @@ export class UserDataStorage {
     try {
       const existingUser = await this.getUser({ address: userData.address });
       if (existingUser) {
-        return existingUser; 
-            }
+        return existingUser;
+      }
 
       await this.userCollection.doc(userData.address).set(userData);
-      console.log(
-        `✅ New user with address ${userData.address} added successfully`
-      );
+      console.log(`✅ New user with address ${userData.address} added successfully`);
       return userData;
-
     } catch (err: unknown) {
       if (err instanceof Error) {
-        throw new Error(
-          `❌ Error adding new user: ${err.message}`
-        );
+        throw new Error(`❌ Error adding new user: ${err.message}`);
       } else {
-        throw new Error(
-          `❌ Error adding new user: Unknown error`
-        );
+        throw new Error(`❌ Error adding new user: Unknown error`);
       }
     }
   }
@@ -51,6 +44,7 @@ export class UserDataStorage {
   public async getUser(param: {
     address?: string;
     email?: string;
+    phoneNumber?: string;
   }): Promise<StoredUserData | null> {
     try {
       let query: Query = this.userCollection;
@@ -59,6 +53,8 @@ export class UserDataStorage {
         query = query.where("address", "==", param.address);
       } else if (param.email) {
         query = query.where("email", "==", param.email);
+      } else if (param.phoneNumber) {
+        query = query.where("phoneNumber", "==", param.phoneNumber);
       } else {
         throw new Error("At least one search parameter must be provided");
       }
@@ -79,10 +75,7 @@ export class UserDataStorage {
     }
   }
 
-  public async updateUserData(
-    address: string,
-    updateData: Partial<StoredUserData>
-  ): Promise<void> {
+  public async updateUserData(address: string, updateData: Partial<StoredUserData>): Promise<void> {
     try {
       await this.userCollection.doc(address).set(updateData, { merge: true });
       console.log(`✅ User data updated for address ${address}`);
@@ -95,9 +88,7 @@ export class UserDataStorage {
   public async getAllUsers(): Promise<StoredUserData[]> {
     try {
       const snapshot = await this.userCollection.get();
-      return snapshot.empty
-        ? []
-        : snapshot.docs.map((doc) => doc.data() as StoredUserData);
+      return snapshot.empty ? [] : snapshot.docs.map((doc) => doc.data() as StoredUserData);
     } catch (err: unknown) {
       if (err instanceof Error) {
         throw new Error(`Failed to get all user data: ${err.message}`);

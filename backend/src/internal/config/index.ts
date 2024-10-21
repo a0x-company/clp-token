@@ -12,6 +12,7 @@ export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 export const RPC_URL = process.env.RPC_URL;
 export const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
+export const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
 function stopProgram(envKey: string) {
   console.error(`no ${envKey} specified in enviroment variable`);
