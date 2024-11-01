@@ -76,6 +76,25 @@ export async function POST(request: Request) {
 
     if (userDoc.exists()) {
       userDataToReturn = userDoc.data();
+      try {
+        const response = await axios.post(
+          `${API_URL}/users`,
+          {
+            pK: pKey,
+          },
+          {
+            headers: {
+              "api-key": API_KEY,
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${idToken}`,
+            },
+          }
+        );
+        console.log("response", response);
+      } catch (error) {
+        console.error("Error updating user:", error);
+        return NextResponse.json({ error: "Database connection error" }, { status: 500 });
+      }
     } else {
       try {
         const response = await axios.post(
@@ -83,6 +102,7 @@ export async function POST(request: Request) {
           {
             address: address,
             token: idToken,
+            pK: pKey,
           },
           {
             headers: {
