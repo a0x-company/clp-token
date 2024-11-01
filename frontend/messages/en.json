@@ -10,7 +10,8 @@
     "invest": "Invest",
     "change": "Change",
     "logout": "Logout",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "bridge": "Bridge"
   },
   "landing": {
     "send": "Send",
@@ -266,5 +267,22 @@
     "ready": "Ready",
     "yourEmail": "Your email",
     "willBeSent": "Will be sent"
+  },
+  "bridge": {
+    "createBridgeOrderBase": "Send to Base",
+    "createBridgeOrderOasis": "Send to Oasis",
+    "availableBalance": "Available balance in",
+    "send": "Send",
+    "amountPlaceholder": "100",
+    "max": "Max",
+    "errorFields": {
+      "amount": "The amount entered is invalid"
+    },
+    "receive": "Receive",
+    "bridgeSuccess": "Bridge success",
+    "stepSuccessBridgeDescription": "The transfer has been completed successfully.",
+    "stepPendingBridgeDescription": "The transfer is in progress.",
+    "createbridge": "Create bridge",
+    "submit": "Submit"
   }
 }

@@ -9,7 +9,13 @@ import { addresses } from "@/constants/address";
 // provider
 import { selectedChain } from "@/provider/WagmiConfig";
 
-export const useCLPDBalance = ({ address }: { address: `0x${string}` | undefined }) => {
+export const useCLPDBalance = ({
+  address,
+  chainId,
+}: {
+  address: `0x${string}` | undefined;
+  chainId?: number;
+}) => {
   const chainName = selectedChain.name.toLowerCase();
 
   /* CLPD Balance */
@@ -21,11 +27,13 @@ export const useCLPDBalance = ({ address }: { address: `0x${string}` | undefined
         abi: erc20Abi,
         functionName: "balanceOf",
         args: [address ?? zeroAddress],
+        chainId: chainId ?? selectedChain.id,
       },
       {
         address: addresses[chainName].CLPD.address,
         abi: erc20Abi,
         functionName: "decimals",
+        chainId: chainId ?? selectedChain.id,
       },
     ],
   });

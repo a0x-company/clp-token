@@ -10,7 +10,8 @@
     "invest": "Invertir",
     "change": "Cambiar",
     "logout": "Cerrar sesión",
-    "backToHome": "Volver a la página"
+    "backToHome": "Volver a la página",
+    "bridge": "Puente"
   },
   "landing": {
     "send": "Envías",
@@ -266,5 +267,22 @@
     "yourEmail": "Tu email",
     "yourBalance": "Tu saldo",
     "willBeSent": "Se enviarán"
+  },
+  "bridge": {
+    "createBridgeOrderBase": "Enviar a Base",
+    "createBridgeOrderOasis": "Enviar a Oasis",
+    "availableBalance": "Saldo disponible en",
+    "send": "Enviar",
+    "amountPlaceholder": "100",
+    "max": "Máximo",
+    "errorFields": {
+      "amount": "La cantidad ingresada es inválida"
+    },
+    "receive": "Recibir",
+    "bridgeSuccess": "Éxito en el envío",
+    "stepSuccessBridgeDescription": "La transferencia se ha completado con éxito.",
+    "stepPendingBridgeDescription": "La transferencia está en proceso.",
+    "createbridge": "Crear envío",
+    "submit": "Enviar"
   }
 }

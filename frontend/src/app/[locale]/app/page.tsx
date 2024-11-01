@@ -1,5 +1,6 @@
 // components
 import AppNavbar from "@/components/app/AppNavbar";
+import Bridge from "@/components/app/Bridge";
 import Change from "@/components/app/Change";
 import Deposit from "@/components/app/Deposit";
 import Invest from "@/components/app/Invest";
@@ -17,6 +18,7 @@ export default function App({
       {searchParams.tab === "withdraw" && <Withdraw />}
       {searchParams.tab === "invest" && <Invest />}
       {searchParams.tab === "change" && <Change />}
+      {searchParams.tab === "bridge" && <Bridge />}
     </main>
   );
 }

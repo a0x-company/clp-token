@@ -41,12 +41,13 @@ import { useGoogleConnect } from "@/hooks/useGoogleConnect";
 
 // ui
 import { Sheet, SheetContent, SheetDescription, SheetTrigger } from "../ui/sheet";
-import { LucideMenu, RefreshCcw } from "lucide-react";
+import { LucideMenu, RefreshCcw, SendIcon } from "lucide-react";
 
 import { Button } from "../ui/button";
 import { LoadingSpinner } from "../ui/spinner";
+import BridgeIcon from "../icons/BridgeIcon";
 
-type NavOption = "deposit" | "withdraw" | "invest" | "change";
+type NavOption = "deposit" | "withdraw" | "invest" | "change" | "bridge";
 
 const getTabColor = (option: NavOption, selectedOption: NavOption) => {
   return selectedOption === option ? "white" : "black";
@@ -73,6 +74,20 @@ const tabs: { href: string; label: NavOption; icon: (color: string) => React.Rea
     label: "change",
     icon: (color) => <ChangeIcon color={color} />,
   },
+  {
+    href: "/app?tab=bridge",
+    label: "bridge",
+    icon: (color) => (
+      <div
+        className={cn(
+          "w-5 h-5 rounded-md flex items-center justify-center",
+          color === "white" ? "bg-white" : "bg-black"
+        )}
+      >
+        <SendIcon color={color === "white" ? "black" : "white"} className="w-4 h-4" />
+      </div>
+    ),
+  },
 ];
 
 const AppNavbar = () => {
@@ -95,9 +110,9 @@ const AppNavbar = () => {
 
   const getButtonStyle = (option: NavOption) => {
     const baseStyle =
-      "flex w-[192px] py-3 px-4 justify-center items-center gap-[8px] rounded-[12px] cursor-pointer transition-all duration-300";
-    const selectedStyle = "bg-black text-white";
-    const unselectedStyle = "border-[2px] border-transparent hover:border-black";
+      "flex w-[192px] py-3 px-4 justify-center items-center gap-[8px] rounded-[12px] cursor-pointer transition-all duration-300 border-[2px]";
+    const selectedStyle = "bg-black text-white border-black";
+    const unselectedStyle = "border-transparent hover:border-black";
 
     return `${baseStyle} ${selectedOption === option ? selectedStyle : unselectedStyle}`;
   };
