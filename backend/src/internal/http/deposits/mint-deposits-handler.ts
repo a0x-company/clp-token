@@ -34,7 +34,7 @@ export function mintDepositsHandler(depositService: DepositService) {
       const deposits = validationResult;
 
       if (deposits.length === 1) {
-        const { id, transactionHash } = deposits[0];  // Cambiado de depositId a id
+        const { id, transactionHash } = deposits[0];
         await depositService.markDepositAsMinted(id, transactionHash);
         return res.status(200).json({ message: "Deposit marked as minted successfully" });
       } else {

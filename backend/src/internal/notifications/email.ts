@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
-import { BurnRequestApprovedEmail, BurnRequestRejectedEmail, DepositApprovedEmail, DepositRejectedEmail, NewBurnRequestEmail, NewDepositEmail, TokensMintedEmail } from './email-templates';
+import { BurnRequestApprovedEmail, BurnRequestCompletedEmail, BurnRequestRejectedEmail, DepositApprovedEmail, DepositRejectedEmail, NewBurnRequestEmail, NewDepositEmail, TokensMintedEmail } from './email-templates';
 
 export enum EmailType {
   NEW_DEPOSIT = 'NEW_DEPOSIT',
@@ -10,6 +10,7 @@ export enum EmailType {
   NEW_BURN_REQUEST = 'NEW_BURN_REQUEST',
   BURN_REQUEST_APPROVED = 'BURN_REQUEST_APPROVED',
   BURN_REQUEST_REJECTED = 'BURN_REQUEST_REJECTED',
+  BURN_REQUEST_COMPLETED = 'BURN_REQUEST_COMPLETED',
 }
 
 export class EmailNotificationService {
@@ -70,6 +71,14 @@ export class EmailNotificationService {
       case EmailType.BURN_REQUEST_REJECTED:
         subject = 'Your burn request has been rejected';
         htmlContent = await render(BurnRequestRejectedEmail(data));
+        break;
+      case EmailType.DEPOSIT_REJECTED:
+        subject = 'Your deposit has been rejected';
+        htmlContent = await render(DepositRejectedEmail(data));
+        break;
+      case EmailType.BURN_REQUEST_COMPLETED:
+        subject = 'Your burn request has been completed';
+        htmlContent = await render(BurnRequestCompletedEmail(data));
         break;
       default:
         throw new Error('Invalid email type');

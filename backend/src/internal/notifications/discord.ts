@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { DISCORD_ALERT_WEBHOOK_URL, DISCORD_DEPOSIT_WEBHOOK_URL, DISCORD_WITHDRAWAL_WEBHOOK_URL } from '@internal/config';
 
 export enum NotificationType {
   INFO = 'INFO',
@@ -13,8 +14,12 @@ interface NotificationConfig {
   emoji: string;
 }
 
+export type NotificationChannel = 'alert' | 'deposit' | 'withdrawal';
+
 export class DiscordNotificationService {
-  private webhookUrl: string;
+  private alertWebhookUrl: string;
+  private depositWebhookUrl: string;
+  private withdrawalWebhookUrl: string;
   private notificationConfigs: Record<NotificationType, NotificationConfig> = {
     [NotificationType.INFO]: { color: 3447003, emoji: 'ℹ️' },
     [NotificationType.SUCCESS]: { color: 5763719, emoji: '✅' },
@@ -23,15 +28,18 @@ export class DiscordNotificationService {
     [NotificationType.EMERGENCY]: { color: 15158332, emoji: '🚨' },
   };
 
-  constructor(webhookUrl: string) {
-    this.webhookUrl = webhookUrl;
+  constructor() {
+    this.alertWebhookUrl = DISCORD_ALERT_WEBHOOK_URL || '';
+    this.depositWebhookUrl = DISCORD_DEPOSIT_WEBHOOK_URL || '';
+    this.withdrawalWebhookUrl = DISCORD_WITHDRAWAL_WEBHOOK_URL || '';
   }
 
   public async sendNotification(
     message: string,
     type: NotificationType = NotificationType.INFO,
     title?: string,
-    imageUrl?: string
+    imageUrl?: string,
+    channel: NotificationChannel = 'alert'
   ): Promise<void> {
     const config = this.notificationConfigs[type];
     const payload = {
@@ -42,13 +50,25 @@ export class DiscordNotificationService {
         image: imageUrl ? { url: imageUrl } : undefined
       }]
     };
-  
+
+    let webhookUrl: string;
+    switch (channel) {
+      case 'deposit':
+        webhookUrl = this.depositWebhookUrl;
+        break;
+      case 'withdrawal':
+        webhookUrl = this.withdrawalWebhookUrl;
+        break;
+      default:
+        webhookUrl = this.alertWebhookUrl;
+    }
+
     try {
-      await axios.post(this.webhookUrl, payload);
-      console.log(`Notificación de Discord enviada con éxito: ${type}`);
+      await axios.post(webhookUrl, payload);
+      console.log(`Discord notification sent successfully: ${type} to ${channel} channel`);
     } catch (error) {
-      console.error('Error al enviar notificación de Discord:', error);
-      throw new Error('No se pudo enviar la notificación de Discord');
+      console.error('Error sending Discord notification:', error);
+      throw new Error('Failed to send Discord notification');
     }
   }
 }

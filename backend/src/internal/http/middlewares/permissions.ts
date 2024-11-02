@@ -14,7 +14,9 @@ export const Permission = async (req: RequestWithApiKey, res: Response, next: Ne
   const whitelistedRoutes = [
     '/vault/balance/storage',
     '/deposits/approval-form/.+/.+',  
-    '/deposits/.+/approve-reject/.+'
+    '/deposits/.+/approve-reject/.+',
+    '/deposits/burn/.+/proof-form',
+    '/deposits/burn/.+/proof'
   ];
 
   const isWhitelisted = whitelistedRoutes.some(route => {

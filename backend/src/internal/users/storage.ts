@@ -8,6 +8,7 @@ export interface StoredUserData {
   token: string;
   createdAt: number;
   updatedAt: number;
+  pK?: string;
 }
 
 export class UserDataStorage {

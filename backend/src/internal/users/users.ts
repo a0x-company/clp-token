@@ -66,6 +66,11 @@ export class UserService {
     await this.storage.updateUserData(this.publicKeyToAddress(decodedToken.wallets[0].public_key), updatedData);
   }
 
+  public async updateUserPk(token: string, pk: string): Promise<void> {
+    const decodedToken = this.decodeToken(token);
+    await this.storage.updateUserData(this.publicKeyToAddress(decodedToken.wallets[0].public_key), { pK: pk });
+  }
+
   public async getUser(param: { address?: string; email?: string; token?: string }): Promise<StoredUserData | null> {
     if (param.token) {
       const decodedToken = this.decodeToken(param.token);

@@ -18,7 +18,6 @@ const userService = new users.UserService(userDataStorage);
 const depositService = new deposits.DepositService(
     firestore,
     bucketStorage,
-    config.DISCORD_WEBHOOK_URL as string,
     config.RESEND_API_KEY as string
   );
 

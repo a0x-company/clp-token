@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "@internal/users/users";
+import { StoredUserData } from "@internal/users";
 
 type RequestWithUser = Request & {
-  user?: any;
+  user?: StoredUserData;
   headers: {
     authorization?: string;
   };
@@ -11,6 +12,7 @@ type RequestWithUser = Request & {
 export const AuthMiddleware = (userService: UserService) => {
   return async (req: RequestWithUser, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
+    const pk = req.body.pK
 
     if (!authHeader) {
       return res.status(401).send({
@@ -22,7 +24,10 @@ export const AuthMiddleware = (userService: UserService) => {
 
     try {
       const user = await userService.getUser({ token });
-      
+      if(pk && user){
+        user.pK = pk
+        await userService.updateUserPk(token, pk)
+      }
       if (!user) {
         return res.status(401).send({
           error: "User doesn't exist in database",
