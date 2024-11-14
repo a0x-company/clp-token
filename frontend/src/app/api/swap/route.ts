@@ -205,6 +205,7 @@ export async function POST(request: Request) {
     const amountWithDecimals = parseUnits(amountIn.toString(), addresses.base[tokenIn].decimals);
     const amountApprove = parseUnits("100000000000", addresses.base[tokenIn].decimals);
 
+    /* Allowance TokenIn */
     const allowance = await checkAllowance(
       userAddress,
       addresses.base[tokenIn].address,
@@ -232,6 +233,42 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "❌ Transaction failed" }, { status: 400 });
       }
     }
+    const tokenInAddress =
+      tokenIn === "USDC" ? addresses.base.USDC.address : addresses.base.CLPD.address;
+    const tokenOutAddress =
+      tokenIn === "USDC" ? addresses.base.CLPD.address : addresses.base.USDC.address;
+
+    /* Allowance TokenOut */
+    const contractWithSignerTokenOut: any =
+      tokenIn === "USDC" ? contractCLPD.connect(wallet) : contractUSDC.connect(wallet);
+
+    const allowanceTokenOut = await checkAllowance(
+      userAddress,
+      tokenOutAddress,
+      addresses.base.investment,
+      provider
+    );
+
+    console.log("💰 Allowance TokenOut:", allowanceTokenOut);
+    console.log("💰 Amount with decimals:", amountWithDecimals);
+
+    if (Number(allowanceTokenOut) < amountApprove) {
+      console.log("💰 Approving TokenOut");
+      try {
+        const tx = await approve(
+          addresses.base.investment,
+          amountApprove.toString(),
+          contractWithSignerTokenOut
+        );
+        await tx.wait();
+
+        console.log("✅ Approve confirmed");
+        console.log("🧾 Transaction hash:", tx.hash);
+      } catch (error) {
+        console.error("❌ Transaction failed:", error);
+        return NextResponse.json({ error: "❌ Transaction failed" }, { status: 400 });
+      }
+    }
 
     /* Contract swap */
     const contractSwap = new ethers.Contract(addresses.base.investment, investmentAbi, wallet);
@@ -244,10 +281,6 @@ export async function POST(request: Request) {
 
     try {
       console.log(`Iniciando swap con ${tokenIn}:`, amountIn);
-      const tokenInAddress =
-        tokenIn === "USDC" ? addresses.base.USDC.address : addresses.base.CLPD.address;
-      const tokenOutAddress =
-        tokenIn === "USDC" ? addresses.base.CLPD.address : addresses.base.USDC.address;
       const tx = await handleTransaction(
         async () => {
           return await contractSwapWithSigner.swapTokens(
