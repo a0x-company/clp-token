@@ -53,7 +53,7 @@ async function getGasPriceBaseViem(): Promise<BigInt> {
   return BigInt(gasPrice);
 }
 
-let MINIMUM_ETH_BALANCE = 0.000006 * 5;
+let MINIMUM_ETH_BALANCE = 0.0003;
 
 async function checkAndRechargeEthBalance(userAddress: string, provider: ethers.JsonRpcProvider) {
   const balanceETH = await provider.getBalance(userAddress);
