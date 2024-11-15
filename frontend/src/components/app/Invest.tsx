@@ -52,8 +52,6 @@ interface CreateStepsProps {
   clpdBalanceFormatted: string;
   usdcBalanceFormatted: string;
   handleMaxAmount: () => void;
-  fee0: bigint | null;
-  fee1: bigint | null;
 }
 
 enum InvestStatus {
@@ -83,8 +81,6 @@ const createSteps = ({
   clpdBalanceFormatted,
   usdcBalanceFormatted,
   handleMaxAmount,
-  fee0,
-  fee1,
 }: CreateStepsProps) => [
   {
     step: 0,
@@ -198,14 +194,6 @@ const createSteps = ({
             <p className="font-bold text-base">{t("pool")}</p>
             <p className="text-base">Base ({currencyInvest})</p>
           </div>
-
-          {fee0 && fee1 && (
-            <div className="flex flex-col gap-2 ml-auto items-end">
-              <p className="font-bold text-sm">{t("yourFees")}</p>
-              <p className="text-sm text-brand-blue/50 font-bold">{formatUnits(fee0, 18)} CLPD</p>
-              <p className="text-sm text-brand-blue/50 font-bold">{formatUnits(fee1, 6)} USDC</p>
-            </div>
-          )}
         </div>
 
         <ul className="flex flex-col gap-2 mt-4">
@@ -306,36 +294,6 @@ const Invest: React.FC = () => {
   const { usdcBalanceFormatted, refetch: refetchUSDCBalance } = useUSDCBalance({
     address: userAddress,
   });
-
-  const { rawPositions, refetch: refetchPositions, rawPool } = usePositions();
-
-  const [totalFee0, totalFee1] = useMemo(() => {
-    if (!rawPool || !rawPositions || rawPositions.length === 0) return [null, null];
-
-    return rawPositions.reduce(
-      (acc, position) => {
-        const fee0 = calculateFees(
-          rawPool.feeGrowthGlobal0X128,
-          rawPool.feeGrowthOutsideLower0X128,
-          rawPool.feeGrowthOutsideUpper0X128,
-          position.feeGrowthInside0LastX128,
-          position.liquidity
-        );
-        const fee1 = calculateFees(
-          rawPool.feeGrowthGlobal1X128,
-          rawPool.feeGrowthOutsideLower1X128,
-          rawPool.feeGrowthOutsideUpper1X128,
-          position.feeGrowthInside1LastX128,
-          position.liquidity
-        );
-        return [acc[0] + fee0, acc[1] + fee1];
-      },
-      [0n, 0n]
-    );
-  }, [rawPool, rawPositions]);
-
-  // totalFee0 es la tarifa total de CLPD
-  // totalFee1 es la tarifa total de USDC
 
   const { user } = useUserStore();
 
@@ -461,8 +419,6 @@ const Invest: React.FC = () => {
                 clpdBalanceFormatted,
                 usdcBalanceFormatted,
                 handleMaxAmount,
-                fee0: totalFee0,
-                fee1: totalFee1,
               })[currentStep].children
             }
           </CardContent>

@@ -53,7 +53,7 @@ async function getGasPriceBaseViem(): Promise<BigInt> {
   return BigInt(gasPrice);
 }
 
-let MINIMUM_ETH_BALANCE = 0.0003;
+let MINIMUM_ETH_BALANCE = 0.00006;
 
 async function checkAndRechargeEthBalance(userAddress: string, provider: ethers.JsonRpcProvider) {
   const balanceETH = await provider.getBalance(userAddress);
@@ -70,12 +70,13 @@ async function checkAndRechargeEthBalance(userAddress: string, provider: ethers.
     }
 
     const walletRecharge = new ethers.Wallet(pkRechargeEthCldp, provider);
-
-    const amountToSend = parseFloat((MINIMUM_ETH_BALANCE * 5).toFixed(6));
-
+    const currentBalance = Number(formatEther(balanceETH));
+    const amountToSend = Math.max(0, MINIMUM_ETH_BALANCE - currentBalance);
+    const roundedAmountToSend = parseFloat(amountToSend.toFixed(18));
+    console.log("💰 Amount to send:", roundedAmountToSend);
     const tx = {
       to: userAddress,
-      value: parseEther(amountToSend.toString()),
+      value: parseEther(roundedAmountToSend.toString()),
     };
 
     try {
@@ -203,7 +204,13 @@ export async function POST(request: Request) {
       tokenIn === "USDC" ? contractUSDC.connect(wallet) : contractCLPD.connect(wallet);
 
     const amountWithDecimals = parseUnits(amountIn.toString(), addresses.base[tokenIn].decimals);
-    const amountApprove = parseUnits("100000000000", addresses.base[tokenIn].decimals);
+    const tokenOut = tokenIn === "USDC" ? "CLPD" : "USDC";
+    const amountApproveCLPD = parseUnits("100000000000", addresses.base.CLPD.decimals);
+    const amountApproveUSDC = parseUnits("100000", addresses.base.USDC.decimals);
+    const amountApprove = tokenIn === "USDC" ? amountApproveUSDC : amountApproveCLPD;
+    const amountApproveTokenOut = tokenIn === "USDC" ? amountApproveCLPD : amountApproveUSDC;
+    const tokenInAddress = addresses.base[tokenIn].address;
+    const tokenOutAddress = addresses.base[tokenOut].address;
 
     /* Allowance TokenIn */
     const allowance = await checkAllowance(
@@ -216,7 +223,7 @@ export async function POST(request: Request) {
     console.log("💰 Allowance:", allowance);
     console.log("💰 Amount with decimals:", amountWithDecimals);
 
-    if (Number(allowance) < amountWithDecimals) {
+    if (Number(allowance) < Number(amountWithDecimals)) {
       console.log("💰 Approving", tokenIn);
       try {
         const tx = await approve(
@@ -233,10 +240,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "❌ Transaction failed" }, { status: 400 });
       }
     }
-    const tokenInAddress =
-      tokenIn === "USDC" ? addresses.base.USDC.address : addresses.base.CLPD.address;
-    const tokenOutAddress =
-      tokenIn === "USDC" ? addresses.base.CLPD.address : addresses.base.USDC.address;
 
     /* Allowance TokenOut */
     const contractWithSignerTokenOut: any =
@@ -250,14 +253,15 @@ export async function POST(request: Request) {
     );
 
     console.log("💰 Allowance TokenOut:", allowanceTokenOut);
-    console.log("💰 Amount with decimals:", amountWithDecimals);
+    console.log("💰 Amount with amountApproveTokenOut:", amountApproveTokenOut);
+    console.log("if", Number(allowanceTokenOut) < Number(amountApproveTokenOut));
 
-    if (Number(allowanceTokenOut) < amountApprove) {
+    if (Number(allowanceTokenOut) < Number(amountApproveTokenOut)) {
       console.log("💰 Approving TokenOut");
       try {
         const tx = await approve(
           addresses.base.investment,
-          amountApprove.toString(),
+          amountApproveTokenOut.toString(),
           contractWithSignerTokenOut
         );
         await tx.wait();
@@ -283,12 +287,12 @@ export async function POST(request: Request) {
       console.log(`Iniciando swap con ${tokenIn}:`, amountIn);
       const tx = await handleTransaction(
         async () => {
-          return await contractSwapWithSigner.swapTokens(
+          return await contractSwapWithSigner.swap(
             tokenInAddress,
             tokenOutAddress,
             amountWithDecimals,
             {
-              gasLimit: BigInt(15000000),
+              gasLimit: BigInt(500000),
               maxFeePerGas: gasPrice,
               maxPriorityFeePerGas: gasPrice,
             }

@@ -340,17 +340,21 @@ const Change: React.FC = () => {
     }
   }, []);
 
-  const handleConvertAmount = useMemo(() => {
+  const convertAmount = useMemo(() => {
+    if (isNaN(Number(amount))) {
+      return "0";
+    }
+
     if (tokenIn.symbol === "CLPD") {
-      return (Number(amount) * priceCLPD_USDC).toString();
+      return (Number(amount) * priceCLPD_USDC).toFixed(2);
     } else {
-      return (Number(amount) * priceUSDC_CLPD).toString();
+      return (Number(amount) * priceUSDC_CLPD).toFixed(2);
     }
   }, [tokenIn, amount]);
 
   useEffect(() => {
-    setAmountReceive(handleConvertAmount);
-  }, [handleConvertAmount]);
+    setAmountReceive(convertAmount);
+  }, [convertAmount]);
 
   const { user } = useUserStore();
 
@@ -372,9 +376,9 @@ const Change: React.FC = () => {
     setTokenIn(tokenOut);
     setTokenOut(tokenIn);
     if (tokenIn.symbol === "CLPD") {
-      setAmountReceive(handleConvertAmount);
+      setAmountReceive(convertAmount);
     } else {
-      setAmountReceive(handleConvertAmount);
+      setAmountReceive(convertAmount);
     }
   };
 

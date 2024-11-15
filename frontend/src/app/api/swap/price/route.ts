@@ -3,28 +3,28 @@ import { NextResponse } from "next/server";
 
 // constants
 import { addresses } from "@/constants/address";
-import poolContractABI from "@/constants/poolContract-abi.json";
+import investmentAbi from "@/constants/investCLPD-abi.json";
 
 // ethers
 import { ethers } from "ethers";
+import { formatUnits } from "viem";
 
 const providerUrl = process.env.QUICKNODE_URL;
 
 const getPrice = async () => {
   const provider = new ethers.JsonRpcProvider(providerUrl);
-  const poolContract = new ethers.Contract(
-    addresses.base.poolUsdcClpdAddress,
-    poolContractABI,
+  const investmentContract = new ethers.Contract(
+    addresses.base.investment,
+    investmentAbi,
     provider
   );
 
   try {
-    const slot0 = await poolContract.slot0();
-    const sqrtPriceX96 = slot0.sqrtPriceX96;
+    const priceCLPDUSDCWithDecimals = await investmentContract.getPriceOfCLPDInUSDC();
+    const priceUSDCCLPDWithDecimals = await investmentContract.getPriceOfUSDCInCLPD();
 
-    const priceCLPDUSDC = (Number(sqrtPriceX96) / 2 ** 96) ** 2 * 10 ** (18 - 6);
-
-    const priceUSDCCLPD = 1 / priceCLPDUSDC;
+    const priceCLPDUSDC = Number(formatUnits(priceCLPDUSDCWithDecimals, 6));
+    const priceUSDCCLPD = Number(formatUnits(priceUSDCCLPDWithDecimals, 18));
 
     console.log("Precio CLPD/USDC:", priceCLPDUSDC.toFixed(3));
     console.log("Precio USDC/CLPD:", priceUSDCCLPD.toFixed(3));

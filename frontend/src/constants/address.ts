@@ -17,8 +17,8 @@ export const addresses: {
 } = {
   base: {
     swap: "0x0000000000000000000000000000000000000000",
-    investment: "0xCf26F8bcC82a9100279aDd043eA632A631CC10c8",
-    poolUsdcClpdAddress: "0x778b848d35cdd7d20845237832a8dc47d6c28b65",
+    investment: "0x34d2C23dC8C51D26D26BCc37608Cf5638Ac7ca2c",
+    poolUsdcClpdAddress: "0x82dbc912599EfDa0F1FDC6e2A13c3843EC48662d",
     positionManageAddress: "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1",
     factoryAddress: "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
     CLPD: {

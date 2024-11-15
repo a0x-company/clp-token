@@ -1,37 +1,14 @@
 [
   { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
   {
-    "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
-    "name": "OwnableInvalidOwner",
-    "type": "error"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
-    "name": "OwnableUnauthorizedAccount",
-    "type": "error"
-  },
-  {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount1", "type": "uint256" }
-    ],
-    "name": "FeesCollected",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "investor", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "amountUSDC", "type": "uint256" },
       { "indexed": false, "internalType": "uint256", "name": "amountCLPD", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "indexed": false, "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-      { "indexed": false, "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount1", "type": "uint256" }
+      { "indexed": false, "internalType": "uint256", "name": "liquidity", "type": "uint256" }
     ],
-    "name": "InvestmentWithCLPD",
+    "name": "InvestmentMade",
     "type": "event"
   },
   {
@@ -39,68 +16,19 @@
     "inputs": [
       { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
       { "indexed": false, "internalType": "uint256", "name": "amountUSDC", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "indexed": false, "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-      { "indexed": false, "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount1", "type": "uint256" }
+      { "indexed": false, "internalType": "uint256", "name": "amountCLPD", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "liquidity", "type": "uint256" }
     ],
-    "name": "InvestmentWithUSDC",
+    "name": "LiquidityAdded",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "indexed": false, "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-      { "indexed": false, "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount1", "type": "uint256" }
+      { "indexed": false, "internalType": "address", "name": "token", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "price", "type": "uint256" }
     ],
-    "name": "LiquidityAddedWithCLPD",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "indexed": false, "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-      { "indexed": false, "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount1", "type": "uint256" }
-    ],
-    "name": "LiquidityAddedWithUSDC",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "percentage", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount1", "type": "uint256" }
-    ],
-    "name": "LiquidityDecreased",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount0Added", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount1Added", "type": "uint256" }
-    ],
-    "name": "LiquidityIncreased",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
-      { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
-    ],
-    "name": "OwnershipTransferred",
+    "name": "PriceFetched",
     "type": "event"
   },
   {
@@ -112,170 +40,100 @@
       { "indexed": false, "internalType": "uint256", "name": "amountIn", "type": "uint256" },
       { "indexed": false, "internalType": "uint256", "name": "amountOut", "type": "uint256" }
     ],
-    "name": "TokensSwapped",
+    "name": "Swapped",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "returnedUSDC", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "returnedCLPD", "type": "uint256" }
+    ],
+    "name": "TokensReturned",
     "type": "event"
   },
   {
     "inputs": [],
     "name": "CLPD",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "SWAP_ROUTER_ADDRESS",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "USDC",
+    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "aeroRouter",
+    "outputs": [{ "internalType": "contract IRouter", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "factory",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "clpd",
-    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
+    "name": "getPriceOfCLPDInUSDC",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }],
-    "name": "collectAllFees",
-    "outputs": [
-      { "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "internalType": "uint256", "name": "amount1", "type": "uint256" }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "uint256", "name": "percentage", "type": "uint256" }
-    ],
-    "name": "decreaseLiquidityPercentage",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "uint256", "name": "amount0ToAdd", "type": "uint256" },
-      { "internalType": "uint256", "name": "amount1ToAdd", "type": "uint256" }
-    ],
-    "name": "increaseLiquidityCurrentRange",
-    "outputs": [
-      { "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-      { "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "internalType": "uint256", "name": "amount1", "type": "uint256" }
-    ],
-    "stateMutability": "nonpayable",
+    "inputs": [],
+    "name": "getPriceOfUSDCInCLPD",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [{ "internalType": "uint256", "name": "amountCLPD", "type": "uint256" }],
     "name": "investCLPDwithoutUSDC",
-    "outputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-      { "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "internalType": "uint256", "name": "amount1", "type": "uint256" }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [{ "internalType": "uint256", "name": "amountUSDC", "type": "uint256" }],
     "name": "investUSDCwithoutCLPD",
-    "outputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-      { "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "internalType": "uint256", "name": "amount1", "type": "uint256" }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "amount0ToAdd", "type": "uint256" }],
+    "inputs": [{ "internalType": "uint256", "name": "amountCLPD", "type": "uint256" }],
     "name": "investWithCLPD",
     "outputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-      { "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "internalType": "uint256", "name": "amount1", "type": "uint256" }
+      { "internalType": "uint256", "name": "amountUSDC", "type": "uint256" },
+      { "internalType": "uint256", "name": "liquidity", "type": "uint256" }
     ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "amount1ToAdd", "type": "uint256" }],
+    "inputs": [{ "internalType": "uint256", "name": "amountUSDC", "type": "uint256" }],
     "name": "investWithUSDC",
     "outputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-      { "internalType": "uint256", "name": "amount0", "type": "uint256" },
-      { "internalType": "uint256", "name": "amount1", "type": "uint256" }
+      { "internalType": "uint256", "name": "amountCLPD", "type": "uint256" },
+      { "internalType": "uint256", "name": "liquidity", "type": "uint256" }
     ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "nonfungiblePositionManager",
-    "outputs": [
-      { "internalType": "contract INonfungiblePositionManager", "name": "", "type": "address" }
-    ],
+    "name": "pool",
+    "outputs": [{ "internalType": "contract IAerodromePool", "name": "", "type": "address" }],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "operator", "type": "address" },
-      { "internalType": "address", "name": "from", "type": "address" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "bytes", "name": "", "type": "bytes" }
-    ],
-    "name": "onERC721Received",
-    "outputs": [{ "internalType": "bytes4", "name": "", "type": "bytes4" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "renounceOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "_tokenPriceAddress", "type": "address" }],
-    "name": "setOracleTokenPrice",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "_CLPD", "type": "address" },
-      { "internalType": "address", "name": "_USDC", "type": "address" }
-    ],
-    "name": "setTokenAddresses",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -284,30 +142,9 @@
       { "internalType": "address", "name": "tokenOut", "type": "address" },
       { "internalType": "uint256", "name": "amountIn", "type": "uint256" }
     ],
-    "name": "swapTokens",
+    "name": "swap",
     "outputs": [{ "internalType": "uint256", "name": "amountOut", "type": "uint256" }],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "tokenPrice",
-    "outputs": [{ "internalType": "contract oracleTokenPriceCLPD", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
-    "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "usdc",
-    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
-    "stateMutability": "view",
     "type": "function"
   }
 ]

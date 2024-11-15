@@ -53,7 +53,7 @@ async function getGasPriceBaseViem(): Promise<BigInt> {
   return BigInt(gasPrice);
 }
 
-let MINIMUM_ETH_BALANCE = 0.000006 * 5;
+let MINIMUM_ETH_BALANCE = 0.00006;
 
 async function checkAndRechargeEthBalance(userAddress: string, provider: ethers.JsonRpcProvider) {
   const balanceETH = await provider.getBalance(userAddress);
@@ -70,12 +70,13 @@ async function checkAndRechargeEthBalance(userAddress: string, provider: ethers.
     }
 
     const walletRecharge = new ethers.Wallet(pkRechargeEthCldp, provider);
-
-    const amountToSend = parseFloat((MINIMUM_ETH_BALANCE * 5).toFixed(6));
-
+    const currentBalance = Number(formatEther(balanceETH));
+    const amountToSend = Math.max(0, MINIMUM_ETH_BALANCE - currentBalance);
+    const roundedAmountToSend = parseFloat(amountToSend.toFixed(18));
+    console.log("💰 Amount to send:", roundedAmountToSend);
     const tx = {
       to: userAddress,
-      value: parseEther(amountToSend.toString()),
+      value: parseEther(roundedAmountToSend.toString()),
     };
 
     try {
@@ -281,7 +282,7 @@ export async function POST(request: Request) {
       const tx = await handleTransaction(
         async () => {
           return await contractInvestmentWithSigner.investCLPDwithoutUSDC(amountWithDecimals, {
-            gasLimit: BigInt(15000000),
+            gasLimit: BigInt(800000),
             maxFeePerGas: gasPrice,
             maxPriorityFeePerGas: gasPrice,
           });
