@@ -29,14 +29,16 @@ export const fetchCache = "force-no-store";
 export const dynamic = "auto";
 
 const fetchBankBalance = async () => {
-  try {
-    const response = await axios.get(
-      "https://development-clpd-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/storage"
-    );
-    return response.data.balance;
-  } catch (error) {
-    console.error("Error al obtener el balance del banco:", error);
-  }
+  // try {
+  //   // const response = await axios.get(
+  //   //   "https://development-clpd-vault-api-claucondor-61523929174.us-central1.run.app/vault/balance/storage"
+  //   // );
+  //   return response.data.balance;
+  // } catch (error) {
+  //   console.error("Error al obtener el balance del banco:", error);
+  // }
+  const response = { data: { balance: 4698102 } };
+  return response.data.balance;
 };
 
 const fetchTokenSupply = async () => {
